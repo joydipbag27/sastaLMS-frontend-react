@@ -51,15 +51,23 @@ const App = () => {
   const [rbacChangeRoleTo, setRbacChangeRoleTo] = useState("User");
   const [sessionCheckResult, setSessionCheckResult] = useState(null);
 
-  // Form states - File Upload
-  const [uploadFileName, setUploadFileName] = useState("test_file.txt");
-  const [uploadContentType, setUploadContentType] = useState("text/plain");
+  // Form states - File Upload & Manager
+  const [uploadFileName, setUploadFileName] = useState("");
+  const [uploadContentType, setUploadContentType] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
-  const [generatedUploadUrl, setGeneratedUploadUrl] = useState("");
-  const [generatedKey, setGeneratedKey] = useState("");
-  const [downloadKey, setDownloadKey] = useState("");
-  const [generatedDownloadUrl, setGeneratedDownloadUrl] = useState("");
   const [uploadProgress, setUploadProgress] = useState("");
+  const [uploadedFiles, setUploadedFiles] = useState(() => {
+    try {
+      const saved = localStorage.getItem("veo_uploaded_files");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewingFileKey, setPreviewingFileKey] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
 
   // Register log callback on mount
   useEffect(() => {
@@ -304,89 +312,184 @@ const App = () => {
     }
   };
 
-  // S3 Upload handlers
-  const handleGetUploadUrl = async (e) => {
-    e.preventDefault();
-    setGeneratedUploadUrl("");
-    setGeneratedKey("");
-    const res = await makeRequest("/file/upload-url", {
-      method: "POST",
-      body: { fileName: uploadFileName, contentType: uploadContentType },
-    });
-    if (res.success) {
-      setGeneratedUploadUrl(res.data.uploadUrl);
-      setGeneratedKey(res.data.key);
-      setDownloadKey(res.data.key);
-    }
-  };
-
+  // S3 Upload & Manager handlers
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
       setUploadFileName(file.name);
       setUploadContentType(file.type || "application/octet-stream");
+      setUploadProgress("");
     }
   };
 
-  const handleSimulatePutUpload = async () => {
-    if (!generatedUploadUrl) {
-      alert("Please request an Upload URL first.");
+  const startFileUpload = async () => {
+    if (!selectedFile) {
+      alert("Please select a file first.");
       return;
     }
-    setUploadProgress("Uploading...");
-    
-    // Determine content to send
-    let bodyData = "This is a test file content uploaded from veoLMS Backend Playground";
-    if (selectedFile) {
-      bodyData = selectedFile;
+
+    const fileName = uploadFileName.trim();
+    if (!fileName) {
+      alert("File name/key cannot be empty.");
+      return;
     }
 
-    try {
-      const startTime = Date.now();
-      const response = await fetch(generatedUploadUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": uploadContentType,
-        },
-        body: bodyData,
-      });
+    setIsUploading(true);
+    setUploadPercent(0);
+    setUploadProgress("Signing upload request...");
 
+    // 1. Request presigned upload URL
+    const res = await makeRequest("/file/upload-url", {
+      method: "POST",
+      body: { fileName, contentType: uploadContentType },
+    });
+
+    if (!res.success) {
+      setUploadProgress(`Signing failed: ${res.data?.error || "Unknown error"}`);
+      setIsUploading(false);
+      return;
+    }
+
+    const { uploadUrl, key } = res.data;
+    setUploadProgress("Uploading file directly to S3...");
+
+    // 2. Upload with progress via XHR
+    const startTime = Date.now();
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        setUploadPercent(percent);
+      }
+    });
+
+    xhr.addEventListener("load", () => {
       const duration = Date.now() - startTime;
-      const responseText = await response.text();
+      const isSuccess = xhr.status >= 200 && xhr.status < 300;
+      const responseText = xhr.statusText || "";
+
+      // Log PUT request to local logger console
       const log = {
         timestamp: new Date().toLocaleTimeString(),
         method: "PUT (Presigned)",
-        url: generatedUploadUrl.substring(0, 120) + "...",
-        body: selectedFile ? `[Binary File: ${selectedFile.name}]` : bodyData,
-        status: response.status,
-        response: responseText || "[Empty Response]",
+        url: uploadUrl.substring(0, 80) + "...",
+        body: `[Binary File: ${selectedFile.name}]`,
+        status: xhr.status,
+        response: responseText || `[Direct S3 code: ${xhr.status}]`,
         duration: `${duration}ms`,
-        success: response.ok,
+        success: isSuccess,
       };
-
       setLogs((prev) => [...prev, log]);
 
-      if (response.ok) {
-        setUploadProgress("Upload successful!");
-        alert("File uploaded successfully to S3 storage!");
+      if (isSuccess) {
+        setUploadProgress("Upload completed successfully!");
+
+        // Add file entry to local table list
+        const newEntry = {
+          key,
+          name: selectedFile.name,
+          size: selectedFile.size,
+          type: uploadContentType,
+          date: new Date().toLocaleString(),
+        };
+
+        const updatedList = [newEntry, ...uploadedFiles];
+        setUploadedFiles(updatedList);
+        localStorage.setItem("veo_uploaded_files", JSON.stringify(updatedList));
+
+        setSelectedFile(null);
+        setUploadFileName("");
+        setUploadContentType("");
+        setUploadPercent(0);
+        setIsUploading(false);
       } else {
-        setUploadProgress(`Upload failed: status ${response.status}`);
-        alert(`Upload failed: status ${response.status}`);
+        setUploadProgress(`Upload failed: status ${xhr.status}`);
+        setIsUploading(false);
       }
-    } catch (err) {
-      setUploadProgress(`Upload error: ${err.message}`);
-      alert(`Upload error: ${err.message}`);
+    });
+
+    xhr.addEventListener("error", () => {
+      const duration = Date.now() - startTime;
+      const log = {
+        timestamp: new Date().toLocaleTimeString(),
+        method: "PUT (Presigned)",
+        url: uploadUrl.substring(0, 80) + "...",
+        body: `[Binary File: ${selectedFile.name}]`,
+        status: 0,
+        response: "XHR connection error",
+        duration: `${duration}ms`,
+        success: false,
+      };
+      setLogs((prev) => [...prev, log]);
+
+      setUploadProgress("Network error during upload.");
+      setIsUploading(false);
+    });
+
+    xhr.open("PUT", uploadUrl);
+    xhr.setRequestHeader("Content-Type", uploadContentType);
+    xhr.send(selectedFile);
+  };
+
+  const downloadFile = async (key) => {
+    const res = await makeRequest(`/file/download-url/${encodeURIComponent(key)}`);
+    if (res.success) {
+      const downloadUrl = res.data.downloadUrl;
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute("download", key);
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      alert(`Download URL generation failed: ${res.data?.error || "Unknown error"}`);
     }
   };
 
-  const handleGetDownloadUrl = async (e) => {
-    e.preventDefault();
-    setGeneratedDownloadUrl("");
-    const res = await makeRequest(`/file/download-url/${encodeURIComponent(downloadKey)}`);
-    if (res.success) {
-      setGeneratedDownloadUrl(res.data.downloadUrl);
+  const previewFile = async (key) => {
+    if (previewingFileKey === key) {
+      setPreviewingFileKey(null);
+      setPreviewUrl("");
+      return;
     }
+    const res = await makeRequest(`/file/download-url/${encodeURIComponent(key)}`);
+    if (res.success) {
+      setPreviewingFileKey(key);
+      setPreviewUrl(res.data.downloadUrl);
+    } else {
+      alert(`Preview URL generation failed: ${res.data?.error || "Unknown error"}`);
+    }
+  };
+
+  const removeLocalFile = (key) => {
+    const updated = uploadedFiles.filter((f) => f.key !== key);
+    setUploadedFiles(updated);
+    localStorage.setItem("veo_uploaded_files", JSON.stringify(updated));
+    if (previewingFileKey === key) {
+      setPreviewingFileKey(null);
+      setPreviewUrl("");
+    }
+  };
+
+  const clearLocalLibrary = () => {
+    if (confirm("Are you sure you want to clear your local file history? (This does not delete files from S3)")) {
+      setUploadedFiles([]);
+      localStorage.removeItem("veo_uploaded_files");
+      setPreviewingFileKey(null);
+      setPreviewUrl("");
+    }
+  };
+
+  const formatBytes = (bytes, decimals = 2) => {
+    if (!+bytes) return "0 Bytes";
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
   };
 
   return (
@@ -943,102 +1046,206 @@ const App = () => {
             {/* FILE STORAGE TAB */}
             {activeTab === "file" && (
               <div className="space-y-6">
-                {/* Request Upload URL */}
+                {/* Upload File Panel */}
                 <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                  <h3 className="text-base font-bold text-sky-400 mb-3">1. Get Presigned Upload URL (/file/upload-url)</h3>
-                  <form onSubmit={handleGetUploadUrl} className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-400 w-32">Select Local File:</span>
+                  <h3 className="text-base font-bold text-sky-400 mb-3">Upload File directly to S3 (/file/upload-url)</h3>
+                  
+                  <div className="space-y-4">
+                    {/* Drag/Drop Zone simulation */}
+                    <div className="border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-lg p-6 text-center cursor-pointer transition-colors relative bg-slate-900/50">
                       <input
                         type="file"
                         onChange={handleFileChange}
-                        className="text-xs text-slate-400 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       />
+                      <div className="text-xs space-y-1">
+                        <p className="text-slate-300 font-bold">Drag and drop file here, or click to select</p>
+                        <p className="text-slate-500">Selected file is signed and uploaded directly to secure storage</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-400 w-32">File Name (Key):</span>
-                      <input
-                        type="text"
-                        required
-                        placeholder="test_file.txt"
-                        value={uploadFileName}
-                        onChange={(e) => setUploadFileName(e.target.value)}
-                        className="bg-slate-900 border border-slate-700 rounded px-2 py-1 flex-1 text-slate-100"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-400 w-32">Content Type:</span>
-                      <input
-                        type="text"
-                        required
-                        placeholder="text/plain"
-                        value={uploadContentType}
-                        onChange={(e) => setUploadContentType(e.target.value)}
-                        className="bg-slate-900 border border-slate-700 rounded px-2 py-1 flex-1 text-slate-100"
-                      />
-                    </div>
-                    <button type="submit" className="bg-sky-600 hover:bg-sky-500 text-white rounded px-3 py-1 font-bold">
-                      Get Presigned PUT URL
-                    </button>
-                  </form>
+
+                    {/* Selected File Details */}
+                    {selectedFile && (
+                      <div className="bg-slate-900 p-3 rounded border border-slate-800 space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-slate-500">Local Name:</span>{" "}
+                            <span className="text-slate-200 font-bold">{selectedFile.name}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500">Size:</span>{" "}
+                            <span className="text-slate-200">{formatBytes(selectedFile.size)}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500">Content Type:</span>{" "}
+                            <span className="text-slate-200">{uploadContentType}</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-slate-400 text-xs">S3 Key (Destination Name):</span>
+                            <input
+                              type="text"
+                              value={uploadFileName}
+                              onChange={(e) => setUploadFileName(e.target.value)}
+                              className="bg-slate-950 border border-slate-700 rounded px-2 py-0.5 text-xs text-sky-300 flex-1 focus:outline-none focus:border-sky-500"
+                            />
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-slate-400 text-xs">Content Type Header:</span>
+                            <input
+                              type="text"
+                              value={uploadContentType}
+                              onChange={(e) => setUploadContentType(e.target.value)}
+                              className="bg-slate-950 border border-slate-700 rounded px-2 py-0.5 text-xs text-slate-300 flex-1 focus:outline-none focus:border-sky-500"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Progress display */}
+                        {isUploading && (
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-[10px] text-sky-400">
+                              <span>Uploading to S3 Bucket...</span>
+                              <span className="font-bold">{uploadPercent}%</span>
+                            </div>
+                            <div className="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+                              <div
+                                className="bg-sky-500 h-1.5 transition-all duration-150"
+                                style={{ width: `${uploadPercent}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={startFileUpload}
+                            disabled={isUploading}
+                            className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 text-white rounded px-4 py-1.5 font-bold text-xs"
+                          >
+                            {isUploading ? "Uploading..." : "Start Direct Upload"}
+                          </button>
+                          <button
+                            onClick={() => setSelectedFile(null)}
+                            disabled={isUploading}
+                            className="bg-slate-800 hover:bg-slate-700 disabled:bg-slate-900 text-slate-400 px-3 py-1.5 rounded text-xs"
+                          >
+                            Cancel
+                          </button>
+                          {uploadProgress && (
+                            <span className="text-xs text-sky-300 font-bold truncate max-w-xs">{uploadProgress}</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* Upload Simulator */}
-                {generatedUploadUrl && (
-                  <div className="bg-slate-950 p-4 rounded border border-slate-800 space-y-3">
-                    <h3 className="text-base font-bold text-sky-400">2. Upload File (PUT direct to Storage)</h3>
-                    <div>
-                      <span className="text-slate-400 block text-xs mb-1">Generated Presigned Upload URL:</span>
-                      <textarea
-                        readOnly
-                        value={generatedUploadUrl}
-                        rows={2}
-                        className="bg-slate-900 text-slate-400 font-mono text-[10px] w-full p-1.5 border border-slate-850 rounded focus:outline-none"
-                      />
-                    </div>
-                    <div className="flex items-center gap-4">
+                {/* Uploaded Files Library */}
+                <div className="bg-slate-950 p-4 rounded border border-slate-800 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-base font-bold text-sky-400">File Manager Library (localStorage)</h3>
+                    {uploadedFiles.length > 0 && (
                       <button
-                        onClick={handleSimulatePutUpload}
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white rounded px-4 py-1.5 font-bold"
+                        onClick={clearLocalLibrary}
+                        className="text-xs text-rose-400 hover:underline"
                       >
-                        Execute PUT Request
+                        Clear History
                       </button>
-                      <span className="text-xs text-sky-300 font-bold">{uploadProgress}</span>
-                    </div>
+                    )}
                   </div>
-                )}
 
-                {/* Download URL Form */}
-                <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                  <h3 className="text-base font-bold text-sky-400 mb-3">3. Get Download URL (/file/download-url/:key)</h3>
-                  <form onSubmit={handleGetDownloadUrl} className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-400 w-32">File Key (Filename):</span>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Name of key to download"
-                        value={downloadKey}
-                        onChange={(e) => setDownloadKey(e.target.value)}
-                        className="bg-slate-900 border border-slate-700 rounded px-2 py-1 flex-1 text-slate-100"
-                      />
-                    </div>
-                    <button type="submit" className="bg-sky-600 hover:bg-sky-500 text-white rounded px-3 py-1 font-bold">
-                      Get Presigned GET URL
-                    </button>
-                  </form>
+                  {uploadedFiles.length === 0 ? (
+                    <p className="text-xs text-slate-500 italic text-center py-4 bg-slate-900/30 rounded border border-slate-850">
+                      No uploaded files recorded. Upload a file above to add it to the library.
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="overflow-x-auto border border-slate-850 rounded">
+                        <table className="w-full text-left border-collapse text-xs">
+                          <thead>
+                            <tr className="bg-slate-900 border-b border-slate-850 text-slate-400">
+                              <th className="p-2 border-r border-slate-850">File Key / Name</th>
+                              <th className="p-2 border-r border-slate-850">Size</th>
+                              <th className="p-2 border-r border-slate-850">MIME Type</th>
+                              <th className="p-2 border-r border-slate-850">Upload Date</th>
+                              <th className="p-2">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {uploadedFiles.map((file) => (
+                              <React.Fragment key={file.key}>
+                                <tr className="border-b border-slate-850 hover:bg-slate-900/30">
+                                  <td className="p-2 border-r border-slate-850 text-slate-200 font-bold break-all">
+                                    {file.key}
+                                  </td>
+                                  <td className="p-2 border-r border-slate-850 text-slate-300 font-mono">
+                                    {formatBytes(file.size)}
+                                  </td>
+                                  <td className="p-2 border-r border-slate-850 text-slate-400 font-mono">
+                                    {file.type}
+                                  </td>
+                                  <td className="p-2 border-r border-slate-850 text-slate-500">
+                                    {file.date}
+                                  </td>
+                                  <td className="p-2 flex gap-1.5 flex-wrap">
+                                    <button
+                                      onClick={() => downloadFile(file.key)}
+                                      className="bg-sky-950 hover:bg-sky-900 border border-sky-800 text-sky-300 px-2 py-0.5 rounded text-[10px]"
+                                    >
+                                      Download
+                                    </button>
+                                    
+                                    {file.type && file.type.startsWith("image/") && (
+                                      <button
+                                        onClick={() => previewFile(file.key)}
+                                        className="bg-violet-950 hover:bg-violet-900 border border-violet-800 text-violet-300 px-2 py-0.5 rounded text-[10px]"
+                                      >
+                                        {previewingFileKey === file.key ? "Hide Preview" : "Preview"}
+                                      </button>
+                                    )}
 
-                  {generatedDownloadUrl && (
-                    <div className="mt-3 bg-slate-900 p-2 border border-slate-800 rounded text-xs space-y-1">
-                      <div className="text-slate-400">Presigned Download URL Generated:</div>
-                      <a
-                        href={generatedDownloadUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sky-400 underline break-all font-mono hover:text-sky-300 block my-1"
-                      >
-                        {generatedDownloadUrl.substring(0, 100)}... (Open in New Tab)
-                      </a>
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(file.key);
+                                        alert("File key copied to clipboard!");
+                                      }}
+                                      className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-2 py-0.5 rounded text-[10px]"
+                                    >
+                                      Copy Key
+                                    </button>
+                                    
+                                    <button
+                                      onClick={() => removeLocalFile(file.key)}
+                                      className="bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 px-2 py-0.5 rounded text-[10px]"
+                                    >
+                                      Remove
+                                    </button>
+                                  </td>
+                                </tr>
+
+                                {/* Inline preview row */}
+                                {previewingFileKey === file.key && previewUrl && (
+                                  <tr className="bg-slate-950 border-b border-slate-850">
+                                    <td colSpan={5} className="p-4">
+                                      <div className="flex flex-col items-center bg-slate-900 rounded p-2 border border-slate-800 max-w-md mx-auto">
+                                        <div className="text-[10px] text-slate-500 mb-1.5 font-bold">Image Preview: {file.key}</div>
+                                        <img
+                                          src={previewUrl}
+                                          alt={file.key}
+                                          className="max-h-64 object-contain rounded border border-slate-750 bg-slate-950"
+                                        />
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
                 </div>
