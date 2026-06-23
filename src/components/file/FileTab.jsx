@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import FileUpload from "./FileUpload";
 import FileLibrary from "./FileLibrary";
 
-const FileTab = ({ currentProfile, onAddLog }) => {
+const FileTab = ({ currentProfile }) => {
   const [uploadedFiles, setUploadedFiles] = useState(() => {
     try {
       const saved = localStorage.getItem("veo_uploaded_files");
@@ -40,7 +40,7 @@ const FileTab = ({ currentProfile, onAddLog }) => {
 
   return (
     <div className="space-y-4">
-      <FileUpload onUploadSuccess={handleUploadSuccess} onAddLog={onAddLog} />
+      <FileUpload onUploadSuccess={handleUploadSuccess} />
       <FileLibrary
         uploadedFiles={uploadedFiles}
         onRemoveFile={handleRemoveFile}

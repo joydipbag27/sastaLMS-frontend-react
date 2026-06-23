@@ -10,7 +10,7 @@ const RbacTab = ({ currentProfile }) => {
   const [usersHasMore, setUsersHasMore] = useState(false);
   const [usersLimit, setUsersLimit] = useState(10);
   const [rbacSelectedUser, setRbacSelectedUser] = useState(null);
-  const [rbacChangeRoleTo, setRbacChangeRoleTo] = useState("User");
+  const [rbacChangeRoleTo, setRbacChangeRoleTo] = useState("STUDENT");
   const [sessionCheckResult, setSessionCheckResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState(null);
@@ -32,7 +32,7 @@ const RbacTab = ({ currentProfile }) => {
       setUsersCursor(res.data.nextCursor);
       setUsersHasMore(res.data.hasMore);
     } else {
-      alert(res.data?.error || "Failed to fetch users. Requires appropriate role.");
+      alert(res.data?.error || "Failed to fetch users. Requires CREATOR or ADMIN privilege.");
     }
   };
 
@@ -143,13 +143,15 @@ const RbacTab = ({ currentProfile }) => {
     );
   }
 
-  // If user role is not admin/manager/owner
-  const hasPrivileges = ["Admin", "Manager", "Owner"].includes(currentProfile.role);
+  // If user role is not admin or creator
+  const hasPrivileges = ["CREATOR", "ADMIN"].includes(currentProfile.role);
+  const isAdmin = currentProfile.role === "ADMIN";
+
   if (!hasPrivileges) {
     return (
-      <div className="bg-slate-950 p-6 border border-slate-850 rounded-lg text-center space-y-2">
+      <div className="bg-slate-950 p-6 border border-slate-850 rounded-lg text-center space-y-2 font-mono">
         <p className="text-rose-400 font-bold">Access Denied</p>
-        <p className="text-xs text-slate-500">Your role ({currentProfile.role || "User"}) does not have permissions to view user records.</p>
+        <p className="text-xs text-slate-500">Your role ({currentProfile.role || "STUDENT"}) does not have permissions to view user records.</p>
       </div>
     );
   }
@@ -205,17 +207,16 @@ const RbacTab = ({ currentProfile }) => {
                       }`}
                       onClick={() => {
                         setRbacSelectedUser(user);
-                        setRbacChangeRoleTo(user.role || "User");
+                        setRbacChangeRoleTo(user.role || "STUDENT");
                       }}
                     >
                       <td className="p-2.5 border-r border-slate-850 text-slate-200 font-bold">{user.username}</td>
                       <td className="p-2.5 border-r border-slate-850 text-slate-400 font-mono text-[11px]">{user.email}</td>
                       <td className="p-2.5 border-r border-slate-850">
                         <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                          user.role === "Owner" ? "bg-purple-950 text-purple-300 border border-purple-800" :
-                          user.role === "Admin" ? "bg-rose-950 text-rose-300 border border-rose-800" :
-                          user.role === "Manager" ? "bg-sky-950 text-sky-300 border border-sky-850" :
-                          "bg-slate-800 text-slate-400 border border-slate-700"
+                          user.role === "ADMIN" ? "bg-rose-950 text-rose-300 border border-rose-800" :
+                          user.role === "CREATOR" ? "bg-sky-950 text-sky-300 border border-sky-850" :
+                          "bg-slate-800 text-slate-400 border-slate-700"
                         }`}>
                           {user.role}
                         </span>
@@ -237,14 +238,6 @@ const RbacTab = ({ currentProfile }) => {
                           Session
                         </Button>
                         <Button
-                          onClick={() => handleAdminBlockUser(user._id)}
-                          variant={user.isBlocked ? "success" : "warning"}
-                          isLoading={actionLoadingId === `${user._id}-block`}
-                          className="px-1.5 py-0.5 text-[10px] font-medium"
-                        >
-                          {user.isBlocked ? "Unblock" : "Block"}
-                        </Button>
-                        <Button
                           onClick={() => handleAdminLogoutUser(user._id)}
                           variant="secondary"
                           isLoading={actionLoadingId === `${user._id}-logout`}
@@ -252,14 +245,28 @@ const RbacTab = ({ currentProfile }) => {
                         >
                           Kill Sid
                         </Button>
-                        <Button
-                          onClick={() => handleAdminDeleteUser(user._id)}
-                          variant="danger"
-                          isLoading={actionLoadingId === `${user._id}-delete`}
-                          className="px-1.5 py-0.5 text-[10px] font-medium"
-                        >
-                          Delete
-                        </Button>
+
+                        {/* ADMIN-only operations */}
+                        {isAdmin && (
+                          <>
+                            <Button
+                              onClick={() => handleAdminBlockUser(user._id)}
+                              variant={user.isBlocked ? "success" : "warning"}
+                              isLoading={actionLoadingId === `${user._id}-block`}
+                              className="px-1.5 py-0.5 text-[10px] font-medium"
+                            >
+                              {user.isBlocked ? "Unblock" : "Block"}
+                            </Button>
+                            <Button
+                              onClick={() => handleAdminDeleteUser(user._id)}
+                              variant="danger"
+                              isLoading={actionLoadingId === `${user._id}-delete`}
+                              className="px-1.5 py-0.5 text-[10px] font-medium"
+                            >
+                              Delete
+                            </Button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   );
@@ -294,7 +301,8 @@ const RbacTab = ({ currentProfile }) => {
         </Card>
       )}
 
-      {rbacSelectedUser && (
+      {/* ADMIN-only Role Assignment section */}
+      {isAdmin && rbacSelectedUser && (
         <Card title={`Assign Role to "${rbacSelectedUser.username}"`} subtitle={`ID: ${rbacSelectedUser._id}`}>
           <form onSubmit={handleChangeRole} className="flex flex-wrap items-end gap-4">
             <div className="flex flex-col gap-1.5">
@@ -313,10 +321,9 @@ const RbacTab = ({ currentProfile }) => {
                 onChange={(e) => setRbacChangeRoleTo(e.target.value)}
                 className="bg-slate-900 border border-slate-700 text-slate-100 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-sky-500"
               >
-                <option value="User">User</option>
-                <option value="Manager">Manager</option>
-                <option value="Admin">Admin</option>
-                <option value="Owner">Owner</option>
+                <option value="STUDENT">STUDENT</option>
+                <option value="CREATOR">CREATOR</option>
+                <option value="ADMIN">ADMIN</option>
               </select>
             </div>
             <Button type="submit" variant="success" isLoading={actionLoadingId === "role-change"}>

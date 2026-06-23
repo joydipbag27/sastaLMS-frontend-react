@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { makeRequest, getApiBaseUrl, setApiBaseUrl, registerLogCallback } from "./apiClient";
+import { makeRequest, getApiBaseUrl, setApiBaseUrl } from "./apiClient";
 import AuthTab from "./components/auth/AuthTab";
 import SettingsTab from "./components/settings/SettingsTab";
 import RbacTab from "./components/rbac/RbacTab";
 import FileTab from "./components/file/FileTab";
-import ConsoleLog from "./components/console/ConsoleLog";
+import CourseTab from "./components/course/CourseTab";
 
 const App = () => {
   // Config state
@@ -13,14 +13,8 @@ const App = () => {
   const [profileLoading, setProfileLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("auth");
 
-  // Logger state
-  const [logs, setLogs] = useState([]);
-
-  // Register log callback on mount and load initial profile
+  // Load initial profile on mount
   useEffect(() => {
-    registerLogCallback((newLog) => {
-      setLogs((prev) => [...prev, newLog]);
-    });
     fetchProfile();
   }, []);
 
@@ -39,14 +33,6 @@ const App = () => {
     } else {
       setCurrentProfile(null);
     }
-  };
-
-  const handleAddLog = (customLog) => {
-    setLogs((prev) => [...prev, customLog]);
-  };
-
-  const handleClearLogs = () => {
-    setLogs([]);
   };
 
   return (
@@ -86,7 +72,7 @@ const App = () => {
           {currentProfile ? (
             <span className="text-emerald-400 flex items-center gap-1.5 font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Connected ({currentProfile.role || "User"})
+              Connected ({currentProfile.role || "STUDENT"})
             </span>
           ) : (
             <span className="text-amber-400 flex items-center gap-1.5 font-bold">
@@ -98,8 +84,8 @@ const App = () => {
       </header>
 
       {/* Main Workspace Split */}
-      <main className="flex-1 flex flex-col md:flex-row overflow-hidden">
-        {/* Left Column: Interactive Playground Panel */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Playground Panel */}
         <section className="flex-1 p-5 overflow-y-auto flex flex-col gap-5">
           {/* Navigation Tabs */}
           <div className="flex border-b border-slate-800/80 font-mono text-xs">
@@ -143,6 +129,16 @@ const App = () => {
             >
               📦 S3 File Manager
             </button>
+            <button
+              onClick={() => setActiveTab("course")}
+              className={`px-4 py-2.5 border-b-2 font-bold transition-all ${
+                activeTab === "course"
+                  ? "border-sky-500 text-sky-400 bg-slate-950/20"
+                  : "border-transparent text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              🎓 Course Creator
+            </button>
           </div>
 
           {/* Profile Quick Summary Header */}
@@ -155,7 +151,7 @@ const App = () => {
               </div>
               <div className="text-slate-500 flex items-center gap-2">
                 <span>Role:</span>
-                <span className="text-amber-400 font-bold">{currentProfile.role || "User"}</span>
+                <span className="text-amber-400 font-bold">{currentProfile.role || "STUDENT"}</span>
               </div>
             </div>
           )}
@@ -172,13 +168,13 @@ const App = () => {
               <RbacTab currentProfile={currentProfile} />
             )}
             {activeTab === "file" && (
-              <FileTab currentProfile={currentProfile} onAddLog={handleAddLog} />
+              <FileTab currentProfile={currentProfile} />
+            )}
+            {activeTab === "course" && (
+              <CourseTab currentProfile={currentProfile} />
             )}
           </div>
         </section>
-
-        {/* Right Column: Console Activity Stream */}
-        <ConsoleLog logs={logs} onClear={handleClearLogs} />
       </main>
     </div>
   );
