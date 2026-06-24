@@ -1,182 +1,119 @@
-import React, { useState, useEffect } from "react";
-import { makeRequest, getApiBaseUrl, setApiBaseUrl } from "./apiClient";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
+// Layouts
+import AuthLayout from "./components/layout/AuthLayout";
+import StudentLayout from "./components/layout/StudentLayout";
+import AdminLayout from "./components/layout/AdminLayout";
+
+// Tabs/Pages
 import AuthTab from "./components/auth/AuthTab";
 import SettingsTab from "./components/settings/SettingsTab";
 import RbacTab from "./components/rbac/RbacTab";
 import FileTab from "./components/file/FileTab";
 import CourseTab from "./components/course/CourseTab";
+import CourseDetails from "./components/course/CourseDetails";
+import LearningDashboard from "./components/course/LearningDashboard";
+
+import { useAuth } from "./hooks/useAuth";
 
 const App = () => {
-  // Config state
-  const [baseUrl, setBaseUrl] = useState(getApiBaseUrl());
-  const [currentProfile, setCurrentProfile] = useState(null);
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("auth");
+  const { profile: currentProfile, profileLoading, fetchProfile, logout } = useAuth();
 
-  // Load initial profile on mount
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const updateBaseUrl = (e) => {
-    const url = e.target.value;
-    setBaseUrl(url);
-    setApiBaseUrl(url);
+  const handleLogout = async () => {
+    await logout();
   };
 
-  const fetchProfile = async () => {
-    setProfileLoading(true);
-    const res = await makeRequest("/user");
-    setProfileLoading(false);
-    if (res.success) {
-      setCurrentProfile(res.data);
-    } else {
-      setCurrentProfile(null);
-    }
-  };
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-sky-400 font-bold tracking-widest uppercase text-sm">Loading veoLMS</p>
+        </div>
+      </div>
+    );
+  }
+
+
+  const isCreatorOrAdmin = currentProfile?.role === "CREATOR" || currentProfile?.role === "ADMIN";
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans flex flex-col antialiased">
-      {/* Header section */}
-      <header className="bg-slate-950 px-5 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-lg font-black text-sky-400 tracking-tight flex items-center gap-2">
-            <span>veoLMS</span>
-            <span className="text-xs bg-sky-950 text-sky-300 px-2 py-0.5 rounded font-mono border border-sky-850">Playground</span>
-          </h1>
-          <p className="text-[10px] text-slate-500 font-mono">Interactive Developer Control Board & Session Inspector</p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <label htmlFor="api-base-url" className="text-xs font-semibold text-slate-500 font-mono">API Base:</label>
-            <input
-              id="api-base-url"
-              type="text"
-              value={baseUrl}
-              onChange={updateBaseUrl}
-              className="bg-slate-900 border border-slate-700 text-sky-300 rounded px-2.5 py-1 text-xs w-48 font-mono focus:outline-none focus:border-sky-500"
-            />
-          </div>
-          <button
-            onClick={fetchProfile}
-            disabled={profileLoading}
-            className="bg-sky-600 hover:bg-sky-500 disabled:bg-slate-800 text-white rounded px-3 py-1 text-xs font-bold transition-all"
-          >
-            {profileLoading ? "Reloading..." : "Sync Profile"}
-          </button>
-        </div>
+    <Router>
+      <Routes>
+        {/* Public Auth Route */}
+        <Route 
+          path="/login" 
+          element={
+            currentProfile ? (
+              <Navigate to={isCreatorOrAdmin ? "/admin/courses" : "/dashboard/courses"} replace />
+            ) : (
+              <AuthLayout>
+                <AuthTab onLoginSuccess={fetchProfile} />
+              </AuthLayout>
+            )
+          } 
+        />
 
-        <div className="bg-slate-900 border border-slate-800 rounded px-3 py-1 flex items-center gap-2 font-mono text-xs">
-          <span className="text-slate-500">Status:</span>
-          {currentProfile ? (
-            <span className="text-emerald-400 flex items-center gap-1.5 font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Connected ({currentProfile.role || "STUDENT"})
-            </span>
-          ) : (
-            <span className="text-amber-400 flex items-center gap-1.5 font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              Not Authenticated
-            </span>
-          )}
-        </div>
-      </header>
+        {/* Student Routes */}
+        <Route 
+          path="/dashboard/*" 
+          element={
+            !currentProfile ? (
+              <Navigate to="/login" replace />
+            ) : isCreatorOrAdmin ? (
+               <Navigate to="/admin/courses" replace />
+            ) : (
+              <StudentLayout profile={currentProfile} onLogout={handleLogout}>
+                <Routes>
+                  <Route path="courses" element={<CourseTab currentProfile={currentProfile} />} />
+                  <Route path="courses/:courseId" element={<CourseDetails currentProfile={currentProfile} />} />
+                  <Route path="settings" element={<SettingsTab profile={currentProfile} onLogoutSuccess={handleLogout} />} />
+                  <Route path="*" element={<Navigate to="courses" replace />} />
+                </Routes>
+              </StudentLayout>
+            )
+          } 
+        />
 
-      {/* Main Workspace Split */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Playground Panel */}
-        <section className="flex-1 p-5 overflow-y-auto flex flex-col gap-5">
-          {/* Navigation Tabs */}
-          <div className="flex border-b border-slate-800/80 font-mono text-xs">
-            <button
-              onClick={() => setActiveTab("auth")}
-              className={`px-4 py-2.5 border-b-2 font-bold transition-all ${
-                activeTab === "auth"
-                  ? "border-sky-500 text-sky-400 bg-slate-950/20"
-                  : "border-transparent text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              🔐 Auth Gateway
-            </button>
-            <button
-              onClick={() => setActiveTab("settings")}
-              className={`px-4 py-2.5 border-b-2 font-bold transition-all ${
-                activeTab === "settings"
-                  ? "border-sky-500 text-sky-400 bg-slate-950/20"
-                  : "border-transparent text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              ⚙️ Account Settings
-            </button>
-            <button
-              onClick={() => setActiveTab("rbac")}
-              className={`px-4 py-2.5 border-b-2 font-bold transition-all ${
-                activeTab === "rbac"
-                  ? "border-sky-500 text-sky-400 bg-slate-950/20"
-                  : "border-transparent text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              👥 RBAC Control
-            </button>
-            <button
-              onClick={() => setActiveTab("file")}
-              className={`px-4 py-2.5 border-b-2 font-bold transition-all ${
-                activeTab === "file"
-                  ? "border-sky-500 text-sky-400 bg-slate-950/20"
-                  : "border-transparent text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              📦 S3 File Manager
-            </button>
-            <button
-              onClick={() => setActiveTab("course")}
-              className={`px-4 py-2.5 border-b-2 font-bold transition-all ${
-                activeTab === "course"
-                  ? "border-sky-500 text-sky-400 bg-slate-950/20"
-                  : "border-transparent text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              🎓 Course Creator
-            </button>
-          </div>
+        {/* Admin/Creator Routes */}
+        <Route 
+          path="/admin/*" 
+          element={
+            !currentProfile ? (
+              <Navigate to="/login" replace />
+            ) : !isCreatorOrAdmin ? (
+              <Navigate to="/dashboard/courses" replace />
+            ) : (
+              <AdminLayout profile={currentProfile} onLogout={handleLogout}>
+                <Routes>
+                  <Route path="courses" element={<CourseTab currentProfile={currentProfile} defaultViewMode="my-courses" />} />
+                  <Route path="courses/:courseId" element={<CourseDetails currentProfile={currentProfile} />} />
+                  <Route path="files" element={<FileTab currentProfile={currentProfile} />} />
+                  <Route path="users" element={<RbacTab currentProfile={currentProfile} />} />
+                  <Route path="settings" element={<SettingsTab profile={currentProfile} onLogoutSuccess={handleLogout} />} />
+                  <Route path="*" element={<Navigate to="courses" replace />} />
+                </Routes>
+              </AdminLayout>
+            )
+          } 
+        />
 
-          {/* Profile Quick Summary Header */}
-          {currentProfile && (
-            <div className="bg-slate-950 px-4 py-2.5 rounded-lg border border-slate-800 text-xs flex justify-between items-center flex-wrap gap-2 font-mono shadow-sm">
-              <div className="flex items-center gap-1.5">
-                <span className="text-slate-500">Active User:</span>{" "}
-                <span className="text-sky-300 font-bold">{currentProfile.username}</span>{" "}
-                <span className="text-slate-600">({currentProfile.email})</span>
-              </div>
-              <div className="text-slate-500 flex items-center gap-2">
-                <span>Role:</span>
-                <span className="text-amber-400 font-bold">{currentProfile.role || "STUDENT"}</span>
-              </div>
-            </div>
-          )}
+        {/* Immersive Learning Classroom Route */}
+        <Route
+          path="/classroom/:courseId"
+          element={
+            !currentProfile ? (
+              <Navigate to="/login" replace />
+            ) : (
+              <LearningDashboard />
+            )
+          }
+        />
 
-          {/* Tab Content Display */}
-          <div className="flex-1">
-            {activeTab === "auth" && (
-              <AuthTab onLoginSuccess={fetchProfile} />
-            )}
-            {activeTab === "settings" && (
-              <SettingsTab profile={currentProfile} onLogoutSuccess={fetchProfile} />
-            )}
-            {activeTab === "rbac" && (
-              <RbacTab currentProfile={currentProfile} />
-            )}
-            {activeTab === "file" && (
-              <FileTab currentProfile={currentProfile} />
-            )}
-            {activeTab === "course" && (
-              <CourseTab currentProfile={currentProfile} />
-            )}
-          </div>
-        </section>
-      </main>
-    </div>
+        {/* Default Redirect */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </Router>
   );
 };
 

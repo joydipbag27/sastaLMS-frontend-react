@@ -53,11 +53,10 @@ export const makeRequest = async (path, options = {}) => {
       method,
       headers,
       body: bodyToSend,
-      credentials: "include", // Crucial for signed session cookies (sid)
+      credentials: "include",
     });
     
     status = response.status;
-    success = response.ok;
     
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
@@ -65,11 +64,31 @@ export const makeRequest = async (path, options = {}) => {
     } else {
       responseData = { text: await response.text() };
     }
+
+    // Normalize the new backend response envelope:
+    // Backend now returns: { success: bool, message: string, data: {...} | null, error: string }
+    // We unwrap `data` so components access res.data.courses etc. instead of res.data.data.courses
+    // Error messages stay at res.data.error, success messages at res.data.message
+    let normalizedData;
+    if (responseData && typeof responseData === "object" && "success" in responseData) {
+      success = responseData.success;
+      // Flatten: merge the inner data payload with message/error at the top level
+      normalizedData = {
+        ...(responseData.data || {}),
+        message: responseData.message,
+        error: responseData.error,
+        success: responseData.success,
+      };
+    } else {
+      // Passthrough for non-standard responses (e.g. text, legacy routes)
+      success = response.ok;
+      normalizedData = responseData;
+    }
     
     const duration = Date.now() - startTime;
-    logRequest(method, path, options.body, status, responseData, duration, success);
+    logRequest(method, path, options.body, status, normalizedData, duration, success);
     
-    return { success, status, data: responseData };
+    return { success, status, data: normalizedData };
   } catch (error) {
     const duration = Date.now() - startTime;
     responseData = { error: error.message };

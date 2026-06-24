@@ -1,29 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { makeRequest } from "../../apiClient";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useCourses } from "../../hooks/useCourses";
 import Card from "../common/Card";
 import Button from "../common/Button";
 import Input from "../common/Input";
 import CourseDetails from "./CourseDetails";
 
-const CourseTab = ({ currentProfile }) => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [nextCursor, setNextCursor] = useState(null);
-  const [hasNextPage, setHasNextPage] = useState(false);
+const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  // View Mode: catalog (all published) or my-courses (creator's own drafts + published)
-  const [viewMode, setViewMode] = useState("catalog");
-
-  // Filter states
-  const [filterCategory, setFilterCategory] = useState("");
-  const [filterLevel, setFilterLevel] = useState("");
-  const [filterStatus, setFilterStatus] = useState("Published"); // Published | Draft
-  const [limit, setLimit] = useState(10);
-
-  // Selected course for detail drill-down
+  // Selected course for detail drill-down (transient UI selection)
   const [selectedCourse, setSelectedCourse] = useState(null);
 
-  // Course Form states
+  // Sync viewMode and filters from URL Search Parameters
+  const viewMode = searchParams.get("view") || defaultViewMode;
+  const filterCategory = searchParams.get("category") || "";
+  const filterLevel = searchParams.get("level") || "";
+  
+  // Set default filterStatus based on viewMode if not present in URL
+  const defaultStatus = viewMode === "my-courses" ? "All" : "Published";
+  const filterStatus = searchParams.get("status") || defaultStatus;
+  const limit = parseInt(searchParams.get("limit")) || 10;
+
+  // React Query hook for course listing
+  const {
+    courses,
+    isLoading: loading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    createCourse,
+    updateCourse,
+    deleteCourse,
+  } = useCourses(viewMode, {
+    category: filterCategory,
+    level: filterLevel,
+    status: filterStatus,
+  }, limit);
+
+  // Course Form states (local, transient)
   const [showForm, setShowForm] = useState(false);
   const [editingCourseId, setEditingCourseId] = useState(null);
   const [courseTitle, setCourseTitle] = useState("");
@@ -35,46 +51,47 @@ const CourseTab = ({ currentProfile }) => {
   const [courseStatus, setCourseStatus] = useState("Draft"); // Draft | Published
   const [formLoading, setFormLoading] = useState(false);
 
-  const currentUserId = currentProfile?._id || currentProfile?.id;
   const isCreatorOrAdmin = currentProfile && ["CREATOR", "ADMIN"].includes(currentProfile.role);
 
-  useEffect(() => {
-    if (!selectedCourse) {
-      fetchCourses();
-    }
-  }, [filterCategory, filterLevel, filterStatus, selectedCourse, viewMode]);
+  // Helper functions to update URL search parameters
+  const setViewMode = (mode) => {
+    setSearchParams((prev) => {
+      prev.set("view", mode);
+      prev.set("status", mode === "my-courses" ? "All" : "Published");
+      return prev;
+    });
+  };
 
-  // Adjust default status filter when switching modes
-  useEffect(() => {
-    if (viewMode === "my-courses") {
-      setFilterStatus(""); // Show all (Draft + Published) by default for creator
-    } else {
-      setFilterStatus("Published"); // Show only published for catalog
-    }
-  }, [viewMode]);
+  const setFilterCategory = (val) => {
+    setSearchParams((prev) => {
+      if (val) prev.set("category", val);
+      else prev.delete("category");
+      return prev;
+    });
+  };
 
-  const fetchCourses = async (cursorVal = null) => {
-    setLoading(true);
-    let url = viewMode === "my-courses"
-      ? `/course/creator/me?limit=${limit}`
-      : `/course?limit=${limit}&status=${filterStatus}`;
+  const setFilterLevel = (val) => {
+    setSearchParams((prev) => {
+      if (val) prev.set("level", val);
+      else prev.delete("level");
+      return prev;
+    });
+  };
 
-    if (filterCategory) url += `&category=${encodeURIComponent(filterCategory)}`;
-    if (filterLevel) url += `&level=${encodeURIComponent(filterLevel)}`;
-    if (viewMode === "my-courses" && filterStatus) url += `&status=${filterStatus}`;
-    if (cursorVal) url += `&cursor=${cursorVal}`;
+  const setFilterStatus = (val) => {
+    setSearchParams((prev) => {
+      if (val) prev.set("status", val);
+      else prev.delete("status");
+      return prev;
+    });
+  };
 
-    const res = await makeRequest(url);
-    setLoading(false);
-    if (res.success) {
-      if (cursorVal) {
-        setCourses((prev) => [...prev, ...res.data.courses]);
-      } else {
-        setCourses(res.data.courses || []);
-      }
-      setNextCursor(res.data.nextCursor);
-      setHasNextPage(res.data.hasNextPage);
-    }
+  const setLimit = (val) => {
+    setSearchParams((prev) => {
+      if (val) prev.set("limit", val.toString());
+      else prev.delete("limit");
+      return prev;
+    });
   };
 
   const handleCourseSubmit = async (e) => {
@@ -90,26 +107,22 @@ const CourseTab = ({ currentProfile }) => {
       status: courseStatus,
     };
 
-    let res;
-    if (editingCourseId) {
-      res = await makeRequest(`/course/${editingCourseId}`, {
-        method: "PATCH",
-        body,
-      });
-    } else {
-      res = await makeRequest("/course", {
-        method: "POST",
-        body,
-      });
-    }
-
-    setFormLoading(false);
-    if (res.success) {
-      alert(editingCourseId ? "Course updated successfully!" : "Course created successfully!");
+    try {
+      if (editingCourseId) {
+        await updateCourse({ id: editingCourseId, body });
+        alert("Course updated successfully!");
+      } else {
+        await createCourse(body);
+        alert("Course created successfully!");
+      }
       resetForm();
-      fetchCourses();
-    } else {
-      alert(res.data?.error || "Failed to submit course");
+      if (viewMode !== "my-courses") {
+        setViewMode("my-courses");
+      }
+    } catch (err) {
+      alert(err.message || "Failed to submit course");
+    } finally {
+      setFormLoading(false);
     }
   };
 
@@ -129,14 +142,11 @@ const CourseTab = ({ currentProfile }) => {
   const handleDeleteClick = async (e, id) => {
     e.stopPropagation();
     if (!confirm("Are you sure you want to delete this course? This cascades to delete all its sections and lessons.")) return;
-    const res = await makeRequest(`/course/${id}`, {
-      method: "DELETE",
-    });
-    if (res.success) {
+    try {
+      await deleteCourse(id);
       alert("Course deleted successfully!");
-      fetchCourses();
-    } else {
-      alert(res.data?.error || "Failed to delete course");
+    } catch (err) {
+      alert(err.message || "Failed to delete course");
     }
   };
 
@@ -158,15 +168,15 @@ const CourseTab = ({ currentProfile }) => {
       <CourseDetails
         course={selectedCourse}
         currentProfile={currentProfile}
-        viewMode={viewMode}
         onBack={() => setSelectedCourse(null)}
       />
     );
   }
 
+
   return (
     <div className="space-y-4 font-mono text-xs">
-      {/* View mode toggle sub-navigation (Only for Creator/Admin) */}
+      {/* View mode toggle sub-navigation (For Creator/Admin) */}
       {isCreatorOrAdmin && (
         <div className="flex justify-between items-center flex-wrap gap-2">
           <div className="flex gap-1.5 bg-slate-950 p-1 rounded-lg border border-slate-800/80">
@@ -197,6 +207,34 @@ const CourseTab = ({ currentProfile }) => {
               + Create New Course
             </Button>
           )}
+        </div>
+      )}
+
+      {/* View mode toggle sub-navigation (For Students) */}
+      {!isCreatorOrAdmin && (
+        <div className="flex justify-between items-center flex-wrap gap-2">
+          <div className="flex gap-1.5 bg-slate-950 p-1 rounded-lg border border-slate-800/80">
+            <button
+              onClick={() => setViewMode("catalog")}
+              className={`px-3 py-1 rounded font-bold text-[11px] transition-all duration-200 ${
+                viewMode === "catalog"
+                  ? "bg-sky-600 text-white shadow"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              🌐 Explore Catalog
+            </button>
+            <button
+              onClick={() => setViewMode("enrolled")}
+              className={`px-3 py-1 rounded font-bold text-[11px] transition-all duration-200 ${
+                viewMode === "enrolled"
+                  ? "bg-sky-600 text-white shadow"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              📚 My Enrolled Courses
+            </button>
+          </div>
         </div>
       )}
 
@@ -291,67 +329,85 @@ const CourseTab = ({ currentProfile }) => {
       ) : (
         /* Courses Catalog Card */
         <Card
-          title={viewMode === "my-courses" ? "My Created Courses" : "Courses Catalog"}
-          subtitle={viewMode === "my-courses" ? "Review and manage your drafts and published curricula" : "Browse curriculum catalogs and manage course sections"}
+          title={
+            viewMode === "my-courses"
+              ? "My Created Courses"
+              : viewMode === "enrolled"
+              ? "My Enrolled Courses"
+              : isCreatorOrAdmin
+              ? "Courses Catalog"
+              : "Explore Courses"
+          }
+          subtitle={
+            viewMode === "my-courses"
+              ? "Review and manage your drafts and published curricula"
+              : viewMode === "enrolled"
+              ? "View and continue learning your enrolled courses"
+              : isCreatorOrAdmin
+              ? "Browse the public course catalog"
+              : "Browse published courses and enroll to start learning"
+          }
         >
-          {/* Filters Header */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-900/40 p-3 rounded border border-slate-800/80 mb-3">
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Category Filter</span>
-              <input
-                type="text"
-                placeholder="e.g. Web Development"
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none"
-              />
+          {/* Filters Header - Hide for Enrolled view */}
+          {viewMode !== "enrolled" && (
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-900/40 p-3 rounded border border-slate-800/80 mb-3">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Category Filter</span>
+                <input
+                  type="text"
+                  placeholder="e.g. Web Development"
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                  className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Difficulty Level</span>
+                <select
+                  value={filterLevel}
+                  onChange={(e) => setFilterLevel(e.target.value)}
+                  className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none"
+                >
+                  <option value="">All Difficulty Levels</option>
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Publish Status</span>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none"
+                >
+                  {viewMode === "my-courses" ? (
+                    <>
+                      <option value="All">All Statuses</option>
+                      <option value="Published">Published Only</option>
+                      <option value="Draft">Drafts Only</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="Published">Published Only</option>
+                      <option value="Draft">Drafts Only</option>
+                    </>
+                  )}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Page Size</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={limit}
+                  onChange={(e) => setLimit(parseInt(e.target.value) || 10)}
+                  className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none text-center"
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Difficulty Level</span>
-              <select
-                value={filterLevel}
-                onChange={(e) => setFilterLevel(e.target.value)}
-                className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none"
-              >
-                <option value="">All Difficulty Levels</option>
-                <option value="Beginner">Beginner</option>
-                <option value="Intermediate">Intermediate</option>
-                <option value="Advanced">Advanced</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Publish Status</span>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none"
-              >
-                {viewMode === "my-courses" ? (
-                  <>
-                    <option value="">All Statuses</option>
-                    <option value="Published">Published Only</option>
-                    <option value="Draft">Drafts Only</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="Published">Published Only</option>
-                    <option value="Draft">Drafts Only</option>
-                  </>
-                )}
-              </select>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold text-slate-500 uppercase">Page Size</span>
-              <input
-                type="number"
-                min={1}
-                max={50}
-                value={limit}
-                onChange={(e) => setLimit(parseInt(e.target.value) || 10)}
-                className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none text-center"
-              />
-            </div>
-          </div>
+          )}
 
           {/* Courses Feed list */}
           {loading && courses.length === 0 ? (
@@ -360,6 +416,8 @@ const CourseTab = ({ currentProfile }) => {
             <div className="text-center py-8 border border-dashed border-slate-800 rounded italic text-slate-500">
               {viewMode === "my-courses"
                 ? "You haven't created any courses matching these filters yet."
+                : viewMode === "enrolled"
+                ? "You are not enrolled in any courses yet. Browse the catalog to enroll!"
                 : "No courses matching these filters were found in the catalog."}
             </div>
           ) : (
@@ -400,11 +458,17 @@ const CourseTab = ({ currentProfile }) => {
 
                       <div className="flex items-center justify-between border-t border-slate-900/80 pt-2 gap-2">
                         <Button
-                          onClick={() => setSelectedCourse(crs)}
+                          onClick={() => {
+                            if (isCreatorOrAdmin) {
+                              navigate(`/admin/courses/${crs._id}`);
+                            } else {
+                              navigate(`/dashboard/courses/${crs._id}`);
+                            }
+                          }}
                           variant="primary"
                           className="py-1 px-3 text-[10px] flex-1 font-bold"
                         >
-                          📖 Curriculum Details
+                          {isCreatorOrAdmin ? "📖 Curriculum Details" : "🎓 View Course"}
                         </Button>
                         
                         {canModify && (
@@ -433,10 +497,10 @@ const CourseTab = ({ currentProfile }) => {
 
               {hasNextPage && (
                 <Button
-                  onClick={() => fetchCourses(nextCursor)}
+                  onClick={() => fetchNextPage()}
                   variant="secondary"
                   className="w-full py-1.5"
-                  isLoading={loading}
+                  isLoading={isFetchingNextPage}
                 >
                   Load More Courses
                 </Button>
