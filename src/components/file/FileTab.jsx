@@ -1,50 +1,51 @@
 import React, { useState } from "react";
+import { Image } from "lucide-react";
 import FileUpload from "./FileUpload";
 import FileLibrary from "./FileLibrary";
+import { useMedia } from "../../hooks/useMedia";
 
 const FileTab = ({ currentProfile }) => {
-  const [uploadedFiles, setUploadedFiles] = useState(() => {
-    try {
-      const saved = localStorage.getItem("veo_uploaded_files");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const mediaHook = useMedia();
+  const [mediaFiles, setMediaFiles] = useState([]);
 
-  const handleUploadSuccess = (newFile) => {
-    const updated = [newFile, ...uploadedFiles];
-    setUploadedFiles(updated);
-    localStorage.setItem("veo_uploaded_files", JSON.stringify(updated));
+  const handleUploadSuccess = (media) => {
+    setMediaFiles((prev) => [media, ...prev]);
   };
 
-  const handleRemoveFile = (key) => {
-    const updated = uploadedFiles.filter((f) => f.key !== key);
-    setUploadedFiles(updated);
-    localStorage.setItem("veo_uploaded_files", JSON.stringify(updated));
-  };
-
-  const handleClearHistory = () => {
-    if (!confirm("Are you sure you want to clear your local file history list? This will not affect files on S3.")) return;
-    setUploadedFiles([]);
-    localStorage.removeItem("veo_uploaded_files");
+  const handleDelete = (mediaId) => {
+    setMediaFiles((prev) => prev.filter((m) => m._id !== mediaId));
   };
 
   if (!currentProfile) {
     return (
-      <div className="bg-slate-950 p-6 text-center border border-slate-800 rounded-lg">
-        <p className="text-slate-400 italic">Please sign in to access file storage uploads and manager.</p>
+      <div className="flex flex-col items-center justify-center py-20 bg-slate-950/50 rounded-xl border border-slate-800/60">
+        <div className="w-16 h-16 rounded-2xl bg-slate-800/60 flex items-center justify-center mb-4">
+          <Image size={28} className="text-slate-600" />
+        </div>
+        <p className="text-sm font-semibold text-slate-400">Sign in to access Media Manager</p>
+        <p className="text-xs text-slate-600 mt-1">Upload, preview, and manage your course media files</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <FileUpload onUploadSuccess={handleUploadSuccess} />
+    <div className="space-y-6">
+      {/* Page header */}
+      <div>
+        <h2 className="text-2xl font-black text-slate-100 tracking-tight">Media Manager</h2>
+        <p className="text-sm text-slate-500 mt-1">
+          Upload and manage media files for your courses. Files are stored securely in cloud storage.
+        </p>
+      </div>
+
+      {/* Upload section */}
+      <FileUpload onUploadSuccess={handleUploadSuccess} useMediaHook={mediaHook} />
+
+      {/* Library section */}
       <FileLibrary
-        uploadedFiles={uploadedFiles}
-        onRemoveFile={handleRemoveFile}
-        onClearHistory={handleClearHistory}
+        mediaFiles={mediaFiles}
+        onDelete={handleDelete}
+        useMediaHook={mediaHook}
       />
     </div>
   );

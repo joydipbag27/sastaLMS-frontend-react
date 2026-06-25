@@ -88,7 +88,7 @@ const App = () => {
                 <Routes>
                   <Route path="courses" element={<CourseTab currentProfile={currentProfile} defaultViewMode="my-courses" />} />
                   <Route path="courses/:courseId" element={<CourseDetails currentProfile={currentProfile} />} />
-                  <Route path="files" element={<FileTab currentProfile={currentProfile} />} />
+                  <Route path="media" element={<FileTab currentProfile={currentProfile} />} />
                   <Route path="users" element={<RbacTab currentProfile={currentProfile} />} />
                   <Route path="settings" element={<SettingsTab profile={currentProfile} onLogoutSuccess={handleLogout} />} />
                   <Route path="*" element={<Navigate to="courses" replace />} />

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCurriculum, useLessons } from "../../hooks/useCurriculum";
+import { useMedia } from "../../hooks/useMedia";
+import FileUpload from "../file/FileUpload";
 import { makeRequest } from "../../apiClient";
 import Card from "../common/Card";
 import Button from "../common/Button";
@@ -42,8 +44,10 @@ const SectionItem = ({
   onEditSectionClick,
   onDeleteSection,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const { lessons, lessonsLoading, createLesson, updateLesson, deleteLesson } = useLessons(sect._id, isCreatorOrAdmin);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { lessons, lessonsLoading, createLesson, updateLesson, deleteLesson } = useLessons(sect._id, isCreatorOrAdmin, isExpanded);
+  const mediaHook = useMedia();
+  const [uploadingLessonId, setUploadingLessonId] = useState(null);
 
   // Lesson Form states
   const [showLessonForm, setShowLessonForm] = useState(false);
@@ -63,7 +67,7 @@ const SectionItem = ({
       title: lessonTitle,
       description: lessonDesc,
       course: courseId,
-      video: lessonVideo,
+      video: lessonVideo || undefined,
       duration: lessonDuration,
       isPreview: lessonIsPreview,
       order: lessonOrder,
@@ -184,8 +188,53 @@ const SectionItem = ({
           ) : (
             <div className="space-y-2">
               {lessons.map((les) => (
-                <div key={les._id} className="relative group">
+                <div key={les._id} className="relative group border border-slate-900 rounded bg-slate-950/45 overflow-hidden">
                   <LessonRow les={les} canEdit={canEdit} />
+                  {canEdit && (
+                    <div className="px-3 pb-2 pt-1.5 bg-slate-950/40 flex flex-wrap items-center justify-between border-t border-slate-900/60">
+                      <div className="flex items-center gap-2">
+                        {les.video ? (
+                          <span className="text-emerald-400 font-bold font-mono text-[9px] flex items-center gap-1">
+                            ✅ Video Attached
+                          </span>
+                        ) : (
+                          <span className="text-amber-500 font-medium font-mono text-[9px] flex items-center gap-1">
+                            ⚠️ No Video Attached
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={() => setUploadingLessonId(uploadingLessonId === les._id ? null : les._id)}
+                          variant="secondary"
+                          className="px-2 py-0.5 text-[9px] font-mono text-slate-350 hover:text-white"
+                        >
+                          {uploadingLessonId === les._id ? "Close Uploader" : les.video ? "Replace Video" : "Upload Video"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {canEdit && uploadingLessonId === les._id && (
+                    <div className="p-3 border-t border-slate-900 bg-slate-900/40">
+                      <FileUpload
+                        useMediaHook={mediaHook}
+                        onUploadSuccess={async (media) => {
+                          try {
+                            await updateLesson({
+                              lessonId: les._id,
+                              body: { video: media._id },
+                            });
+                            setUploadingLessonId(null);
+                            alert("Video attached successfully!");
+                          } catch (err) {
+                            alert(err.message || "Failed to link video to lesson");
+                          }
+                        }}
+                      />
+                    </div>
+                  )}
+
                   {canEdit && (
                     <div className="absolute right-2 top-2 flex gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                       <Button
@@ -236,11 +285,11 @@ const SectionItem = ({
                     onChange={(e) => setLessonTitle(e.target.value)}
                   />
                   <Input
-                    label="Video Resource Link"
+                    label="Video Media ID (Optional)"
                     id={`lesson-video-${sect._id}`}
-                    required
                     value={lessonVideo}
                     onChange={(e) => setLessonVideo(e.target.value)}
+                    placeholder="e.g. 24-character ID"
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">

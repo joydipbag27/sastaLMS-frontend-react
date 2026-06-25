@@ -106,7 +106,7 @@ export const useCurriculum = (courseId, isCreatorOrAdmin) => {
 };
 
 // Hook for fetching lessons of a specific section (used by nested components)
-export const useLessons = (sectionId, isCreatorOrAdmin) => {
+export const useLessons = (sectionId, isCreatorOrAdmin, enabled = true) => {
   const queryClient = useQueryClient();
 
   const lessonsQuery = useQuery({
@@ -121,7 +121,7 @@ export const useLessons = (sectionId, isCreatorOrAdmin) => {
       }
       throw new Error(res.data?.error || "Failed to fetch lessons");
     },
-    enabled: !!sectionId,
+    enabled: !!sectionId && enabled,
   });
 
   const createLessonMutation = useMutation({

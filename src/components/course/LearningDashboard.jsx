@@ -6,6 +6,7 @@ import { useCurriculum, useLessons, useLesson } from "../../hooks/useCurriculum"
 import { useCourses } from "../../hooks/useCourses";
 import Card from "../common/Card";
 import Button from "../common/Button";
+import { makeRequest } from "../../apiClient";
 
 // Separate Section Accordion item for the sidebar
 const SidebarSectionItem = ({
@@ -16,8 +17,8 @@ const SidebarSectionItem = ({
   completedLessons,
   toggleLessonCompletion,
 }) => {
-  const [isOpen, setIsOpen] = useState(true);
-  const { lessons, lessonsLoading } = useLessons(sect._id, isCreatorOrAdmin);
+  const [isOpen, setIsOpen] = useState(sect.order === 1);
+  const { lessons, lessonsLoading } = useLessons(sect._id, isCreatorOrAdmin, isOpen);
 
   const completedCount = lessons.filter(l => completedLessons[l._id]).length;
 
@@ -125,6 +126,34 @@ const LearningDashboard = () => {
 
   // Retrieve selected lesson details
   const { data: activeLesson, isLoading: lessonLoading } = useLesson(activeLessonId);
+
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [videoUrlLoading, setVideoUrlLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeLesson?.video) {
+      const mediaId = activeLesson.video._id || activeLesson.video;
+      setVideoUrlLoading(true);
+      makeRequest(`/media/${mediaId}/download`)
+        .then((res) => {
+          if (res.success) {
+            setVideoUrl(res.data.downloadUrl);
+          } else {
+            setVideoUrl(null);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to fetch video download URL:", err);
+          setVideoUrl(null);
+        })
+        .finally(() => {
+          setVideoUrlLoading(false);
+        });
+    } else {
+      setVideoUrl(null);
+      setVideoUrlLoading(false);
+    }
+  }, [activeLesson]);
 
   // Initialize first lesson and completed mapping from localStorage
   useEffect(() => {
@@ -239,16 +268,15 @@ const LearningDashboard = () => {
           <div className="w-full bg-black flex flex-col items-center justify-center relative group select-none shadow-2xl">
             {/* The Aspect Ratio Video Box */}
             <div className="w-full max-w-[1020px] aspect-video relative flex items-center justify-center bg-slate-950 shadow-inner overflow-hidden">
-              {lessonLoading ? (
+              {lessonLoading || videoUrlLoading ? (
                 <div className="flex flex-col items-center text-slate-400 animate-pulse">
                   <div className="w-10 h-10 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mb-3"></div>
                   <span className="text-[10px] uppercase font-bold tracking-widest font-mono">Loading Media Context...</span>
                 </div>
               ) : activeLesson ? (
-                /* In a real scenario, this key maps to an S3 download URL from B2 or standard video path */
-                activeLesson.video ? (
+                videoUrl ? (
                   <video
-                    src={activeLesson.video}
+                    src={videoUrl}
                     controls
                     className="w-full h-full object-contain"
                     poster={currentCourse.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020"}
@@ -256,8 +284,8 @@ const LearningDashboard = () => {
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-6 text-center select-none">
                     <Play className="text-slate-700 mb-3 hover:text-sky-500 transition-colors" size={48} />
-                    <p className="text-slate-400 font-bold text-xs font-mono">Mock High-Fidelity Video Player</p>
-                    <p className="text-[10px] text-slate-600 font-mono mt-1">This lesson is configured. Video URL would load from Backblaze B2.</p>
+                    <p className="text-slate-400 font-bold text-xs font-mono">No Video Available</p>
+                    <p className="text-[10px] text-slate-600 font-mono mt-1">This lesson has no video attached yet.</p>
                   </div>
                 )
               ) : (

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, BookOpen, Users, Folder, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, BookOpen, Users, Image, Settings, LogOut } from "lucide-react";
 import { makeRequest } from "../../apiClient";
 
 const AdminLayout = ({ profile, onLogout, children }) => {
@@ -17,7 +17,7 @@ const AdminLayout = ({ profile, onLogout, children }) => {
   const navLinks = [
     isCreator && { name: "Dashboard", path: "/admin", icon: LayoutDashboard, exact: true },
     isCreator && { name: "Course Creator", path: "/admin/courses", icon: BookOpen },
-    isCreator && { name: "File Manager", path: "/admin/files", icon: Folder },
+    isCreator && { name: "Media Manager", path: "/admin/media", icon: Image },
     isAdmin && { name: "RBAC Control", path: "/admin/users", icon: Users },
     { name: "Settings", path: "/admin/settings", icon: Settings },
   ].filter(Boolean);
