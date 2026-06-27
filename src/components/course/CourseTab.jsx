@@ -1,14 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useCourses } from "../../hooks/useCourses";
+import { useQueryClient } from "@tanstack/react-query";
+import { makeRequest } from "../../apiClient";
 import Card from "../common/Card";
 import Button from "../common/Button";
 import Input from "../common/Input";
 import CourseDetails from "./CourseDetails";
+import FileUpload from "../file/FileUpload";
+
+const CourseImage = ({ src, alt, className = "" }) => {
+  const [imgSrc, setImgSrc] = useState(src || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020");
+
+  useEffect(() => {
+    setImgSrc(src || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020");
+  }, [src]);
+
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      onError={() => {
+        setImgSrc("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020");
+      }}
+      className={`w-full h-44 object-cover ${className}`}
+    />
+  );
+};
 
 const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Selected course for detail drill-down (transient UI selection)
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -50,6 +73,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
   const [courseLevel, setCourseLevel] = useState("Beginner"); // Beginner | Intermediate | Advanced
   const [courseStatus, setCourseStatus] = useState("Draft"); // Draft | Published
   const [formLoading, setFormLoading] = useState(false);
+  const [pendingThumbnailFile, setPendingThumbnailFile] = useState(null);
 
   const isCreatorOrAdmin = currentProfile && ["CREATOR", "ADMIN"].includes(currentProfile.role);
 
@@ -100,7 +124,6 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
     const body = {
       title: courseTitle,
       description: courseDesc,
-      thumbnail: courseThumbnail || undefined,
       price: coursePrice,
       category: courseCategory,
       level: courseLevel,
@@ -108,13 +131,56 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
     };
 
     try {
+      let courseId = editingCourseId;
+      
+      // 1. Create or Update Course
       if (editingCourseId) {
         await updateCourse({ id: editingCourseId, body });
-        alert("Course updated successfully!");
       } else {
-        await createCourse(body);
-        alert("Course created successfully!");
+        const newCourseRes = await createCourse(body);
+        courseId = newCourseRes.course._id;
       }
+
+      // 2. Handle Thumbnail Upload if file is pending
+      if (pendingThumbnailFile) {
+        const mimeType = pendingThumbnailFile.type || "image/png";
+        
+        // Stage A: Get upload URL
+        const presignRes = await makeRequest(`/course/${courseId}/thumbnail/upload-url`, {
+          method: "POST",
+          body: { mimeType },
+        });
+        if (!presignRes.success) throw new Error(presignRes.data?.error || "Failed to generate upload URL");
+
+        const { uploadUrl, mediaId } = presignRes.data;
+
+        // Stage B: PUT binary to S3
+        await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.addEventListener("load", () => {
+            if (xhr.status >= 200 && xhr.status < 300) resolve();
+            else reject(new Error(`S3 upload failed with HTTP ${xhr.status}`));
+          });
+          xhr.addEventListener("error", () => reject(new Error("Network error during S3 upload")));
+          xhr.open("PUT", uploadUrl);
+          xhr.setRequestHeader("Content-Type", mimeType);
+          xhr.send(pendingThumbnailFile);
+        });
+
+        // Stage C: Confirm with backend
+        const confirmRes = await makeRequest(`/course/${courseId}/thumbnail/confirm`, {
+          method: "POST",
+          body: { mediaId },
+        });
+        if (!confirmRes.success) throw new Error(confirmRes.data?.error || "Failed to confirm upload");
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      if (editingCourseId) {
+        queryClient.invalidateQueries({ queryKey: ["course", editingCourseId] });
+      }
+
+      alert(editingCourseId ? "Course updated successfully!" : "Course created successfully!");
       resetForm();
       if (viewMode !== "my-courses") {
         setViewMode("my-courses");
@@ -131,7 +197,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
     setEditingCourseId(crs._id);
     setCourseTitle(crs.title);
     setCourseDesc(crs.description);
-    setCourseThumbnail(crs.thumbnail || "");
+    setCourseThumbnail(crs.thumbnailUrl || crs.thumbnail || "");
     setCoursePrice(crs.price || 0);
     setCourseCategory(crs.category);
     setCourseLevel(crs.level || "Beginner");
@@ -159,7 +225,25 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
     setCourseLevel("Beginner");
     setCourseStatus("Draft");
     setEditingCourseId(null);
+    setPendingThumbnailFile(null);
     setShowForm(false);
+  };
+
+  const handleDeleteThumbnail = async () => {
+    if (!confirm("Are you sure you want to delete the course thumbnail from storage?")) return;
+    try {
+      const res = await makeRequest(`/course/${editingCourseId}/thumbnail`, {
+        method: "DELETE",
+      });
+      if (!res.success) throw new Error(res.data?.error || "Failed to delete thumbnail");
+      
+      setCourseThumbnail("");
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course", editingCourseId] });
+      alert("Thumbnail deleted successfully!");
+    } catch (err) {
+      alert(err.message || "Failed to delete thumbnail");
+    }
   };
 
   // If viewing details of a course, render the curriculum coordinator instead
@@ -175,14 +259,14 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
 
 
   return (
-    <div className="space-y-4 font-mono text-xs">
+    <div className="space-y-6 font-sans text-sm">
       {/* View mode toggle sub-navigation (For Creator/Admin) */}
       {isCreatorOrAdmin && (
-        <div className="flex justify-between items-center flex-wrap gap-2">
-          <div className="flex gap-1.5 bg-slate-950 p-1 rounded-lg border border-slate-800/80">
+        <div className="flex justify-between items-center flex-wrap gap-3">
+          <div className="flex gap-1 bg-[#090e1a] p-1 rounded-xl border border-slate-800/60 shadow-inner">
             <button
               onClick={() => setViewMode("catalog")}
-              className={`px-3 py-1 rounded font-bold text-[11px] transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-all duration-200 ${
                 viewMode === "catalog"
                   ? "bg-sky-600 text-white shadow"
                   : "text-slate-400 hover:text-slate-200"
@@ -192,7 +276,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
             </button>
             <button
               onClick={() => setViewMode("my-courses")}
-              className={`px-3 py-1 rounded font-bold text-[11px] transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-all duration-200 ${
                 viewMode === "my-courses"
                   ? "bg-sky-600 text-white shadow"
                   : "text-slate-400 hover:text-slate-200"
@@ -203,7 +287,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
           </div>
 
           {!showForm && (
-            <Button onClick={() => setShowForm(true)} variant="primary" className="py-1 px-3">
+            <Button onClick={() => setShowForm(true)} variant="primary" className="py-1.5 px-4 font-outfit">
               + Create New Course
             </Button>
           )}
@@ -212,11 +296,11 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
 
       {/* View mode toggle sub-navigation (For Students) */}
       {!isCreatorOrAdmin && (
-        <div className="flex justify-between items-center flex-wrap gap-2">
-          <div className="flex gap-1.5 bg-slate-950 p-1 rounded-lg border border-slate-800/80">
+        <div className="flex justify-between items-center flex-wrap gap-3">
+          <div className="flex gap-1 bg-[#090e1a] p-1 rounded-xl border border-slate-800/60 shadow-inner">
             <button
               onClick={() => setViewMode("catalog")}
-              className={`px-3 py-1 rounded font-bold text-[11px] transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-all duration-200 ${
                 viewMode === "catalog"
                   ? "bg-sky-600 text-white shadow"
                   : "text-slate-400 hover:text-slate-200"
@@ -226,7 +310,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
             </button>
             <button
               onClick={() => setViewMode("enrolled")}
-              className={`px-3 py-1 rounded font-bold text-[11px] transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-all duration-200 ${
                 viewMode === "enrolled"
                   ? "bg-sky-600 text-white shadow"
                   : "text-slate-400 hover:text-slate-200"
@@ -242,7 +326,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
       {showForm ? (
         <Card title={editingCourseId ? "Edit Course Parameters" : "Create New Course"} subtitle="Add catalog courses to the LMS database">
           <form onSubmit={handleCourseSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Course Title"
                 id="course-title"
@@ -269,7 +353,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
               onChange={(e) => setCourseDesc(e.target.value)}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Input
                 label="Price ($ USD)"
                 id="course-price"
@@ -285,7 +369,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
                   id="course-level"
                   value={courseLevel}
                   onChange={(e) => setCourseLevel(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 text-slate-100 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-sky-500"
+                  className="bg-[#0c1220] border border-slate-800 text-slate-100 rounded-lg px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15"
                 >
                   <option value="Beginner">Beginner</option>
                   <option value="Intermediate">Intermediate</option>
@@ -299,7 +383,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
                   id="course-status"
                   value={courseStatus}
                   onChange={(e) => setCourseStatus(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 text-slate-100 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-sky-500"
+                  className="bg-[#0c1220] border border-slate-800 text-slate-100 rounded-lg px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15"
                 >
                   <option value="Draft">Draft</option>
                   <option value="Published">Published</option>
@@ -307,20 +391,79 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
               </div>
             </div>
 
-            <Input
-              label="Thumbnail URL (Optional)"
-              id="course-thumbnail"
-              type="url"
-              placeholder="e.g. https://domain.com/image.png"
-              value={courseThumbnail}
-              onChange={(e) => setCourseThumbnail(e.target.value)}
-            />
+            <div className="space-y-3 bg-[#0c1220] border border-slate-800 p-4 rounded-lg">
+              <span className="text-xs font-semibold text-slate-400 block">Course Thumbnail</span>
+              
+              {courseThumbnail || pendingThumbnailFile ? (
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <img 
+                    src={pendingThumbnailFile ? URL.createObjectURL(pendingThumbnailFile) : courseThumbnail} 
+                    alt="Course Thumbnail" 
+                    className="w-32 h-20 object-cover rounded-lg border border-slate-800 shadow-md bg-slate-900"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020";
+                    }}
+                  />
+                  <div className="space-y-2">
+                    <p className="text-xs text-slate-400">
+                      {pendingThumbnailFile ? "New thumbnail selected (pending save)" : "Current course thumbnail"}
+                    </p>
+                    <Button 
+                      type="button" 
+                      variant="danger" 
+                      className="py-1 px-3 text-[11px] font-bold font-outfit"
+                      onClick={() => {
+                        if (pendingThumbnailFile) {
+                          setPendingThumbnailFile(null);
+                        } else {
+                          handleDeleteThumbnail();
+                        }
+                      }}
+                    >
+                      Remove Thumbnail
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-xs text-slate-500">
+                    No thumbnail selected. Select a PNG, JPEG, or WEBP image (Max size: 2MB).
+                  </p>
+                  
+                  <div 
+                    onClick={() => document.getElementById("thumbnail-file-input").click()}
+                    className="border border-dashed border-slate-700 hover:border-sky-500 bg-slate-900/20 hover:bg-slate-900/40 rounded-lg p-4 text-center cursor-pointer transition-colors text-xs text-slate-400 font-medium"
+                  >
+                    Click to select thumbnail image
+                  </div>
+                  
+                  <input
+                    id="thumbnail-file-input"
+                    type="file"
+                    accept="image/png, image/jpeg, image/webp"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        if (file.size > 2 * 1024 * 1024) {
+                          alert("File size exceeds 2MB limit.");
+                          return;
+                        }
+                        setPendingThumbnailFile(file);
+                        setPendingDeletion(false);
+                      }
+                    }}
+                  />
+                </div>
+              )}
+            </div>
 
-            <div className="flex gap-2 pt-1">
-              <Button type="submit" variant="success" isLoading={formLoading}>
+            <div className="flex gap-3 pt-2">
+              <Button type="submit" variant="success" isLoading={formLoading} className="font-outfit">
                 {editingCourseId ? "Save Changes" : "Create Course"}
               </Button>
-              <Button onClick={resetForm} variant="secondary">
+              <Button onClick={resetForm} variant="secondary" className="font-outfit">
                 Cancel
               </Button>
             </div>
@@ -350,23 +493,23 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
         >
           {/* Filters Header - Hide for Enrolled view */}
           {viewMode !== "enrolled" && (
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-900/40 p-3 rounded border border-slate-800/80 mb-3">
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Category Filter</span>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-900/40 p-4 rounded-xl border border-slate-800/50 mb-4">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-outfit">Category Filter</span>
                 <input
                   type="text"
                   placeholder="e.g. Web Development"
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
-                  className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none"
+                  className="bg-[#0c1220] border border-slate-800 text-slate-100 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 placeholder:text-slate-600"
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Difficulty Level</span>
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-outfit">Difficulty Level</span>
                 <select
                   value={filterLevel}
                   onChange={(e) => setFilterLevel(e.target.value)}
-                  className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none"
+                  className="bg-[#0c1220] border border-slate-800 text-slate-100 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
                 >
                   <option value="">All Difficulty Levels</option>
                   <option value="Beginner">Beginner</option>
@@ -374,12 +517,12 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
                   <option value="Advanced">Advanced</option>
                 </select>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Publish Status</span>
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-outfit">Publish Status</span>
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none"
+                  className="bg-[#0c1220] border border-slate-800 text-slate-100 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
                 >
                   {viewMode === "my-courses" ? (
                     <>
@@ -395,15 +538,15 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
                   )}
                 </select>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Page Size</span>
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-outfit">Page Size</span>
                 <input
                   type="number"
                   min={1}
                   max={50}
                   value={limit}
                   onChange={(e) => setLimit(parseInt(e.target.value) || 10)}
-                  className="bg-slate-950 border border-slate-755 text-slate-100 rounded px-2 py-1 text-xs focus:outline-none text-center"
+                  className="bg-[#0c1220] border border-slate-800 text-slate-100 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 text-center"
                 />
               </div>
             </div>
@@ -411,9 +554,9 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
 
           {/* Courses Feed list */}
           {loading && courses.length === 0 ? (
-            <div className="text-center py-8 italic text-slate-500">Querying courses database...</div>
+            <div className="text-center py-12 italic text-slate-500">Querying courses database...</div>
           ) : courses.length === 0 ? (
-            <div className="text-center py-8 border border-dashed border-slate-800 rounded italic text-slate-500">
+            <div className="text-center py-12 border border-dashed border-slate-800 rounded-xl italic text-slate-500">
               {viewMode === "my-courses"
                 ? "You haven't created any courses matching these filters yet."
                 : viewMode === "enrolled"
@@ -421,74 +564,82 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
                 : "No courses matching these filters were found in the catalog."}
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {courses.map((crs) => {
                   const canModify = currentProfile && ["CREATOR", "ADMIN"].includes(currentProfile.role);
 
                   return (
                     <div
                       key={crs._id}
-                      className="border border-slate-800 rounded bg-slate-950 p-4 flex flex-col justify-between hover:shadow-md gap-3 shadow-inner"
+                      className="border border-slate-800/80 rounded-xl bg-slate-950/40 overflow-hidden flex flex-col justify-between hover:shadow-lg hover:border-slate-700/60 transition-all duration-300 gap-4"
                     >
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-start gap-2">
-                          <span className="bg-slate-900 border border-slate-850 px-2 py-0.5 rounded text-[10px] text-sky-400 font-bold uppercase font-mono">
-                            {crs.category}
-                          </span>
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            crs.status === "Published" ? "bg-emerald-950 text-emerald-300 border border-emerald-900/60" : "bg-amber-950 text-amber-300 border border-amber-900/60"
-                          }`}>
-                            {crs.status}
-                          </span>
-                        </div>
-
-                        <h4 className="text-sm font-bold text-slate-100 truncate font-mono" title={crs.title}>{crs.title}</h4>
-                        <p className="text-[11px] text-slate-400 line-clamp-2 h-8 leading-relaxed font-mono">{crs.description}</p>
-                      </div>
-
-                      <div className="border-t border-slate-900/80 pt-2 flex justify-between items-center text-[10px] text-slate-500 font-mono">
-                        <div>
-                          Level: <span className="text-slate-300 font-bold">{crs.level}</span>
-                        </div>
-                        <div className="text-right">
-                          Price: <span className="text-sky-400 font-bold">{crs.price === 0 ? "FREE" : `$${crs.price}`}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between border-t border-slate-900/80 pt-2 gap-2">
-                        <Button
-                          onClick={() => {
-                            if (isCreatorOrAdmin) {
-                              navigate(`/admin/courses/${crs._id}`);
-                            } else {
-                              navigate(`/dashboard/courses/${crs._id}`);
-                            }
-                          }}
-                          variant="primary"
-                          className="py-1 px-3 text-[10px] flex-1 font-bold"
-                        >
-                          {isCreatorOrAdmin ? "📖 Curriculum Details" : "🎓 View Course"}
-                        </Button>
+                      <div>
+                        <CourseImage src={crs.thumbnailUrl} alt={crs.title} />
                         
-                        {canModify && (
-                          <div className="flex gap-1.5">
-                            <Button
-                              onClick={(e) => handleEditClick(e, crs)}
-                              variant="secondary"
-                              className="px-2 py-1 text-[10px] font-bold"
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              onClick={(e) => handleDeleteClick(e, crs._id)}
-                              variant="danger"
-                              className="px-2 py-1 text-[10px] font-bold"
-                            >
-                              Delete
-                            </Button>
+                        <div className="p-5 space-y-3">
+                          <div className="flex justify-between items-center gap-2">
+                            <span className="bg-sky-500/10 border border-sky-500/25 px-2.5 py-0.5 rounded text-[10px] text-sky-400 font-bold uppercase tracking-wider font-outfit">
+                              {crs.category}
+                            </span>
+                            <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wider font-outfit ${
+                              crs.status === "Published"
+                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25"
+                                : "bg-amber-500/10 text-amber-400 border border-amber-500/25"
+                            }`}>
+                              {crs.status}
+                            </span>
                           </div>
-                        )}
+
+                          <h4 className="text-base font-bold text-slate-100 font-outfit tracking-wide truncate" title={crs.title}>{crs.title}</h4>
+                          <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{crs.description}</p>
+                        </div>
+                      </div>
+
+                      <div className="px-5 pb-5 space-y-4 flex flex-col justify-end flex-1">
+                        <div className="border-t border-slate-900 pt-3 flex justify-between items-center text-xs text-slate-500 font-sans">
+                          <div>
+                            Level: <span className="text-slate-300 font-bold">{crs.level}</span>
+                          </div>
+                          <div className="text-right">
+                            Price: <span className="text-sky-400 font-bold">{crs.price === 0 ? "FREE" : `$${crs.price}`}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between border-t border-slate-900 pt-3 gap-3">
+                          <Button
+                            onClick={() => {
+                              if (isCreatorOrAdmin) {
+                                navigate(`/admin/courses/${crs._id}`);
+                              } else {
+                                navigate(`/dashboard/courses/${crs._id}`);
+                              }
+                            }}
+                            variant="primary"
+                            className="py-2 px-3 text-xs flex-1 font-bold font-outfit"
+                          >
+                            {isCreatorOrAdmin ? "📖 Curriculum Details" : "🎓 View Course"}
+                          </Button>
+                          
+                          {canModify && (
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={(e) => handleEditClick(e, crs)}
+                                variant="secondary"
+                                className="px-3 py-2 text-xs font-bold font-outfit"
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                onClick={(e) => handleDeleteClick(e, crs._id)}
+                                variant="danger"
+                                className="px-3 py-2 text-xs font-bold font-outfit"
+                              >
+                                Delete
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -499,7 +650,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
                 <Button
                   onClick={() => fetchNextPage()}
                   variant="secondary"
-                  className="w-full py-1.5"
+                  className="w-full py-2.5 font-outfit mt-2"
                   isLoading={isFetchingNextPage}
                 >
                   Load More Courses

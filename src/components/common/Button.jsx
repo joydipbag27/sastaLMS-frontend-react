@@ -10,14 +10,14 @@ const Button = ({
   isLoading = false,
 }) => {
   const baseStyle =
-    "px-4 py-2 rounded font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2";
+    "px-4 py-2 rounded-lg font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm flex items-center justify-center gap-2 transform active:scale-[0.98] hover:scale-[1.01]";
 
   const variants = {
-    primary: "bg-sky-600 hover:bg-sky-500 text-white focus:ring-sky-500",
-    success: "bg-emerald-600 hover:bg-emerald-500 text-white focus:ring-emerald-500",
-    danger: "bg-rose-600 hover:bg-rose-500 text-white focus:ring-rose-500",
-    warning: "bg-amber-600 hover:bg-amber-500 text-white focus:ring-amber-500",
-    secondary: "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 focus:ring-slate-500",
+    primary: "bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white shadow-md shadow-sky-950/20 focus:ring-sky-500",
+    success: "bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-md shadow-emerald-950/20 focus:ring-emerald-500",
+    danger: "bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white shadow-md shadow-rose-950/20 focus:ring-rose-500",
+    warning: "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white shadow-md shadow-amber-950/20 focus:ring-amber-500",
+    secondary: "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-750 focus:ring-slate-500",
   };
 
   return (

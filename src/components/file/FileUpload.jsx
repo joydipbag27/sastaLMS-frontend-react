@@ -65,7 +65,7 @@ const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
       // Stage 1: Get presigned upload URL
       setUploadStage("presign");
       setStatusText("Generating secure upload URL...");
-      const { uploadUrl, storageKey } = await getUploadUrl(mimeType);
+      const { uploadUrl, mediaId } = await getUploadUrl(mimeType);
 
       // Stage 2: Upload binary to B2 via XHR (for progress tracking)
       setUploadStage("uploading");
@@ -100,7 +100,7 @@ const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
       setUploadStage("confirming");
       setStatusText("Confirming with server...");
       const result = await confirmUpload({
-        storageKey,
+        mediaId,
         mimeType,
         size: selectedFile.size,
       });

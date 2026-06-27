@@ -23,14 +23,14 @@ const SidebarSectionItem = ({
   const completedCount = lessons.filter(l => completedLessons[l._id]).length;
 
   return (
-    <div className="border-b border-slate-800">
+    <div className="border-b border-slate-800/80">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-slate-900/40 hover:bg-slate-900/80 transition-colors text-left"
+        className="w-full flex items-center justify-between p-4 bg-slate-900/20 hover:bg-slate-900/50 transition-all text-left"
       >
         <div>
-          <h4 className="font-bold text-slate-100 text-xs sm:text-[13px] leading-snug">{sect.title}</h4>
-          <span className="text-[10px] text-slate-400 font-medium">
+          <h4 className="font-bold text-slate-100 text-sm leading-snug font-outfit">{sect.title}</h4>
+          <span className="text-[11px] text-slate-400 font-medium">
             {completedCount} of {lessons.length} complete
           </span>
         </div>
@@ -40,11 +40,11 @@ const SidebarSectionItem = ({
       </button>
 
       {isOpen && (
-        <div className="bg-slate-950/60 divide-y divide-slate-900/60">
+        <div className="bg-slate-950/40 divide-y divide-slate-900/30">
           {lessonsLoading ? (
-            <div className="p-4 text-center text-[10px] italic text-slate-500">Loading lessons...</div>
+            <div className="p-4 text-center text-xs italic text-slate-500">Loading lessons...</div>
           ) : lessons.length === 0 ? (
-            <div className="p-4 text-center text-[10px] italic text-slate-500">No lessons inside this section</div>
+            <div className="p-4 text-center text-xs italic text-slate-500">No lessons inside this section</div>
           ) : (
             lessons.map((les, index) => {
               const isSelected = activeLessonId === les._id;
@@ -55,26 +55,26 @@ const SidebarSectionItem = ({
                 <div
                   key={les._id}
                   onClick={() => onSelectLesson(les._id)}
-                  className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
-                    isSelected ? "bg-slate-800/45 border-l-2 border-sky-500" : "hover:bg-slate-900/50"
+                  className={`flex items-center justify-between p-3.5 cursor-pointer transition-all ${
+                    isSelected ? "bg-sky-500/10 border-l-2 border-sky-500" : "hover:bg-slate-900/30"
                   }`}
                 >
                   <div className="flex gap-3 flex-1 min-w-0 pr-2">
-                    <span className={`text-[11px] font-mono font-bold shrink-0 ${isSelected ? "text-sky-400" : "text-slate-500"}`}>
+                    <span className={`text-xs font-mono font-bold shrink-0 ${isSelected ? "text-sky-400" : "text-slate-500"}`}>
                       {displayOrder}
                     </span>
                     <div className="min-w-0">
-                      <p className={`text-[11px] font-medium leading-tight truncate ${isSelected ? "text-slate-100 font-bold" : "text-slate-300"}`}>
+                      <p className={`text-xs font-semibold leading-tight truncate ${isSelected ? "text-sky-400 font-bold" : "text-slate-300"}`}>
                         {les.title}
                       </p>
-                      <span className="text-[9px] text-slate-500 font-medium">Video</span>
+                      <span className="text-[10px] text-slate-500 font-medium font-outfit uppercase tracking-wider">Video</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center gap-2.5" onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => toggleLessonCompletion(les._id)}
-                      className={`transition-transform hover:scale-110 ${isCompleted ? "text-emerald-400" : "text-slate-500 hover:text-slate-400"}`}
+                      className={`transition-all hover:scale-110 ${isCompleted ? "text-emerald-400" : "text-slate-500 hover:text-slate-400"}`}
                     >
                       {isCompleted ? <CheckCircle size={16} /> : <Circle size={16} />}
                     </button>
@@ -83,7 +83,7 @@ const SidebarSectionItem = ({
                         navigator.clipboard.writeText(`${window.location.origin}/classroom/${les.course}?lesson=${les._id}`);
                         alert("Lesson link copied to clipboard!");
                       }}
-                      className="text-slate-500 hover:text-slate-400 transition-colors"
+                      className="text-slate-500 hover:text-slate-350 transition-colors"
                       title="Share Lesson"
                     >
                       <Share2 size={13} />
@@ -226,30 +226,30 @@ const LearningDashboard = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-[#0b0f19] text-slate-100 font-sans overflow-hidden">
+    <div className="h-screen flex flex-col bg-[#080c14] text-slate-100 font-sans overflow-hidden">
       {/* Immersive Classroom Header */}
-      <header className="h-14 bg-[#0d1222] border-b border-slate-800/80 px-4 flex items-center justify-between shrink-0 select-none">
+      <header className="h-14 bg-slate-950 border-b border-slate-850 px-4 flex items-center justify-between shrink-0 select-none z-20">
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={handleBack}
-            className="w-8 h-8 rounded-full bg-slate-900 border border-slate-850 flex items-center justify-center text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all shrink-0"
+            className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all shrink-0"
           >
             <ArrowLeft size={16} />
           </button>
           
           <div className="flex items-center gap-2 shrink-0">
-            <span className="w-6 h-6 rounded-md bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-black text-xs text-white shadow-md">
+            <span className="w-6 h-6 rounded-md bg-gradient-to-tr from-sky-500 to-indigo-650 flex items-center justify-center font-black text-xs text-white shadow-md">
               Pro
             </span>
           </div>
 
-          <h1 className="font-bold text-xs sm:text-[13px] text-slate-200 truncate pr-4 font-mono max-w-[200px] md:max-w-md" title={currentCourse.title}>
+          <h1 className="font-bold text-xs sm:text-sm text-slate-200 truncate pr-4 font-outfit max-w-[200px] md:max-w-md" title={currentCourse.title}>
             {currentCourse.title}
           </h1>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <div className="bg-slate-900/80 border border-slate-800/60 px-3 py-1 rounded-full flex items-center gap-2 text-[10px] text-slate-400 font-mono font-bold select-none">
+          <div className="bg-slate-900/80 border border-slate-800/60 px-3 py-1 rounded-full flex items-center gap-2 text-[10px] text-slate-400 font-sans font-bold select-none">
             <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
             <span>{overallCompletedCount} lessons complete</span>
           </div>
@@ -271,7 +271,7 @@ const LearningDashboard = () => {
               {lessonLoading || videoUrlLoading ? (
                 <div className="flex flex-col items-center text-slate-400 animate-pulse">
                   <div className="w-10 h-10 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-                  <span className="text-[10px] uppercase font-bold tracking-widest font-mono">Loading Media Context...</span>
+                  <span className="text-[10px] uppercase font-bold tracking-widest font-sans">Loading Media Context...</span>
                 </div>
               ) : activeLesson ? (
                 videoUrl ? (
@@ -279,33 +279,33 @@ const LearningDashboard = () => {
                     src={videoUrl}
                     controls
                     className="w-full h-full object-contain"
-                    poster={currentCourse.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020"}
+                    poster={currentCourse.thumbnailUrl || currentCourse.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020"}
                   />
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-6 text-center select-none">
                     <Play className="text-slate-700 mb-3 hover:text-sky-500 transition-colors" size={48} />
-                    <p className="text-slate-400 font-bold text-xs font-mono">No Video Available</p>
-                    <p className="text-[10px] text-slate-600 font-mono mt-1">This lesson has no video attached yet.</p>
+                    <p className="text-slate-400 font-bold text-xs font-outfit">No Video Available</p>
+                    <p className="text-[10px] text-slate-655 font-sans mt-1">This lesson has no video attached yet.</p>
                   </div>
                 )
               ) : (
-                <div className="flex flex-col items-center justify-center text-slate-500 p-6 text-center">
+                <div className="flex flex-col items-center justify-center text-slate-550 p-6 text-center">
                   <Play className="text-slate-800 mb-3" size={48} />
-                  <p className="text-slate-400 font-bold text-xs font-mono">Select a lesson from the outline to start learning</p>
+                  <p className="text-slate-400 font-bold text-xs font-outfit">Select a lesson from the outline to start learning</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Under-Player Metadata & Tabs */}
-          <div className="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 space-y-4">
-            <div className="flex justify-between items-start border-b border-slate-800/80 pb-2">
+          <div className="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 space-y-5">
+            <div className="flex justify-between items-start border-b border-slate-800/80 pb-3">
               <div>
-                <h2 className="text-sm sm:text-base font-bold text-slate-100 font-mono leading-snug">
+                <h2 className="text-base sm:text-lg font-bold text-slate-100 font-outfit leading-snug">
                   {activeLesson ? activeLesson.title : "Select a lesson"}
                 </h2>
                 {activeLesson?.duration && (
-                  <span className="text-[10px] text-slate-500 font-mono">Duration: {activeLesson.duration} minutes</span>
+                  <span className="text-[11px] text-slate-550 font-sans mt-1 block">Duration: {activeLesson.duration} minutes</span>
                 )}
               </div>
 
@@ -313,7 +313,7 @@ const LearningDashboard = () => {
                 <Button
                   onClick={() => toggleLessonCompletion(activeLesson._id)}
                   variant={completedLessons[activeLesson._id] ? "success" : "secondary"}
-                  className="py-1 px-3 text-[10px] font-bold shrink-0 font-mono"
+                  className="py-1.5 px-4 text-xs font-bold shrink-0 font-outfit"
                 >
                   {completedLessons[activeLesson._id] ? "✓ Completed" : "Mark Complete"}
                 </Button>
@@ -321,7 +321,7 @@ const LearningDashboard = () => {
             </div>
 
             {/* Premium LMS Navigation Tabs */}
-            <div className="flex gap-6 border-b border-slate-800/80 text-[11px] font-bold font-mono">
+            <div className="flex gap-6 border-b border-slate-800/80 text-xs font-bold font-outfit tracking-wide">
               <button
                 onClick={() => setActiveTab("description")}
                 className={`pb-2.5 transition-colors relative ${
@@ -349,23 +349,23 @@ const LearningDashboard = () => {
             </div>
 
             {/* Tab Body Contents */}
-            <div className="text-[11px] leading-relaxed text-slate-300 font-mono">
+            <div className="text-xs sm:text-sm leading-relaxed text-slate-300 font-sans">
               {activeTab === "description" && (
-                <div className="space-y-2 bg-slate-900/20 p-4 rounded-lg border border-slate-800/50">
+                <div className="space-y-2 bg-slate-900/10 p-4 rounded-xl border border-slate-800/50">
                   <p>{activeLesson?.description || "No description provided for this lesson."}</p>
                 </div>
               )}
 
               {activeTab === "resources" && (
-                <div className="space-y-3 bg-slate-900/20 p-4 rounded-lg border border-slate-800/50">
+                <div className="space-y-3 bg-slate-900/10 p-4 rounded-xl border border-slate-800/50">
                   <p className="text-slate-400">Downloadable lesson materials:</p>
                   <div className="space-y-2">
                     <a
                       href="#"
                       onClick={e => e.preventDefault()}
-                      className="flex items-center gap-2.5 text-sky-400 hover:underline p-2 rounded bg-slate-950/60 border border-slate-900"
+                      className="flex items-center gap-2.5 text-sky-400 hover:underline p-3 rounded-lg bg-slate-950/40 border border-slate-900/80"
                     >
-                      <FileText size={14} />
+                      <FileText size={15} />
                       <span>Chapter Code Snippets.zip (1.2 MB)</span>
                     </a>
                   </div>
@@ -380,24 +380,24 @@ const LearningDashboard = () => {
                       placeholder="Ask a question about this lesson..."
                       value={newQuestion}
                       onChange={e => setNewQuestion(e.target.value)}
-                      className="flex-1 bg-slate-950 border border-slate-800 text-slate-100 rounded px-3 py-1.5 text-[11px] focus:outline-none focus:border-sky-500"
+                      className="flex-1 bg-slate-950 border border-slate-800 text-slate-100 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
                     />
-                    <Button type="submit" variant="primary" className="py-1 px-3 shrink-0 font-bold">
+                    <Button type="submit" variant="primary" className="py-1.5 px-4 shrink-0 font-bold font-outfit">
                       Post
                     </Button>
                   </form>
 
                   <div className="space-y-2.5">
                     {qnaList.map(item => (
-                      <div key={item.id} className="p-3 bg-slate-900/30 rounded border border-slate-800/40">
+                      <div key={item.id} className="p-3 bg-slate-900/20 rounded-lg border border-slate-800/40">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="font-bold text-slate-200">{item.user}</span>
-                          <span className="text-[9px] text-slate-500 flex items-center gap-1">
-                            <MessageSquare size={10} />
+                          <span className="font-bold text-slate-200 text-xs font-outfit">{item.user}</span>
+                          <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                            <MessageSquare size={11} />
                             {item.replies} replies
                           </span>
                         </div>
-                        <p className="text-slate-400 text-[10px] leading-relaxed">{item.comment}</p>
+                        <p className="text-slate-400 text-xs leading-relaxed">{item.comment}</p>
                       </div>
                     ))}
                   </div>
@@ -409,31 +409,31 @@ const LearningDashboard = () => {
 
         {/* Collapsible Content Sidebar */}
         <div
-          className={`h-full border-l border-slate-800/80 bg-[#0d1222] flex flex-col shrink-0 transition-all duration-300 relative select-none z-10 ${
+          className={`h-full border-l border-slate-850 bg-[#0d1222]/85 backdrop-blur-md flex flex-col shrink-0 transition-all duration-300 relative select-none z-10 ${
             sidebarOpen ? "w-80 md:w-96" : "w-0"
           }`}
         >
           {/* Toggle Collapsible Bar Trigger Button on Left Boundary */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="absolute left-[-14px] top-4 w-7 h-7 rounded-full bg-slate-850 border border-slate-800 text-slate-300 hover:text-slate-100 flex items-center justify-center transition-all hover:scale-105 shadow-lg"
+            className="absolute left-[-14px] top-4 w-7 h-7 rounded-full bg-slate-800 border border-slate-700 text-slate-300 hover:text-slate-100 flex items-center justify-center transition-all hover:scale-105 shadow-lg"
           >
-            <span className="text-[10px] font-bold">
+            <span className="text-xs font-bold font-mono">
               {sidebarOpen ? ">" : "<"}
             </span>
           </button>
 
           {sidebarOpen && (
             <div className="w-full h-full flex flex-col overflow-hidden">
-              <div className="p-4 border-b border-slate-800/80 bg-slate-900/20">
-                <h3 className="font-mono font-bold text-slate-200 text-xs sm:text-[13px] uppercase tracking-wider">Content Outline</h3>
+              <div className="p-4 border-b border-slate-850 bg-slate-950/20">
+                <h3 className="font-outfit font-bold text-slate-200 text-sm uppercase tracking-wider">Content Outline</h3>
               </div>
 
-              <div className="flex-1 overflow-y-auto divide-y divide-slate-800/80">
+              <div className="flex-1 overflow-y-auto divide-y divide-slate-850">
                 {sectionsLoading ? (
-                  <div className="p-6 text-center text-[10px] italic text-slate-500 font-mono">Retrieving sections database...</div>
+                  <div className="p-6 text-center text-xs italic text-slate-500">Retrieving sections database...</div>
                 ) : sections.length === 0 ? (
-                  <div className="p-6 text-center text-[10px] italic text-slate-500 font-mono">No sections in curriculum outline.</div>
+                  <div className="p-6 text-center text-xs italic text-slate-500">No sections in curriculum outline.</div>
                 ) : (
                   sections.map((sect) => (
                     <SidebarSectionItem

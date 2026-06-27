@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCurriculum, useLessons } from "../../hooks/useCurriculum";
@@ -10,24 +10,43 @@ import Button from "../common/Button";
 import Input from "../common/Input";
 import { Play, Lock, Unlock, CheckCircle, GraduationCap } from "lucide-react";
 
+const CourseImage = ({ src, alt, className = "" }) => {
+  const [imgSrc, setImgSrc] = useState(src || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020");
+
+  useEffect(() => {
+    setImgSrc(src || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020");
+  }, [src]);
+
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      onError={() => {
+        setImgSrc("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020");
+      }}
+      className={`w-full h-48 object-cover ${className}`}
+    />
+  );
+};
+
 const LessonRow = ({ les, canEdit }) => {
   return (
-    <div className="flex justify-between items-center p-3 rounded bg-slate-900/20 border border-slate-900 hover:border-slate-800 transition-colors">
+    <div className="flex justify-between items-center p-3.5 rounded-lg bg-slate-900/20 border border-slate-900 hover:border-slate-800 transition-all">
       <div className="flex items-center gap-3 min-w-0">
-        <span className="text-slate-500 font-mono text-[10px] shrink-0">L{les.order}</span>
+        <span className="text-slate-500 font-mono text-[10px] shrink-0 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800/40">L{les.order}</span>
         <div className="min-w-0">
-          <p className="font-bold text-slate-300 text-[11px] truncate leading-tight">{les.title}</p>
-          <span className="text-[9px] text-slate-500 font-medium">Video {les.duration > 0 ? `(${les.duration}m)` : ""}</span>
+          <p className="font-bold text-slate-300 text-xs sm:text-sm truncate leading-tight">{les.title}</p>
+          <span className="text-[10px] text-slate-500 font-medium">Video {les.duration > 0 ? `(${les.duration}m)` : ""}</span>
         </div>
       </div>
       
       <div className="flex items-center gap-2 shrink-0">
         {les.isPreview ? (
-          <span className="bg-emerald-950/60 text-emerald-400 border border-emerald-900/60 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1 font-mono">
+          <span className="bg-emerald-950/60 text-emerald-400 border border-emerald-900/60 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1 font-outfit">
             <Unlock size={10} /> PREVIEW
           </span>
         ) : !canEdit ? (
-          <span className="text-slate-600 flex items-center gap-1 font-mono text-[9px]">
+          <span className="text-slate-600 flex items-center gap-1 font-outfit text-[9px] tracking-wider">
             <Lock size={10} /> LOCKED
           </span>
         ) : null}
@@ -67,7 +86,6 @@ const SectionItem = ({
       title: lessonTitle,
       description: lessonDesc,
       course: courseId,
-      video: lessonVideo || undefined,
       duration: lessonDuration,
       isPreview: lessonIsPreview,
       order: lessonOrder,
@@ -128,19 +146,19 @@ const SectionItem = ({
   };
 
   return (
-    <div className="border border-slate-800 rounded bg-slate-950 overflow-hidden shadow-sm">
+    <div className="border border-slate-800/80 rounded-xl bg-slate-950/40 overflow-hidden shadow-sm">
       {/* Section Header */}
       <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex justify-between items-center p-3.5 cursor-pointer bg-slate-900/60 hover:bg-slate-900 transition-colors select-none"
+        className="flex justify-between items-center p-4 cursor-pointer bg-slate-900/40 hover:bg-slate-900/70 transition-all select-none"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-sky-400 font-mono font-bold text-xs">Section {sect.order}</span>
-          <span className="font-bold text-slate-200 text-xs sm:text-[13px]">{sect.title}</span>
-          {sect.description && <span className="text-[10px] text-slate-500 hidden sm:inline">({sect.description})</span>}
+        <div className="flex items-center gap-3">
+          <span className="text-sky-400 font-mono font-bold text-xs bg-sky-950/50 px-2 py-0.5 rounded border border-sky-900/30">Section {sect.order}</span>
+          <span className="font-bold text-slate-200 text-sm">{sect.title}</span>
+          {sect.description && <span className="text-xs text-slate-500 hidden sm:inline">({sect.description})</span>}
         </div>
 
-        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-2.5" onClick={(e) => e.stopPropagation()}>
           {canEdit && (
             <>
               <Button
@@ -150,27 +168,27 @@ const SectionItem = ({
                   setEditingLessonId(null);
                 }}
                 variant="success"
-                className="px-2 py-0.5 text-[9px] font-bold text-white bg-emerald-600 hover:bg-emerald-500 font-mono"
+                className="px-2 py-1 text-[10px] font-bold text-white bg-emerald-600 hover:bg-emerald-500 font-outfit"
               >
                 + Lesson
               </Button>
               <Button
                 onClick={() => onEditSectionClick(sect)}
                 variant="secondary"
-                className="px-2 py-0.5 text-[9px] font-bold font-mono"
+                className="px-2 py-1 text-[10px] font-bold font-outfit"
               >
                 Edit
               </Button>
               <Button
                 onClick={() => onDeleteSection(sect._id)}
                 variant="danger"
-                className="px-2 py-0.5 text-[9px] font-bold font-mono"
+                className="px-2 py-1 text-[10px] font-bold font-outfit"
               >
                 Delete
               </Button>
             </>
           )}
-          <span className="text-slate-500 font-mono text-sm w-4 text-center">
+          <span className="text-slate-500 font-mono text-xs w-4 text-center">
             {isExpanded ? "▼" : "▶"}
           </span>
         </div>
@@ -218,18 +236,31 @@ const SectionItem = ({
                   {canEdit && uploadingLessonId === les._id && (
                     <div className="p-3 border-t border-slate-900 bg-slate-900/40">
                       <FileUpload
-                        useMediaHook={mediaHook}
-                        onUploadSuccess={async (media) => {
-                          try {
-                            await updateLesson({
-                              lessonId: les._id,
-                              body: { video: media._id },
+                        useMediaHook={{
+                          getUploadUrl: async (mimeType) => {
+                            const endpoint = les.video
+                              ? `/media/lesson/${les._id}/replace-url`
+                              : `/media/lesson/${les._id}/upload-url`;
+                            const res = await makeRequest(endpoint, {
+                              method: "POST",
+                              body: { mimeType },
                             });
-                            setUploadingLessonId(null);
-                            alert("Video attached successfully!");
-                          } catch (err) {
-                            alert(err.message || "Failed to link video to lesson");
+                            if (!res.success) throw new Error(res.data?.error || "Failed to get upload URL");
+                            return res.data;
+                          },
+                          confirmUpload: async ({ mediaId, mimeType, size }) => {
+                            const res = await makeRequest(`/media/lesson/${les._id}/confirm`, {
+                              method: "POST",
+                              body: { mediaId, mimeType, size },
+                            });
+                            if (!res.success) throw new Error(res.data?.error || "Failed to confirm upload");
+                            return res.data;
                           }
+                        }}
+                        onUploadSuccess={() => {
+                          refetchLessons();
+                          setUploadingLessonId(null);
+                          alert("Video uploaded and attached successfully!");
                         }}
                       />
                     </div>
@@ -276,20 +307,13 @@ const SectionItem = ({
                 {editingLessonId ? "Modify Lesson" : "New Lesson for Section"}
               </h5>
               <form onSubmit={handleLessonSubmit} className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
                   <Input
                     label="Lesson Title"
                     id={`lesson-title-${sect._id}`}
                     required
                     value={lessonTitle}
                     onChange={(e) => setLessonTitle(e.target.value)}
-                  />
-                  <Input
-                    label="Video Media ID (Optional)"
-                    id={`lesson-video-${sect._id}`}
-                    value={lessonVideo}
-                    onChange={(e) => setLessonVideo(e.target.value)}
-                    placeholder="e.g. 24-character ID"
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -476,15 +500,15 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
   const handleBack = onBack || (() => navigate(-1));
 
   return (
-    <div className="space-y-6 font-mono text-xs max-w-5xl mx-auto">
+    <div className="space-y-6 font-sans text-sm max-w-5xl mx-auto">
       {/* Back Button */}
       <div className="flex items-center justify-between">
-        <Button onClick={handleBack} variant="secondary" className="px-4 py-1.5 font-bold font-mono">
+        <Button onClick={handleBack} variant="secondary" className="px-4 py-1.5 font-bold font-outfit">
           ← Back to Catalog
         </Button>
         {isCreatorOrAdmin && (
           <Link to={`/classroom/${course._id}`}>
-            <Button variant="primary" className="px-4 py-1.5 font-bold font-mono">
+            <Button variant="primary" className="px-4 py-1.5 font-bold font-outfit">
               👁️ Preview Classroom
             </Button>
           </Link>
@@ -496,22 +520,22 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
         {/* Left Column: Summary Card */}
         <div className="md:col-span-2 space-y-4">
           <Card title={course.title} subtitle={`Category: ${course.category} | Level: ${course.level}`}>
-            <div className="space-y-4 text-slate-300">
-              <p className="text-slate-400 bg-slate-900/40 p-4 rounded-lg border border-slate-800 leading-relaxed text-xs">
+            <div className="space-y-4 text-slate-350">
+              <p className="text-slate-400 bg-slate-900/30 p-4 rounded-xl border border-slate-800/80 leading-relaxed text-xs sm:text-sm">
                 {course.description}
               </p>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-[11px] pt-1">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs pt-1">
                 <div>
-                  <span className="text-slate-500 block text-[10px] uppercase">Level</span>
+                  <span className="text-slate-500 block text-[10px] uppercase font-outfit tracking-wider">Level</span>
                   <span className="font-bold text-slate-200">{course.level}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px] uppercase">Category</span>
+                  <span className="text-slate-500 block text-[10px] uppercase font-outfit tracking-wider">Category</span>
                   <span className="font-bold text-slate-200">{course.category}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px] uppercase">Instructor</span>
+                  <span className="text-slate-500 block text-[10px] uppercase font-outfit tracking-wider">Instructor</span>
                   <span className="font-bold text-sky-400">{course.creator?.username || course.creator || "LMS Tutor"}</span>
                 </div>
               </div>
@@ -521,28 +545,32 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
 
         {/* Right Column: Dynamic Action Enrollment CTA Card */}
         <div className="space-y-4">
-          <div className="bg-slate-900/30 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col justify-between gap-4">
+          <div className="border border-slate-800 rounded-xl overflow-hidden shadow-lg bg-slate-950/40">
+            <CourseImage src={course.thumbnailUrl} alt={course.title} />
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col justify-between gap-4">
             <div>
-              <span className="text-slate-500 text-[10px] font-bold block uppercase tracking-wider mb-1">
+              <span className="text-slate-500 text-[10px] font-bold block uppercase tracking-wider mb-1 font-outfit">
                 {isEnrolled ? "YOUR STUDENT ACCESS" : "COURSE TUITION"}
               </span>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-black text-slate-100">
+                <span className="text-2xl font-black text-slate-100 font-outfit">
                   {isEnrolled ? "UNLOCKED" : course.price === 0 ? "FREE" : `$${course.price}`}
                 </span>
-                {!isEnrolled && course.price > 0 && <span className="text-[10px] text-slate-500 font-bold">USD</span>}
+                {!isEnrolled && course.price > 0 && <span className="text-[10px] text-slate-500 font-bold font-outfit">USD</span>}
               </div>
             </div>
 
             <div className="space-y-2.5 pt-2">
               {isEnrolled ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 p-2.5 bg-emerald-950/20 border border-emerald-900/50 rounded-lg text-emerald-300 text-[10px] font-bold">
+                  <div className="flex items-center gap-2 p-2.5 bg-emerald-950/20 border border-emerald-900/50 rounded-lg text-emerald-300 text-[10px] font-bold font-sans">
                     <CheckCircle size={16} className="shrink-0" />
                     <span>You are actively enrolled in this classroom!</span>
                   </div>
                   <Link to={`/classroom/${course._id}`} className="block">
-                    <Button variant="success" className="w-full py-2.5 text-xs font-bold font-mono uppercase tracking-wider flex items-center justify-center gap-2">
+                    <Button variant="success" className="w-full py-2.5 text-xs font-bold font-outfit uppercase tracking-wider flex items-center justify-center gap-2">
                       <GraduationCap size={16} />
                       Start Learning
                     </Button>
@@ -553,7 +581,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
                   onClick={handleEnroll}
                   variant="primary"
                   isLoading={enrollLoading}
-                  className="w-full py-2.5 text-xs font-bold font-mono uppercase tracking-wider"
+                  className="w-full py-2.5 text-xs font-bold font-outfit uppercase tracking-wider"
                 >
                   {course.price === 0 ? "Enroll for Free" : `Enroll — $${course.price}`}
                 </Button>
@@ -567,7 +595,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
       {showSectionForm && (
         <Card title={editingSectionId ? "Edit Section" : "Add Section"} subtitle="Group lessons inside this course">
           <form onSubmit={handleSectionSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Section Title"
                 id="section-title"
@@ -590,13 +618,14 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
               value={sectionDesc}
               onChange={(e) => setSectionDesc(e.target.value)}
             />
-            <div className="flex gap-2">
-              <Button type="submit" variant="success" isLoading={sectionFormLoading}>
+            <div className="flex gap-3">
+              <Button type="submit" variant="success" isLoading={sectionFormLoading} className="font-outfit">
                 {editingSectionId ? "Save Changes" : "Create Section"}
               </Button>
               <Button
                 onClick={resetSectionForm}
                 variant="secondary"
+                className="font-outfit"
               >
                 Cancel
               </Button>
@@ -612,7 +641,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
           <div className="flex justify-between items-center w-full mt-1.5 flex-wrap gap-2">
             <span>Review the structured lectures and assignments</span>
             {canEdit && !showSectionForm && (
-              <Button onClick={() => setShowSectionForm(true)} variant="primary" className="py-1 px-3 text-[10px] font-mono">
+              <Button onClick={() => setShowSectionForm(true)} variant="primary" className="py-1.5 px-4 font-outfit">
                 + Add Section
               </Button>
             )}
@@ -620,13 +649,13 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
         }
       >
         {loading ? (
-          <div className="text-center py-4 italic text-slate-500 text-[11px] font-mono">Loading curriculum...</div>
+          <div className="text-center py-6 italic text-slate-500 text-xs">Loading curriculum...</div>
         ) : sections.length === 0 ? (
-          <div className="text-center py-6 border border-dashed border-slate-800 rounded italic text-slate-500 text-[11px] font-mono">
+          <div className="text-center py-8 border border-dashed border-slate-800 rounded-xl italic text-slate-500 text-xs">
             No curriculum sections added yet.
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 font-sans">
             {sections.map((sect) => (
               <SectionItem
                 key={sect._id}

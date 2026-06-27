@@ -17,11 +17,13 @@ const StudentLayout = ({ profile, onLogout, children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex text-slate-800 font-sans">
+    <div className="min-h-screen bg-slate-900 flex text-slate-200 font-sans">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm z-10 hidden md:flex">
-        <div className="h-16 flex items-center px-6 border-b border-slate-100">
-          <h1 className="text-2xl font-black text-sky-600 tracking-tight">veoLMS</h1>
+      <aside className="w-64 bg-slate-950 border-r border-slate-800 flex flex-col hidden md:flex shadow-xl z-10">
+        <div className="h-16 flex items-center px-6 border-b border-slate-800">
+          <h1 className="text-2xl font-black text-sky-500 tracking-tight flex items-center gap-2">
+            veoLMS <span className="text-[10px] bg-sky-950/40 border border-sky-800/80 px-1.5 py-0.5 rounded text-sky-400 font-bold uppercase tracking-wider font-outfit">STUDENT</span>
+          </h1>
         </div>
         
         <nav className="flex-1 p-4 space-y-1.5">
@@ -34,23 +36,23 @@ const StudentLayout = ({ profile, onLogout, children }) => {
                 to={link.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-semibold ${
                   isActive 
-                    ? "bg-sky-50 text-sky-700 shadow-sm" 
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-sky-600 text-white shadow-md" 
+                    : "text-slate-400 hover:bg-slate-900 hover:text-slate-100"
                 }`}
               >
-                <Icon size={20} className={isActive ? "text-sky-600" : "text-slate-400"} />
+                <Icon size={20} className={isActive ? "text-white" : "text-slate-500"} />
                 {link.name}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-100">
+        <div className="p-4 border-t border-slate-800">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 w-full text-left rounded-lg text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors font-semibold"
+            className="flex items-center gap-3 px-4 py-3 w-full text-left rounded-lg text-slate-400 hover:bg-slate-900 hover:text-rose-400 transition-colors font-semibold"
           >
-            <LogOut size={20} className="text-slate-400 group-hover:text-rose-500" />
+            <LogOut size={20} className="text-slate-500" />
             Sign Out
           </button>
         </div>
@@ -59,24 +61,26 @@ const StudentLayout = ({ profile, onLogout, children }) => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-0">
+        <header className="h-16 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-8 shadow-sm z-0">
           <div className="flex items-center gap-4 flex-1">
-             {/* Mobile logo placeholder */}
-             <h1 className="md:hidden text-xl font-black text-sky-600 tracking-tight">veoLMS</h1>
+             <h1 className="md:hidden text-xl font-black text-sky-500 tracking-tight">veoLMS</h1>
+             <span className="bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider hidden sm:block font-outfit">
+               Student Portal
+             </span>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-bold text-slate-800">{profile?.username}</div>
-              <div className="text-xs text-slate-500 font-medium">Student</div>
+              <div className="text-sm font-bold text-slate-200">{profile?.username}</div>
+              <div className="text-xs text-slate-500 font-medium">{profile?.email}</div>
             </div>
-            <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-700 font-bold border-2 border-sky-200">
+            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-bold border border-slate-655 text-slate-300">
               {profile?.username?.charAt(0).toUpperCase()}
             </div>
           </div>
         </header>
         
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50/50">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#0b1120]">
           <div className="max-w-6xl mx-auto">
             {children}
           </div>
