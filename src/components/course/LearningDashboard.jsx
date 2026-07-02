@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Hls from "hls.js";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ChevronDown, CheckCircle, Circle, Play, MessageSquare, FileText, Share2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
@@ -99,6 +100,60 @@ const SidebarSectionItem = ({
   );
 };
 
+const VideoPlayer = ({ src, poster }) => {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let hls;
+
+    if (Hls.isSupported()) {
+      hls = new Hls({
+        maxMaxBufferLength: 10,
+      });
+      hls.loadSource(src);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              console.error("fatal network error, trying to recover");
+              hls.startLoad();
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              console.error("fatal media error, trying to recover");
+              hls.recoverMediaError();
+              break;
+            default:
+              console.error("unrecoverable HLS error");
+              hls.destroy();
+              break;
+          }
+        }
+      });
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = src;
+    }
+
+    return () => {
+      if (hls) {
+        hls.destroy();
+      }
+    };
+  }, [src]);
+
+  return (
+    <video
+      ref={videoRef}
+      controls
+      className="w-full h-full object-contain"
+      poster={poster}
+    />
+  );
+};
+
 const LearningDashboard = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -129,29 +184,43 @@ const LearningDashboard = () => {
 
   const [videoUrl, setVideoUrl] = useState(null);
   const [videoUrlLoading, setVideoUrlLoading] = useState(false);
+  const [playbackStatus, setPlaybackStatus] = useState("none"); // "none" | "loading" | "ready" | "processing" | "error"
+  const [playbackError, setPlaybackError] = useState("");
 
   useEffect(() => {
-    if (activeLesson?.video) {
-      const mediaId = activeLesson.video._id || activeLesson.video;
+    if (activeLesson && activeLesson.video) {
       setVideoUrlLoading(true);
-      makeRequest(`/media/${mediaId}/download`)
+      setPlaybackStatus("loading");
+      setPlaybackError("");
+      makeRequest(`/lesson/${activeLesson._id}/play`)
         .then((res) => {
-          if (res.success) {
-            setVideoUrl(res.data.downloadUrl);
+          if (res.success && res.data?.playlistUrl) {
+            setVideoUrl(res.data.playlistUrl);
+            setPlaybackStatus("ready");
           } else {
             setVideoUrl(null);
+            if (res.status === 423) {
+              setPlaybackStatus("processing");
+            } else {
+              setPlaybackStatus("error");
+              setPlaybackError(res.data?.error || "Failed to load video stream.");
+            }
           }
         })
         .catch((err) => {
-          console.error("Failed to fetch video download URL:", err);
+          console.error("Failed to fetch HLS playback stream URL:", err);
           setVideoUrl(null);
+          setPlaybackStatus("error");
+          setPlaybackError(err.message || "An unexpected network error occurred.");
         })
         .finally(() => {
           setVideoUrlLoading(false);
         });
     } else {
       setVideoUrl(null);
+      setPlaybackStatus("none");
       setVideoUrlLoading(false);
+      setPlaybackError("");
     }
   }, [activeLesson]);
 
@@ -268,21 +337,31 @@ const LearningDashboard = () => {
           <div className="w-full bg-black flex flex-col items-center justify-center relative group select-none shadow-2xl">
             {/* The Aspect Ratio Video Box */}
             <div className="w-full max-w-[1020px] aspect-video relative flex items-center justify-center bg-slate-950 shadow-inner overflow-hidden">
-              {lessonLoading || videoUrlLoading ? (
+              {lessonLoading || videoUrlLoading || playbackStatus === "loading" ? (
                 <div className="flex flex-col items-center text-slate-400 animate-pulse">
                   <div className="w-10 h-10 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mb-3"></div>
                   <span className="text-[10px] uppercase font-bold tracking-widest font-sans">Loading Media Context...</span>
                 </div>
               ) : activeLesson ? (
-                videoUrl ? (
-                  <video
+                playbackStatus === "ready" && videoUrl ? (
+                  <VideoPlayer
                     src={videoUrl}
-                    controls
-                    className="w-full h-full object-contain"
                     poster={currentCourse.thumbnailUrl || currentCourse.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020"}
                   />
-                ) : (
+                ) : playbackStatus === "processing" ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-6 text-center select-none">
+                    <div className="w-10 h-10 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <p className="text-amber-500 font-bold text-xs font-outfit">Video is Processing</p>
+                    <p className="text-[10px] text-slate-400 font-sans mt-1">We are preparing this video for high-quality streaming. Please check back shortly.</p>
+                  </div>
+                ) : playbackStatus === "error" ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-6 text-center select-none">
+                    <Play className="text-rose-500/80 mb-3" size={48} />
+                    <p className="text-rose-500 font-bold text-xs font-outfit">Failed to Load Video</p>
+                    <p className="text-[10px] text-slate-400 font-sans mt-1">{playbackError || "An error occurred while launching playback stream."}</p>
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-550 p-6 text-center select-none">
                     <Play className="text-slate-700 mb-3 hover:text-sky-500 transition-colors" size={48} />
                     <p className="text-slate-400 font-bold text-xs font-outfit">No Video Available</p>
                     <p className="text-[10px] text-slate-655 font-sans mt-1">This lesson has no video attached yet.</p>

@@ -239,8 +239,8 @@ const SectionItem = ({
                         useMediaHook={{
                           getUploadUrl: async (mimeType) => {
                             const endpoint = les.video
-                              ? `/media/lesson/${les._id}/replace-url`
-                              : `/media/lesson/${les._id}/upload-url`;
+                              ? `/media/s3/lesson/${les._id}/replace-url`
+                              : `/media/s3/lesson/${les._id}/upload-url`;
                             const res = await makeRequest(endpoint, {
                               method: "POST",
                               body: { mimeType },
@@ -249,7 +249,7 @@ const SectionItem = ({
                             return res.data;
                           },
                           confirmUpload: async ({ mediaId, mimeType, size }) => {
-                            const res = await makeRequest(`/media/lesson/${les._id}/confirm`, {
+                            const res = await makeRequest(`/media/s3/lesson/${les._id}/confirm`, {
                               method: "POST",
                               body: { mediaId, mimeType, size },
                             });
