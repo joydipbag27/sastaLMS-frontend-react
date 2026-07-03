@@ -65,7 +65,7 @@ const SectionItem = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { lessons, lessonsLoading, createLesson, updateLesson, deleteLesson } = useLessons(sect._id, isCreatorOrAdmin, isExpanded);
-  const mediaHook = useMedia();
+  const { getLessonVideoHook } = useMedia();
   const [uploadingLessonId, setUploadingLessonId] = useState(null);
 
   // Lesson Form states
@@ -236,27 +236,7 @@ const SectionItem = ({
                   {canEdit && uploadingLessonId === les._id && (
                     <div className="p-3 border-t border-slate-900 bg-slate-900/40">
                       <FileUpload
-                        useMediaHook={{
-                          getUploadUrl: async (mimeType) => {
-                            const endpoint = les.video
-                              ? `/media/s3/lesson/${les._id}/replace-url`
-                              : `/media/s3/lesson/${les._id}/upload-url`;
-                            const res = await makeRequest(endpoint, {
-                              method: "POST",
-                              body: { mimeType },
-                            });
-                            if (!res.success) throw new Error(res.data?.error || "Failed to get upload URL");
-                            return res.data;
-                          },
-                          confirmUpload: async ({ mediaId, mimeType, size }) => {
-                            const res = await makeRequest(`/media/s3/lesson/${les._id}/confirm`, {
-                              method: "POST",
-                              body: { mediaId, mimeType, size },
-                            });
-                            if (!res.success) throw new Error(res.data?.error || "Failed to confirm upload");
-                            return res.data;
-                          }
-                        }}
+                        useMediaHook={getLessonVideoHook(les._id, !!les.video)}
                         onUploadSuccess={() => {
                           refetchLessons();
                           setUploadingLessonId(null);

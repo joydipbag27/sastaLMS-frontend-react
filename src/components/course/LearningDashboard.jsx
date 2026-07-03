@@ -105,16 +105,53 @@ const VideoPlayer = ({ src, poster }) => {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      console.warn("[VideoPlayer] Video reference is null.");
+      return;
+    }
+
+    console.log("[VideoPlayer] Initializing player with src:", src);
+    console.log("[VideoPlayer] Hls.isSupported():", Hls.isSupported());
+    console.log("[VideoPlayer] Native HLS support:", video.canPlayType("application/vnd.apple.mpegurl") !== "");
 
     let hls;
 
     if (Hls.isSupported()) {
       hls = new Hls({
         maxMaxBufferLength: 10,
+        abrBandwidthFactor: 0.95,
+        abrBandwidthUpFactor: 0.7,
+        capLevelToPlayerSize: false,
       });
       hls.loadSource(src);
       hls.attachMedia(video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+        console.log(`[HLS] Manifest parsed. Found ${data.levels?.length || 0} quality levels.`);
+        data.levels?.forEach((level, idx) => {
+          console.log(`  Level ${idx}: ${level.width}x${level.height} | Bitrate: ${Math.round(level.bitrate / 1000)} kbps`);
+        });
+        console.log(`[HLS] Network-adaptive switching (ABR) active. Current Level Index: ${hls.currentLevel}`);
+      });
+
+      hls.on(Hls.Events.LEVEL_SWITCHING, (event, data) => {
+        const targetLvl = hls.levels[data.level];
+        if (targetLvl) {
+          console.log(`[HLS] Network changed. Switching to: ${targetLvl.width}x${targetLvl.height} (${Math.round(targetLvl.bitrate / 1000)} kbps)`);
+        } else {
+          console.log(`[HLS] Switching to level index: ${data.level}`);
+        }
+      });
+
+      hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+        const activeLvl = hls.levels[data.level];
+        if (activeLvl) {
+          console.log(`[HLS] Successfully switched to: ${activeLvl.width}x${activeLvl.height} (${Math.round(activeLvl.bitrate / 1000)} kbps)`);
+        } else {
+          console.log(`[HLS] Switched to level index: ${data.level}`);
+        }
+      });
+
       hls.on(Hls.Events.ERROR, (event, data) => {
         if (data.fatal) {
           switch (data.type) {
@@ -137,7 +174,14 @@ const VideoPlayer = ({ src, poster }) => {
       video.src = src;
     }
 
+    const handleResize = () => {
+      console.log(`[VideoPlayer] Rendered resolution changed to: ${video.videoWidth}x${video.videoHeight}`);
+    };
+
+    video.addEventListener("resize", handleResize);
+
     return () => {
+      video.removeEventListener("resize", handleResize);
       if (hls) {
         hls.destroy();
       }

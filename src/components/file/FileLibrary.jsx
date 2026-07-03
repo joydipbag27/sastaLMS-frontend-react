@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import {
   Download, Trash2, Eye, EyeOff, Copy, CheckCheck,
-  Image, Film, Music, FileText, Archive, File, Grid, List,
+  Image, Film, Music, FileText, Archive, File, Grid, List, RefreshCw,
 } from "lucide-react";
 
 const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
-  const { getDownloadUrl, deleteMedia, isDeleting } = useMediaHook;
+  const { getDownloadUrl, deleteMedia, isDeleting, retryTransfer, isRetrying } = useMediaHook;
   const [view, setView] = useState("grid"); // "grid" | "list"
   const [loadingId, setLoadingId] = useState(null);
   const [previewId, setPreviewId] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [copiedId, setCopiedId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [retryingId, setRetryingId] = useState(null);
 
   const formatBytes = (bytes) => {
     if (!bytes) return "0 B";
@@ -87,6 +88,18 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
       alert(err.message || "Failed to delete");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleRetryTransfer = async (media) => {
+    setRetryingId(media._id);
+    try {
+      const result = await retryTransfer(media._id);
+      alert(result?.message || "Retry complete!");
+    } catch (err) {
+      alert(err.message || "Retry failed");
+    } finally {
+      setRetryingId(null);
     }
   };
 
@@ -191,12 +204,16 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
                   <div className="mt-2 flex items-center gap-1.5">
                     <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
                       media.status === "READY" ? "bg-emerald-500/10 text-emerald-400" :
-                      media.status === "UPLOADING" ? "bg-amber-500/10 text-amber-400" :
+                      media.status === "PROCESSING" ? "bg-amber-500/10 text-amber-400" :
+                      media.status === "COPY_PENDING" ? "bg-orange-500/10 text-orange-400" :
+                      media.status === "UPLOADING" ? "bg-sky-500/10 text-sky-400" :
                       "bg-rose-500/10 text-rose-400"
                     }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${
                         media.status === "READY" ? "bg-emerald-400" :
-                        media.status === "UPLOADING" ? "bg-amber-400" :
+                        media.status === "PROCESSING" ? "bg-amber-400 animate-pulse" :
+                        media.status === "COPY_PENDING" ? "bg-orange-400 animate-pulse" :
+                        media.status === "UPLOADING" ? "bg-sky-400 animate-pulse" :
                         "bg-rose-400"
                       }`} />
                       {media.status}
@@ -223,6 +240,21 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
                       >
                         {isThisPreview ? <EyeOff size={13} /> : <Eye size={13} />}
                         <span className="hidden sm:inline">{isThisPreview ? "Hide" : "Preview"}</span>
+                      </button>
+                    )}
+                    {media.status === "COPY_PENDING" && retryTransfer && (
+                      <button
+                        onClick={() => handleRetryTransfer(media)}
+                        disabled={retryingId === media._id}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-orange-950/40 hover:bg-orange-950/70 text-orange-400 text-xs font-medium transition-colors disabled:opacity-50"
+                        title="Retry pending file transfer"
+                      >
+                        {retryingId === media._id ? (
+                          <div className="w-3 h-3 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <RefreshCw size={13} />
+                        )}
+                        <span className="hidden sm:inline">Retry</span>
                       </button>
                     )}
                     <button
@@ -292,12 +324,16 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
                       <td className="py-3 px-4 hidden md:table-cell">
                         <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
                           media.status === "READY" ? "bg-emerald-500/10 text-emerald-400" :
-                          media.status === "UPLOADING" ? "bg-amber-500/10 text-amber-400" :
+                          media.status === "PROCESSING" ? "bg-amber-500/10 text-amber-400" :
+                          media.status === "COPY_PENDING" ? "bg-orange-500/10 text-orange-400" :
+                          media.status === "UPLOADING" ? "bg-sky-500/10 text-sky-400" :
                           "bg-rose-500/10 text-rose-400"
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${
                             media.status === "READY" ? "bg-emerald-400" :
-                            media.status === "UPLOADING" ? "bg-amber-400" :
+                            media.status === "PROCESSING" ? "bg-amber-400 animate-pulse" :
+                            media.status === "COPY_PENDING" ? "bg-orange-400 animate-pulse" :
+                            media.status === "UPLOADING" ? "bg-sky-400 animate-pulse" :
                             "bg-rose-400"
                           }`} />
                           {media.status}
@@ -322,6 +358,20 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
                               title="Preview"
                             >
                               {isThisPreview ? <EyeOff size={14} /> : <Eye size={14} />}
+                            </button>
+                          )}
+                          {media.status === "COPY_PENDING" && retryTransfer && (
+                            <button
+                              onClick={() => handleRetryTransfer(media)}
+                              disabled={retryingId === media._id}
+                              className="p-2 rounded-lg hover:bg-orange-950/40 text-orange-400 transition-colors disabled:opacity-50"
+                              title="Retry pending transfer"
+                            >
+                              {retryingId === media._id ? (
+                                <div className="w-3.5 h-3.5 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <RefreshCw size={14} />
+                              )}
                             </button>
                           )}
                           <button

@@ -2,35 +2,44 @@ import { useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../apiClient";
 
 /**
- * Hook for media API operations (upload-url, confirm-upload, download, delete).
- * Does NOT manage a list query — the parent component holds the media array in state.
+ * Hook for media API operations.
+ *
+ * Video uploads are lesson-scoped — use the helpers below with a lessonId.
+ * The old generic /media/upload-url endpoint no longer exists.
  */
 export const useMedia = () => {
-  // 1. Get presigned PUT URL + mediaId (the Media _id, also the B2 key)
-  const uploadUrlMutation = useMutation({
-    mutationFn: async (mimeType) => {
-      const res = await makeRequest("/media/upload-url", {
+  // ── Lesson-scoped S3 video upload ──────────────────────────────────────────
+
+  /**
+   * Returns a { getUploadUrl, confirmUpload } pair bound to a specific lesson.
+   * Pass this object as `useMediaHook` to <FileUpload />.
+   *
+   * @param {string} lessonId
+   * @param {boolean} hasVideo - true if the lesson already has a video (triggers replace-url)
+   */
+  const getLessonVideoHook = (lessonId, hasVideo = false) => ({
+    getUploadUrl: async (mimeType) => {
+      const endpoint = hasVideo
+        ? `/media/s3/lesson/${lessonId}/replace-url`
+        : `/media/s3/lesson/${lessonId}/upload-url`;
+      const res = await makeRequest(endpoint, {
         method: "POST",
         body: { mimeType },
       });
       if (!res.success) throw new Error(res.data?.error || "Failed to get upload URL");
       return res.data; // { uploadUrl, mediaId }
     },
-  });
-
-  // 2. Confirm upload → updates Media document to READY
-  const confirmUploadMutation = useMutation({
-    mutationFn: async ({ mediaId, mimeType, size }) => {
-      const res = await makeRequest("/media/confirm-upload", {
+    confirmUpload: async ({ mediaId, mimeType, size }) => {
+      const res = await makeRequest(`/media/s3/lesson/${lessonId}/confirm`, {
         method: "POST",
         body: { mediaId, mimeType, size },
       });
       if (!res.success) throw new Error(res.data?.error || "Failed to confirm upload");
-      return res.data; // { media }
+      return res.data; // { lesson, media }
     },
   });
 
-  // 3. Delete media (B2 + MongoDB)
+  // ── Delete media (B2 + MongoDB) ────────────────────────────────────────────
   const deleteMediaMutation = useMutation({
     mutationFn: async (mediaId) => {
       const res = await makeRequest(`/media/${mediaId}`, {
@@ -41,23 +50,37 @@ export const useMedia = () => {
     },
   });
 
-  // 4. Get presigned download URL (standalone function, not a mutation)
+  // ── Presigned download URL ─────────────────────────────────────────────────
   const getDownloadUrl = async (mediaId) => {
     const res = await makeRequest(`/media/${mediaId}/download`);
     if (!res.success) throw new Error(res.data?.error || "Failed to get download URL");
     return res.data.downloadUrl;
   };
 
+  // ── Admin: retry COPY_PENDING transfer ────────────────────────────────────
+  const retryTransferMutation = useMutation({
+    mutationFn: async (mediaId) => {
+      const res = await makeRequest(`/media/${mediaId}/retry-transfer`, {
+        method: "POST",
+      });
+      if (!res.success) throw new Error(res.data?.error || "Failed to retry transfer");
+      return res.data;
+    },
+  });
+
   return {
-    getUploadUrl: uploadUrlMutation.mutateAsync,
-    isGettingUploadUrl: uploadUrlMutation.isPending,
+    // Lesson-scoped upload helpers
+    getLessonVideoHook,
 
-    confirmUpload: confirmUploadMutation.mutateAsync,
-    isConfirming: confirmUploadMutation.isPending,
-
+    // Delete
     deleteMedia: deleteMediaMutation.mutateAsync,
     isDeleting: deleteMediaMutation.isPending,
 
+    // Download
     getDownloadUrl,
+
+    // Admin retry
+    retryTransfer: retryTransferMutation.mutateAsync,
+    isRetrying: retryTransferMutation.isPending,
   };
 };
