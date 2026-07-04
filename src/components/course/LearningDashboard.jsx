@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Hls from "hls.js";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ChevronDown, CheckCircle, Circle, Play, MessageSquare, FileText, Share2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useCurriculum, useLessons, useLesson } from "../../hooks/useCurriculum";
 import { useCourses } from "../../hooks/useCourses";
+import { useLessonProgress } from "../../hooks/useLessonProgress";
 import Card from "../common/Card";
 import Button from "../common/Button";
 import { makeRequest } from "../../apiClient";
@@ -16,7 +17,6 @@ const SidebarSectionItem = ({
   activeLessonId,
   onSelectLesson,
   completedLessons,
-  toggleLessonCompletion,
 }) => {
   const [isOpen, setIsOpen] = useState(sect.order === 1);
   const { lessons, lessonsLoading } = useLessons(sect._id, isCreatorOrAdmin, isOpen);
@@ -73,12 +73,11 @@ const SidebarSectionItem = ({
                   </div>
 
                   <div className="flex items-center gap-2.5" onClick={e => e.stopPropagation()}>
-                    <button
-                      onClick={() => toggleLessonCompletion(les._id)}
-                      className={`transition-all hover:scale-110 ${isCompleted ? "text-emerald-400" : "text-slate-500 hover:text-slate-400"}`}
+                    <div
+                      className={`${isCompleted ? "text-emerald-400" : "text-slate-600"}`}
                     >
                       {isCompleted ? <CheckCircle size={16} /> : <Circle size={16} />}
-                    </button>
+                    </div>
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(`${window.location.origin}/classroom/${les.course}?lesson=${les._id}`);
@@ -100,8 +99,22 @@ const SidebarSectionItem = ({
   );
 };
 
-const VideoPlayer = ({ src, poster }) => {
+const VideoPlayer = ({
+  src,
+  poster,
+  initialTime = 0,
+  onTimeUpdate,
+  onPlay,
+  onPause,
+  onSeeked,
+  onEnded,
+}) => {
   const videoRef = useRef(null);
+  const initialTimeSetRef = useRef(false);
+
+  useEffect(() => {
+    initialTimeSetRef.current = false;
+  }, [src]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -188,14 +201,91 @@ const VideoPlayer = ({ src, poster }) => {
     };
   }, [src]);
 
+  const handlePlay = () => {
+    if (onPlay) onPlay();
+  };
+
+  const handlePause = () => {
+    if (onPause) onPause();
+  };
+
+  const handleTimeUpdate = (e) => {
+    const video = e.target;
+    if (!initialTimeSetRef.current && initialTime > 0) {
+      console.log(`[VideoPlayer] Setting initial position on timeupdate: ${initialTime}`);
+      video.currentTime = initialTime;
+      initialTimeSetRef.current = true;
+    }
+    if (onTimeUpdate) {
+      onTimeUpdate(video.currentTime);
+    }
+  };
+
+  const handleSeeked = (e) => {
+    if (onSeeked) {
+      onSeeked(e.target.currentTime);
+    }
+  };
+
+  const handleEnded = () => {
+    if (onEnded) onEnded();
+  };
+
+  const handleLoadedMetadata = (e) => {
+    const video = e.target;
+    if (!initialTimeSetRef.current && initialTime > 0) {
+      console.log(`[VideoPlayer] Setting initial position on loadedmetadata: ${initialTime}`);
+      video.currentTime = initialTime;
+      initialTimeSetRef.current = true;
+    }
+  };
+
   return (
     <video
       ref={videoRef}
       controls
       className="w-full h-full object-contain"
       poster={poster}
+      onPlay={handlePlay}
+      onPause={handlePause}
+      onTimeUpdate={handleTimeUpdate}
+      onSeeked={handleSeeked}
+      onEnded={handleEnded}
+      onLoadedMetadata={handleLoadedMetadata}
     />
   );
+};
+
+// Simple debounce utility with flush capability
+const createDebouncedFunc = (func, delay) => {
+  let timeoutId;
+  let latestArgs;
+
+  const debounced = (...args) => {
+    latestArgs = args;
+    if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func(...latestArgs);
+      timeoutId = null;
+    }, delay);
+  };
+
+  debounced.flush = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      func(...latestArgs);
+      timeoutId = null;
+    }
+  };
+
+  debounced.cancel = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  };
+
+  return debounced;
 };
 
 const LearningDashboard = () => {
@@ -215,6 +305,7 @@ const LearningDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("description"); // description | resources | qna
   const [completedLessons, setCompletedLessons] = useState({});
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Q&A Comments State
   const [qnaList, setQnaList] = useState([
@@ -226,10 +317,130 @@ const LearningDashboard = () => {
   // Retrieve selected lesson details
   const { data: activeLesson, isLoading: lessonLoading } = useLesson(activeLessonId);
 
+  // Lesson Progress Hook integration
+  const { progress, progressLoading, updateProgress } = useLessonProgress(activeLessonId, isCreatorOrAdmin);
+
   const [videoUrl, setVideoUrl] = useState(null);
   const [videoUrlLoading, setVideoUrlLoading] = useState(false);
   const [playbackStatus, setPlaybackStatus] = useState("none"); // "none" | "loading" | "ready" | "processing" | "error"
   const [playbackError, setPlaybackError] = useState("");
+
+  // Playback position refs for debounced/periodic saving
+  const lastSavedPositionRef = useRef(0);
+  const currentPositionRef = useRef(0);
+
+  // Sync refs when new progress loads
+  useEffect(() => {
+    const initialPos = progress?.lastPosition || 0;
+    lastSavedPositionRef.current = initialPos;
+    currentPositionRef.current = initialPos;
+  }, [activeLessonId, progressLoading]);
+
+  // Sync completion status to local mapping to reflect instantly in the sidebar
+  useEffect(() => {
+    if (activeLessonId && progress) {
+      setCompletedLessons(prev => ({
+        ...prev,
+        [activeLessonId]: progress.completed,
+      }));
+    }
+  }, [activeLessonId, progress]);
+
+  // Setup debounced progress updater
+  const saveProgressDebounced = useMemo(() => {
+    return createDebouncedFunc(async (lessonId, position) => {
+      if (isCreatorOrAdmin || !lessonId) return;
+      try {
+        console.log(`[Progress] Saving position ${position} for lesson ${lessonId}`);
+        await updateProgress(position);
+        lastSavedPositionRef.current = position;
+      } catch (err) {
+        console.error("Failed to save progress:", err);
+      }
+    }, 1000); // 1-second debounce for seek/pause bursts
+  }, [updateProgress, isCreatorOrAdmin]);
+
+  // Flush any pending save on lesson switch or component unmount
+  useEffect(() => {
+    return () => {
+      if (saveProgressDebounced) {
+        saveProgressDebounced.flush();
+      }
+    };
+  }, [activeLessonId, saveProgressDebounced]);
+
+  // 30-second periodic save interval during active playback
+  useEffect(() => {
+    if (isCreatorOrAdmin || !activeLessonId || !isPlaying) return;
+
+    const intervalId = setInterval(() => {
+      const currentPos = currentPositionRef.current;
+      const lastSaved = lastSavedPositionRef.current;
+
+      // Save if there's any playback progress (>0.5s shift)
+      if (Math.abs(currentPos - lastSaved) > 0.5) {
+        console.log("[Progress] Periodic 30s tick: saving progress");
+        saveProgressDebounced(activeLessonId, currentPos);
+      }
+    }, 30000);
+
+    return () => clearInterval(intervalId);
+  }, [isPlaying, activeLessonId, isCreatorOrAdmin, saveProgressDebounced]);
+
+  // Event handlers to update references & trigger saves on important events
+  const handleTimeUpdate = (time) => {
+    currentPositionRef.current = time;
+  };
+
+  const handlePause = () => {
+    setIsPlaying(false);
+    if (!isCreatorOrAdmin && activeLessonId) {
+      console.log("[Progress] Event: Pause. Saving immediately.");
+      saveProgressDebounced(activeLessonId, currentPositionRef.current);
+      saveProgressDebounced.flush();
+    }
+  };
+
+  const handleSeeked = (time) => {
+    currentPositionRef.current = time;
+    if (!isCreatorOrAdmin && activeLessonId) {
+      console.log("[Progress] Event: Seeked. Saving immediately.");
+      saveProgressDebounced(activeLessonId, time);
+      saveProgressDebounced.flush();
+    }
+  };
+
+  const handleEnded = () => {
+    setIsPlaying(false);
+    if (!isCreatorOrAdmin && activeLessonId) {
+      console.log("[Progress] Event: Ended. Saving immediately.");
+      saveProgressDebounced(activeLessonId, currentPositionRef.current);
+      saveProgressDebounced.flush();
+    }
+  };
+
+  // Browser level exit events: visibility change & page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (saveProgressDebounced) {
+        saveProgressDebounced.flush();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden" && saveProgressDebounced) {
+        saveProgressDebounced.flush();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [saveProgressDebounced]);
 
   useEffect(() => {
     if (activeLesson && activeLesson.video) {
@@ -268,19 +479,16 @@ const LearningDashboard = () => {
     }
   }, [activeLesson]);
 
-  // Initialize first lesson and completed mapping from localStorage
+  // Initialize first lesson and completed mapping
   useEffect(() => {
     if (sections && sections.length > 0 && !activeLessonId) {
-      // Find first section, we'll try to find first lesson to set active
       const firstSection = sections[0];
       if (firstSection) {
-        // Query param check or default
         const params = new URLSearchParams(window.location.search);
         const queryLessonId = params.get("lesson");
         if (queryLessonId) {
           setActiveLessonId(queryLessonId);
         } else {
-          // fetch first lesson from API
           makeRequest(`/lesson/section/${firstSection._id}`).then(res => {
             if (res.success && res.data.lessons?.length > 0) {
               setActiveLessonId(res.data.lessons[0]._id);
@@ -290,30 +498,6 @@ const LearningDashboard = () => {
       }
     }
   }, [sections]);
-
-  // Load completion states
-  useEffect(() => {
-    if (profile?._id && courseId) {
-      const stored = localStorage.getItem(`veo_progress_${profile._id}_${courseId}`);
-      if (stored) {
-        try {
-          setCompletedLessons(JSON.parse(stored));
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    }
-  }, [profile?._id, courseId]);
-
-  const toggleLessonCompletion = (lesId) => {
-    setCompletedLessons(prev => {
-      const updated = { ...prev, [lesId]: !prev[lesId] };
-      if (profile?._id && courseId) {
-        localStorage.setItem(`veo_progress_${profile._id}_${courseId}`, JSON.stringify(updated));
-      }
-      return updated;
-    });
-  };
 
   const handlePostQuestion = (e) => {
     e.preventDefault();
@@ -331,7 +515,7 @@ const LearningDashboard = () => {
   };
 
   // Compute overall completion stats
-  const totalLessonsCount = sections.length * 4; // Mock estimate or total lessons if available
+  const totalLessonsCount = sections.length * 4; 
   const overallCompletedCount = Object.keys(completedLessons).filter(k => completedLessons[k]).length;
 
   const handleBack = () => {
@@ -381,7 +565,7 @@ const LearningDashboard = () => {
           <div className="w-full bg-black flex flex-col items-center justify-center relative group select-none shadow-2xl">
             {/* The Aspect Ratio Video Box */}
             <div className="w-full max-w-[1020px] aspect-video relative flex items-center justify-center bg-slate-950 shadow-inner overflow-hidden">
-              {lessonLoading || videoUrlLoading || playbackStatus === "loading" ? (
+              {lessonLoading || videoUrlLoading || playbackStatus === "loading" || progressLoading ? (
                 <div className="flex flex-col items-center text-slate-400 animate-pulse">
                   <div className="w-10 h-10 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mb-3"></div>
                   <span className="text-[10px] uppercase font-bold tracking-widest font-sans">Loading Media Context...</span>
@@ -391,15 +575,21 @@ const LearningDashboard = () => {
                   <VideoPlayer
                     src={videoUrl}
                     poster={currentCourse.thumbnailUrl || currentCourse.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1020"}
+                    initialTime={progress?.lastPosition || 0}
+                    onTimeUpdate={handleTimeUpdate}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={handlePause}
+                    onSeeked={handleSeeked}
+                    onEnded={handleEnded}
                   />
                 ) : playbackStatus === "processing" ? (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-6 text-center select-none">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-550 p-6 text-center select-none">
                     <div className="w-10 h-10 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mb-3"></div>
                     <p className="text-amber-500 font-bold text-xs font-outfit">Video is Processing</p>
                     <p className="text-[10px] text-slate-400 font-sans mt-1">We are preparing this video for high-quality streaming. Please check back shortly.</p>
                   </div>
                 ) : playbackStatus === "error" ? (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-6 text-center select-none">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-550 p-6 text-center select-none">
                     <Play className="text-rose-500/80 mb-3" size={48} />
                     <p className="text-rose-500 font-bold text-xs font-outfit">Failed to Load Video</p>
                     <p className="text-[10px] text-slate-400 font-sans mt-1">{playbackError || "An error occurred while launching playback stream."}</p>
@@ -432,14 +622,14 @@ const LearningDashboard = () => {
                 )}
               </div>
 
-              {activeLesson && (
-                <Button
-                  onClick={() => toggleLessonCompletion(activeLesson._id)}
-                  variant={completedLessons[activeLesson._id] ? "success" : "secondary"}
-                  className="py-1.5 px-4 text-xs font-bold shrink-0 font-outfit"
-                >
-                  {completedLessons[activeLesson._id] ? "✓ Completed" : "Mark Complete"}
-                </Button>
+              {activeLesson && !isCreatorOrAdmin && (
+                <div className={`py-1.5 px-4 text-xs font-bold shrink-0 font-outfit rounded-lg border ${
+                  completedLessons[activeLesson._id]
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
+                    : "bg-slate-900 text-slate-400 border-slate-800"
+                }`}>
+                  {completedLessons[activeLesson._id] ? "✓ Completed" : "In Progress"}
+                </div>
               )}
             </div>
 
@@ -566,7 +756,6 @@ const LearningDashboard = () => {
                       activeLessonId={activeLessonId}
                       onSelectLesson={setActiveLessonId}
                       completedLessons={completedLessons}
-                      toggleLessonCompletion={toggleLessonCompletion}
                     />
                   ))
                 )}

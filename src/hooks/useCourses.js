@@ -90,6 +90,34 @@ export const useCourses = (viewMode, filters, limit = 10) => {
     },
   });
 
+  const publishCourseMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await makeRequest(`/course/${id}/publish`, {
+        method: "PATCH",
+      });
+      if (!res.success) throw new Error(res.data?.error || "Failed to publish course");
+      return res.data;
+    },
+    onSuccess: (data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course", id] });
+    },
+  });
+
+  const unpublishCourseMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await makeRequest(`/course/${id}/unpublish`, {
+        method: "PATCH",
+      });
+      if (!res.success) throw new Error(res.data?.error || "Failed to unpublish course");
+      return res.data;
+    },
+    onSuccess: (data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course", id] });
+    },
+  });
+
   return {
     ...query,
     courses: query.data?.pages.flatMap((page) => page.courses) || [],
@@ -99,5 +127,9 @@ export const useCourses = (viewMode, filters, limit = 10) => {
     isUpdating: updateCourseMutation.isPending,
     deleteCourse: deleteCourseMutation.mutateAsync,
     isDeleting: deleteCourseMutation.isPending,
+    publishCourse: publishCourseMutation.mutateAsync,
+    isPublishing: publishCourseMutation.isPending,
+    unpublishCourse: unpublishCourseMutation.mutateAsync,
+    isUnpublishing: unpublishCourseMutation.isPending,
   };
 };

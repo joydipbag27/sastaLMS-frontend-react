@@ -56,6 +56,8 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
     createCourse,
     updateCourse,
     deleteCourse,
+    publishCourse,
+    unpublishCourse,
   } = useCourses(viewMode, {
     category: filterCategory,
     level: filterLevel,
@@ -72,6 +74,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
   const [courseCategory, setCourseCategory] = useState("");
   const [courseLevel, setCourseLevel] = useState("Beginner"); // Beginner | Intermediate | Advanced
   const [courseStatus, setCourseStatus] = useState("Draft"); // Draft | Published
+  const [originalStatus, setOriginalStatus] = useState("Draft");
   const [formLoading, setFormLoading] = useState(false);
   const [pendingThumbnailFile, setPendingThumbnailFile] = useState(null);
 
@@ -127,7 +130,6 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
       price: coursePrice,
       category: courseCategory,
       level: courseLevel,
-      status: courseStatus,
     };
 
     try {
@@ -136,9 +138,28 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
       // 1. Create or Update Course
       if (editingCourseId) {
         await updateCourse({ id: editingCourseId, body });
+        
+        // Handle publish/unpublish if status changed
+        if (courseStatus !== originalStatus) {
+          if (courseStatus === "Published") {
+            await publishCourse(editingCourseId);
+          } else if (courseStatus === "Draft") {
+            await unpublishCourse(editingCourseId);
+          }
+        }
       } else {
         const newCourseRes = await createCourse(body);
         courseId = newCourseRes.course._id;
+        
+        // If they selected Published during creation (even though new course starts as Draft)
+        if (courseStatus === "Published") {
+          try {
+            await publishCourse(courseId);
+          } catch (pubErr) {
+            console.warn("Could not publish new course immediately:", pubErr);
+            alert(`Course created as Draft. Note: ${pubErr.message}`);
+          }
+        }
       }
 
       // 2. Handle Thumbnail Upload if file is pending
@@ -202,6 +223,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
     setCourseCategory(crs.category);
     setCourseLevel(crs.level || "Beginner");
     setCourseStatus(crs.status || "Draft");
+    setOriginalStatus(crs.status || "Draft");
     setShowForm(true);
   };
 
@@ -224,6 +246,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
     setCourseCategory("");
     setCourseLevel("Beginner");
     setCourseStatus("Draft");
+    setOriginalStatus("Draft");
     setEditingCourseId(null);
     setPendingThumbnailFile(null);
     setShowForm(false);
@@ -623,6 +646,39 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
                           
                           {canModify && (
                             <div className="flex gap-2">
+                              {crs.status === "Published" ? (
+                                <Button
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      await unpublishCourse(crs._id);
+                                      alert("Course unpublished successfully!");
+                                    } catch (err) {
+                                      alert(err.message || "Failed to unpublish course");
+                                    }
+                                  }}
+                                  variant="secondary"
+                                  className="px-3 py-2 text-xs font-bold font-outfit text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
+                                >
+                                  Unpublish
+                                </Button>
+                              ) : (
+                                <Button
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      await publishCourse(crs._id);
+                                      alert("Course published successfully!");
+                                    } catch (err) {
+                                      alert(err.message || "Failed to publish course");
+                                    }
+                                  }}
+                                  variant="secondary"
+                                  className="px-3 py-2 text-xs font-bold font-outfit text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
+                                >
+                                  Publish
+                                </Button>
+                              )}
                               <Button
                                 onClick={(e) => handleEditClick(e, crs)}
                                 variant="secondary"
