@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import Hls from "hls.js";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ChevronDown, CheckCircle, Circle, Play, MessageSquare, FileText, Share2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useCurriculum, useLessons, useLesson } from "../../hooks/useCurriculum";
 import { useCourses } from "../../hooks/useCourses";
 import { useLessonProgress } from "../../hooks/useLessonProgress";
-import Card from "../common/Card";
 import Button from "../common/Button";
+import VideoPlayer from "../common/VideoPlayer";
 import { makeRequest } from "../../apiClient";
 
 const formatDuration = (seconds) => {
@@ -109,162 +108,7 @@ const SidebarSectionItem = ({
   );
 };
 
-const VideoPlayer = ({
-  src,
-  poster,
-  initialTime = 0,
-  onTimeUpdate,
-  onPlay,
-  onPause,
-  onSeeked,
-  onEnded,
-}) => {
-  const videoRef = useRef(null);
-  const initialTimeSetRef = useRef(false);
-
-  useEffect(() => {
-    initialTimeSetRef.current = false;
-  }, [src]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) {
-      console.warn("[VideoPlayer] Video reference is null.");
-      return;
-    }
-
-    console.log("[VideoPlayer] Initializing player with src:", src);
-    console.log("[VideoPlayer] Hls.isSupported():", Hls.isSupported());
-    console.log("[VideoPlayer] Native HLS support:", video.canPlayType("application/vnd.apple.mpegurl") !== "");
-
-    let hls;
-
-    if (Hls.isSupported()) {
-      hls = new Hls({
-        maxMaxBufferLength: 10,
-        abrBandwidthFactor: 0.95,
-        abrBandwidthUpFactor: 0.7,
-        capLevelToPlayerSize: false,
-      });
-      hls.loadSource(src);
-      hls.attachMedia(video);
-
-      hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-        console.log(`[HLS] Manifest parsed. Found ${data.levels?.length || 0} quality levels.`);
-        data.levels?.forEach((level, idx) => {
-          console.log(`  Level ${idx}: ${level.width}x${level.height} | Bitrate: ${Math.round(level.bitrate / 1000)} kbps`);
-        });
-        console.log(`[HLS] Network-adaptive switching (ABR) active. Current Level Index: ${hls.currentLevel}`);
-      });
-
-      hls.on(Hls.Events.LEVEL_SWITCHING, (event, data) => {
-        const targetLvl = hls.levels[data.level];
-        if (targetLvl) {
-          console.log(`[HLS] Network changed. Switching to: ${targetLvl.width}x${targetLvl.height} (${Math.round(targetLvl.bitrate / 1000)} kbps)`);
-        } else {
-          console.log(`[HLS] Switching to level index: ${data.level}`);
-        }
-      });
-
-      hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
-        const activeLvl = hls.levels[data.level];
-        if (activeLvl) {
-          console.log(`[HLS] Successfully switched to: ${activeLvl.width}x${activeLvl.height} (${Math.round(activeLvl.bitrate / 1000)} kbps)`);
-        } else {
-          console.log(`[HLS] Switched to level index: ${data.level}`);
-        }
-      });
-
-      hls.on(Hls.Events.ERROR, (event, data) => {
-        if (data.fatal) {
-          switch (data.type) {
-            case Hls.ErrorTypes.NETWORK_ERROR:
-              console.error("fatal network error, trying to recover");
-              hls.startLoad();
-              break;
-            case Hls.ErrorTypes.MEDIA_ERROR:
-              console.error("fatal media error, trying to recover");
-              hls.recoverMediaError();
-              break;
-            default:
-              console.error("unrecoverable HLS error");
-              hls.destroy();
-              break;
-          }
-        }
-      });
-    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = src;
-    }
-
-    const handleResize = () => {
-      console.log(`[VideoPlayer] Rendered resolution changed to: ${video.videoWidth}x${video.videoHeight}`);
-    };
-
-    video.addEventListener("resize", handleResize);
-
-    return () => {
-      video.removeEventListener("resize", handleResize);
-      if (hls) {
-        hls.destroy();
-      }
-    };
-  }, [src]);
-
-  const handlePlay = () => {
-    if (onPlay) onPlay();
-  };
-
-  const handlePause = () => {
-    if (onPause) onPause();
-  };
-
-  const handleTimeUpdate = (e) => {
-    const video = e.target;
-    if (!initialTimeSetRef.current && initialTime > 0) {
-      console.log(`[VideoPlayer] Setting initial position on timeupdate: ${initialTime}`);
-      video.currentTime = initialTime;
-      initialTimeSetRef.current = true;
-    }
-    if (onTimeUpdate) {
-      onTimeUpdate(video.currentTime);
-    }
-  };
-
-  const handleSeeked = (e) => {
-    if (onSeeked) {
-      onSeeked(e.target.currentTime);
-    }
-  };
-
-  const handleEnded = () => {
-    if (onEnded) onEnded();
-  };
-
-  const handleLoadedMetadata = (e) => {
-    const video = e.target;
-    if (!initialTimeSetRef.current && initialTime > 0) {
-      console.log(`[VideoPlayer] Setting initial position on loadedmetadata: ${initialTime}`);
-      video.currentTime = initialTime;
-      initialTimeSetRef.current = true;
-    }
-  };
-
-  return (
-    <video
-      ref={videoRef}
-      controls
-      className="w-full h-full object-contain"
-      poster={poster}
-      onPlay={handlePlay}
-      onPause={handlePause}
-      onTimeUpdate={handleTimeUpdate}
-      onSeeked={handleSeeked}
-      onEnded={handleEnded}
-      onLoadedMetadata={handleLoadedMetadata}
-    />
-  );
-};
+// Reusable VideoPlayer imported from common components
 
 // Simple debounce utility with flush capability
 const createDebouncedFunc = (func, delay) => {
@@ -344,21 +188,24 @@ const LearningDashboard = () => {
     const initialPos = progress?.lastPosition || 0;
     lastSavedPositionRef.current = initialPos;
     currentPositionRef.current = initialPos;
-  }, [activeLessonId, progressLoading]);
+  }, [activeLessonId, progressLoading, progress?.lastPosition]);
 
   // Sync completion status to local mapping to reflect instantly in the sidebar
   useEffect(() => {
     if (activeLessonId && progress) {
-      setCompletedLessons(prev => ({
-        ...prev,
-        [activeLessonId]: progress.completed,
-      }));
+      setTimeout(() => {
+        setCompletedLessons(prev => ({
+          ...prev,
+          [activeLessonId]: progress.completed,
+        }));
+      }, 0);
     }
   }, [activeLessonId, progress]);
 
-  // Setup debounced progress updater
-  const saveProgressDebounced = useMemo(() => {
-    return createDebouncedFunc(async (lessonId, position) => {
+  // Ref to hold the latest saveProgress function to avoid dependency updates in the debounced function
+  const saveProgressRef = useRef();
+  useEffect(() => {
+    saveProgressRef.current = async (lessonId, position) => {
       if (isCreatorOrAdmin || !lessonId) return;
       try {
         console.log(`[Progress] Saving position ${position} for lesson ${lessonId}`);
@@ -367,17 +214,33 @@ const LearningDashboard = () => {
       } catch (err) {
         console.error("Failed to save progress:", err);
       }
-    }, 1000); // 1-second debounce for seek/pause bursts
+    };
   }, [updateProgress, isCreatorOrAdmin]);
+
+  // Setup debounced progress updater (stable reference in a ref to satisfy ESLint ref rules)
+  const saveProgressDebouncedRef = useRef(null);
+  useEffect(() => {
+    saveProgressDebouncedRef.current = createDebouncedFunc((lessonId, position) => {
+      if (saveProgressRef.current) {
+        saveProgressRef.current(lessonId, position);
+      }
+    }, 1000); // 1-second debounce for seek/pause bursts
+
+    return () => {
+      if (saveProgressDebouncedRef.current) {
+        saveProgressDebouncedRef.current.cancel();
+      }
+    };
+  }, []);
 
   // Flush any pending save on lesson switch or component unmount
   useEffect(() => {
     return () => {
-      if (saveProgressDebounced) {
-        saveProgressDebounced.flush();
+      if (saveProgressDebouncedRef.current) {
+        saveProgressDebouncedRef.current.flush();
       }
     };
-  }, [activeLessonId, saveProgressDebounced]);
+  }, [activeLessonId]);
 
   // 30-second periodic save interval during active playback
   useEffect(() => {
@@ -390,12 +253,14 @@ const LearningDashboard = () => {
       // Save if there's any playback progress (>0.5s shift)
       if (Math.abs(currentPos - lastSaved) > 0.5) {
         console.log("[Progress] Periodic 30s tick: saving progress");
-        saveProgressDebounced(activeLessonId, currentPos);
+        if (saveProgressDebouncedRef.current) {
+          saveProgressDebouncedRef.current(activeLessonId, currentPos);
+        }
       }
     }, 30000);
 
     return () => clearInterval(intervalId);
-  }, [isPlaying, activeLessonId, isCreatorOrAdmin, saveProgressDebounced]);
+  }, [isPlaying, activeLessonId, isCreatorOrAdmin]);
 
   // Event handlers to update references & trigger saves on important events
   const handleTimeUpdate = (time) => {
@@ -406,8 +271,10 @@ const LearningDashboard = () => {
     setIsPlaying(false);
     if (!isCreatorOrAdmin && activeLessonId) {
       console.log("[Progress] Event: Pause. Saving immediately.");
-      saveProgressDebounced(activeLessonId, currentPositionRef.current);
-      saveProgressDebounced.flush();
+      if (saveProgressDebouncedRef.current) {
+        saveProgressDebouncedRef.current(activeLessonId, currentPositionRef.current);
+        saveProgressDebouncedRef.current.flush();
+      }
     }
   };
 
@@ -415,8 +282,10 @@ const LearningDashboard = () => {
     currentPositionRef.current = time;
     if (!isCreatorOrAdmin && activeLessonId) {
       console.log("[Progress] Event: Seeked. Saving immediately.");
-      saveProgressDebounced(activeLessonId, time);
-      saveProgressDebounced.flush();
+      if (saveProgressDebouncedRef.current) {
+        saveProgressDebouncedRef.current(activeLessonId, time);
+        saveProgressDebouncedRef.current.flush();
+      }
     }
   };
 
@@ -424,22 +293,24 @@ const LearningDashboard = () => {
     setIsPlaying(false);
     if (!isCreatorOrAdmin && activeLessonId) {
       console.log("[Progress] Event: Ended. Saving immediately.");
-      saveProgressDebounced(activeLessonId, currentPositionRef.current);
-      saveProgressDebounced.flush();
+      if (saveProgressDebouncedRef.current) {
+        saveProgressDebouncedRef.current(activeLessonId, currentPositionRef.current);
+        saveProgressDebouncedRef.current.flush();
+      }
     }
   };
 
   // Browser level exit events: visibility change & page unload
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (saveProgressDebounced) {
-        saveProgressDebounced.flush();
+      if (saveProgressDebouncedRef.current) {
+        saveProgressDebouncedRef.current.flush();
       }
     };
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden" && saveProgressDebounced) {
-        saveProgressDebounced.flush();
+      if (document.visibilityState === "hidden" && saveProgressDebouncedRef.current) {
+        saveProgressDebouncedRef.current.flush();
       }
     };
 
@@ -450,15 +321,23 @@ const LearningDashboard = () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [saveProgressDebounced]);
+  }, []);
 
   useEffect(() => {
+    let active = true;
+
     if (activeLesson && activeLesson.video) {
-      setVideoUrlLoading(true);
-      setPlaybackStatus("loading");
-      setPlaybackError("");
+      // Async state update to prevent setState-in-effect warning
+      setTimeout(() => {
+        if (!active) return;
+        setVideoUrlLoading(true);
+        setPlaybackStatus("loading");
+        setPlaybackError("");
+      }, 0);
+
       makeRequest(`/lesson/${activeLesson._id}/play`)
         .then((res) => {
+          if (!active) return;
           if (res.success && res.data?.playlistUrl) {
             setVideoUrl(res.data.playlistUrl);
             setPlaybackStatus("ready");
@@ -473,20 +352,29 @@ const LearningDashboard = () => {
           }
         })
         .catch((err) => {
+          if (!active) return;
           console.error("Failed to fetch HLS playback stream URL:", err);
           setVideoUrl(null);
           setPlaybackStatus("error");
           setPlaybackError(err.message || "An unexpected network error occurred.");
         })
         .finally(() => {
+          if (!active) return;
           setVideoUrlLoading(false);
         });
     } else {
-      setVideoUrl(null);
-      setPlaybackStatus("none");
-      setVideoUrlLoading(false);
-      setPlaybackError("");
+      setTimeout(() => {
+        if (!active) return;
+        setVideoUrl(null);
+        setPlaybackStatus("none");
+        setVideoUrlLoading(false);
+        setPlaybackError("");
+      }, 0);
     }
+
+    return () => {
+      active = false;
+    };
   }, [activeLesson]);
 
   // Initialize first lesson and completed mapping
@@ -497,7 +385,9 @@ const LearningDashboard = () => {
         const params = new URLSearchParams(window.location.search);
         const queryLessonId = params.get("lesson");
         if (queryLessonId) {
-          setActiveLessonId(queryLessonId);
+          setTimeout(() => {
+            setActiveLessonId(queryLessonId);
+          }, 0);
         } else {
           makeRequest(`/lesson/section/${firstSection._id}`).then(res => {
             if (res.success && res.data.lessons?.length > 0) {
@@ -507,7 +397,7 @@ const LearningDashboard = () => {
         }
       }
     }
-  }, [sections]);
+  }, [sections, activeLessonId]);
 
   const handlePostQuestion = (e) => {
     e.preventDefault();
@@ -525,7 +415,6 @@ const LearningDashboard = () => {
   };
 
   // Compute overall completion stats
-  const totalLessonsCount = sections.length * 4; 
   const overallCompletedCount = Object.keys(completedLessons).filter(k => completedLessons[k]).length;
 
   const handleBack = () => {
@@ -572,9 +461,9 @@ const LearningDashboard = () => {
         {/* Left Side: Video Player and Tabs Info */}
         <div className="flex-1 flex flex-col overflow-y-auto bg-[#0b0f19]">
           {/* Main Video Viewport Wrapper */}
-          <div className="w-full bg-black flex flex-col items-center justify-center relative group select-none shadow-2xl">
+          <div className="w-full bg-[#0b0f19] pt-6 px-6 pb-2 flex flex-col items-center justify-center relative group select-none">
             {/* The Aspect Ratio Video Box */}
-            <div className="w-full max-w-[1020px] aspect-video relative flex items-center justify-center bg-slate-950 shadow-inner overflow-hidden">
+            <div className="w-full max-w-5xl aspect-video relative flex items-center justify-center bg-slate-950 shadow-2xl rounded-xl border border-slate-800/50 overflow-hidden">
               {lessonLoading || videoUrlLoading || playbackStatus === "loading" || progressLoading ? (
                 <div className="flex flex-col items-center text-slate-400 animate-pulse">
                   <div className="w-10 h-10 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mb-3"></div>

@@ -12,11 +12,19 @@
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
     "@tanstack/react-query": "^5.101.1",
+    "@videojs/themes": "^1.0.1",
     "hls.js": "^1.6.16",
     "lucide-react": "^1.21.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router-dom": "^7.18.0"
+    "react-router-dom": "^7.18.0",
+    "video.js": "^8.23.9",
+    "videojs-contrib-quality-levels": "^4.1.0",
+    "videojs-hls-quality-selector": "^2.0.0",
+    "videojs-hotkeys": "^0.2.30",
+    "videojs-markers": "^1.0.1",
+    "videojs-mobile-ui": "^1.2.6",
+    "videojs-seek-buttons": "^3.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
