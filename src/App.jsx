@@ -12,6 +12,7 @@ import RbacTab from "./components/rbac/RbacTab";
 import FileTab from "./components/file/FileTab";
 import CourseTab from "./components/course/CourseTab";
 import CourseDetails from "./components/course/CourseDetails";
+import CheckoutPage from "./components/course/CheckoutPage";
 import LearningDashboard from "./components/course/LearningDashboard";
 
 import { useAuth } from "./hooks/useAuth";
@@ -67,6 +68,7 @@ const App = () => {
                 <Routes>
                   <Route path="courses" element={<CourseTab currentProfile={currentProfile} />} />
                   <Route path="courses/:courseId" element={<CourseDetails currentProfile={currentProfile} />} />
+                  <Route path="checkout/:courseId" element={<CheckoutPage currentProfile={currentProfile} />} />
                   <Route path="settings" element={<SettingsTab profile={currentProfile} onLogoutSuccess={handleLogout} />} />
                   <Route path="*" element={<Navigate to="courses" replace />} />
                 </Routes>

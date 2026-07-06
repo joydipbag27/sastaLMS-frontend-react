@@ -394,6 +394,11 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
   const [sectionFormLoading, setSectionFormLoading] = useState(false);
 
   const handleEnroll = async () => {
+    if (course.price > 0) {
+      navigate(`/dashboard/checkout/${course._id}`);
+      return;
+    }
+
     try {
       await enroll();
       alert("Enrolled successfully!");
