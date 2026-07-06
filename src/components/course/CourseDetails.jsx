@@ -29,6 +29,16 @@ const CourseImage = ({ src, alt, className = "" }) => {
   );
 };
 
+const formatDuration = (seconds) => {
+  if (!seconds) return "";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.round(seconds % 60);
+  if (mins > 0) {
+    return `${mins}m ${secs > 0 ? `${secs}s` : ""}`;
+  }
+  return `${secs}s`;
+};
+
 const LessonRow = ({ les, canEdit }) => {
   return (
     <div className="flex justify-between items-center p-3.5 rounded-lg bg-slate-900/20 border border-slate-900 hover:border-slate-800 transition-all">
@@ -36,7 +46,7 @@ const LessonRow = ({ les, canEdit }) => {
         <span className="text-slate-500 font-mono text-[10px] shrink-0 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800/40">L{les.order}</span>
         <div className="min-w-0">
           <p className="font-bold text-slate-300 text-xs sm:text-sm truncate leading-tight">{les.title}</p>
-          <span className="text-[10px] text-slate-500 font-medium">Video {les.duration > 0 ? `(${les.duration}m)` : ""}</span>
+          <span className="text-[10px] text-slate-500 font-medium">Video {les.duration > 0 ? `(${formatDuration(les.duration)})` : ""}</span>
         </div>
       </div>
       
@@ -74,7 +84,6 @@ const SectionItem = ({
   const [lessonTitle, setLessonTitle] = useState("");
   const [lessonDesc, setLessonDesc] = useState("");
   const [lessonVideo, setLessonVideo] = useState("");
-  const [lessonDuration, setLessonDuration] = useState(0);
   const [lessonIsPreview, setLessonIsPreview] = useState(false);
   const [lessonOrder, setLessonOrder] = useState(1);
   const [lessonFormLoading, setLessonFormLoading] = useState(false);
@@ -86,7 +95,6 @@ const SectionItem = ({
       title: lessonTitle,
       description: lessonDesc,
       course: courseId,
-      duration: lessonDuration,
       isPreview: lessonIsPreview,
       order: lessonOrder,
     };
@@ -115,7 +123,6 @@ const SectionItem = ({
       setLessonTitle(fullLesson.title);
       setLessonDesc(fullLesson.description || "");
       setLessonVideo(fullLesson.video || "");
-      setLessonDuration(fullLesson.duration || 0);
       setLessonIsPreview(fullLesson.isPreview || false);
       setLessonOrder(fullLesson.order || 1);
       setShowLessonForm(true);
@@ -138,7 +145,6 @@ const SectionItem = ({
     setLessonTitle("");
     setLessonDesc("");
     setLessonVideo("");
-    setLessonDuration(0);
     setLessonIsPreview(false);
     setLessonOrder(1);
     setEditingLessonId(null);
@@ -296,15 +302,7 @@ const SectionItem = ({
                     onChange={(e) => setLessonTitle(e.target.value)}
                   />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <Input
-                    label="Duration (Minutes)"
-                    id={`lesson-duration-${sect._id}`}
-                    type="number"
-                    required
-                    value={lessonDuration}
-                    onChange={(e) => setLessonDuration(parseInt(e.target.value) || 0)}
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <Input
                     label="Order Rank"
                     id={`lesson-order-${sect._id}`}

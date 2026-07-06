@@ -10,6 +10,16 @@ import Card from "../common/Card";
 import Button from "../common/Button";
 import { makeRequest } from "../../apiClient";
 
+const formatDuration = (seconds) => {
+  if (!seconds) return "";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.round(seconds % 60);
+  if (mins > 0) {
+    return `${mins}m ${secs > 0 ? `${secs}s` : ""}`;
+  }
+  return `${secs}s`;
+};
+
 // Separate Section Accordion item for the sidebar
 const SidebarSectionItem = ({
   sect,
@@ -618,7 +628,7 @@ const LearningDashboard = () => {
                   {activeLesson ? activeLesson.title : "Select a lesson"}
                 </h2>
                 {activeLesson?.duration && (
-                  <span className="text-[11px] text-slate-550 font-sans mt-1 block">Duration: {activeLesson.duration} minutes</span>
+                  <span className="text-[11px] text-slate-500 font-sans mt-1 block">Duration: {formatDuration(activeLesson.duration)}</span>
                 )}
               </div>
 
