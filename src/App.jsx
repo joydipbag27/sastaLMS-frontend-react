@@ -1,21 +1,21 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 // Layouts
-import AuthLayout from "./components/layout/AuthLayout";
-import StudentLayout from "./components/layout/StudentLayout";
-import AdminLayout from "./components/layout/AdminLayout";
+import AuthLayout from "./app/layouts/AuthLayout";
+import StudentLayout from "./app/layouts/StudentLayout";
+import AdminLayout from "./app/layouts/AdminLayout";
 
 // Tabs/Pages
-import AuthTab from "./components/auth/AuthTab";
-import SettingsTab from "./components/settings/SettingsTab";
-import RbacTab from "./components/rbac/RbacTab";
-import FileTab from "./components/file/FileTab";
-import CourseTab from "./components/course/CourseTab";
-import CourseDetails from "./components/course/CourseDetails";
-import CheckoutPage from "./components/course/CheckoutPage";
-import LearningDashboard from "./components/course/LearningDashboard";
+import AuthTab from "./pages/auth/AuthTab";
+import SettingsTab from "./pages/learner/SettingsTab";
+import RbacTab from "./pages/creator/RbacTab";
+import FileTab from "./pages/creator/FileTab";
+import CourseTab from "./pages/learner/CourseTab";
+import CourseDetails from "./pages/learner/CourseDetails";
+import CheckoutPage from "./pages/learner/CheckoutPage";
+import LearningDashboard from "./pages/learner/LearningDashboard";
 
-import { useAuth } from "./hooks/useAuth";
+import { useAuth } from "./features/auth/hooks/useAuth";
 
 const App = () => {
   const { profile: currentProfile, profileLoading, fetchProfile, logout } = useAuth();
