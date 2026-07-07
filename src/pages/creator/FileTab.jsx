@@ -44,7 +44,7 @@ const FileTab = ({ currentProfile }) => {
             every video is properly associated with its lesson and processed through the HLS pipeline.
           </p>
           <Link
-            to={currentProfile?.role === "ADMIN" ? "/admin/courses" : "/dashboard/courses"}
+            to="/courses"
             className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-sky-400 hover:text-sky-300 transition-colors"
           >
             <LinkIcon size={13} />

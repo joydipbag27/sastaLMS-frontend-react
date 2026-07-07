@@ -317,33 +317,7 @@ const CourseTab = ({ currentProfile, defaultViewMode = "catalog" }) => {
         </div>
       )}
 
-      {/* View mode toggle sub-navigation (For Students) */}
-      {!isCreatorOrAdmin && (
-        <div className="flex justify-between items-center flex-wrap gap-3">
-          <div className="flex gap-1 bg-[#090e1a] p-1 rounded-xl border border-slate-800/60 shadow-inner">
-            <button
-              onClick={() => setViewMode("catalog")}
-              className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-all duration-200 ${
-                viewMode === "catalog"
-                  ? "bg-sky-600 text-white shadow"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              🌐 Explore Catalog
-            </button>
-            <button
-              onClick={() => setViewMode("enrolled")}
-              className={`px-4 py-1.5 rounded-lg font-bold text-xs transition-all duration-200 ${
-                viewMode === "enrolled"
-                  ? "bg-sky-600 text-white shadow"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              📚 My Enrolled Courses
-            </button>
-          </div>
-        </div>
-      )}
+
 
       {/* Toggle Course Creation/Editing Form vs Courses List */}
       {showForm ? (

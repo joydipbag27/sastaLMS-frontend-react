@@ -1,9 +1,10 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
 
 // Layouts
 import AuthLayout from "./app/layouts/AuthLayout";
 import StudentLayout from "./app/layouts/StudentLayout";
 import AdminLayout from "./app/layouts/AdminLayout";
+import PublicLayout from "./app/layouts/PublicLayout";
 
 // Tabs/Pages
 import AuthTab from "./pages/auth/AuthTab";
@@ -14,8 +15,15 @@ import CourseTab from "./pages/learner/CourseTab";
 import CourseDetails from "./pages/learner/CourseDetails";
 import CheckoutPage from "./pages/learner/CheckoutPage";
 import LearningDashboard from "./pages/learner/LearningDashboard";
+import MyLearning from "./pages/learner/MyLearning";
 
 import { useAuth } from "./features/auth/hooks/useAuth";
+import { GuestOnlyRoute, AuthenticatedRoute, RoleRoute } from "./app/router/Guards";
+
+const NavigateToCourse = () => {
+  const { courseId } = useParams();
+  return <Navigate to={`/courses/${courseId}`} replace />;
+};
 
 const App = () => {
   const { profile: currentProfile, profileLoading, fetchProfile, logout } = useAuth();
@@ -35,23 +43,35 @@ const App = () => {
     );
   }
 
-
   const isCreatorOrAdmin = currentProfile?.role === "CREATOR" || currentProfile?.role === "ADMIN";
+
+  const renderPublicRoute = (component) => {
+    if (!currentProfile) {
+      return <PublicLayout>{component}</PublicLayout>;
+    }
+    if (isCreatorOrAdmin) {
+      return <AdminLayout profile={currentProfile} onLogout={handleLogout}>{component}</AdminLayout>;
+    }
+    return <StudentLayout profile={currentProfile} onLogout={handleLogout}>{component}</StudentLayout>;
+  };
 
   return (
     <Router>
       <Routes>
+        {/* Public Course Explorer */}
+        <Route path="/courses" element={renderPublicRoute(<CourseTab currentProfile={currentProfile} />)} />
+        <Route path="/courses/:courseId" element={renderPublicRoute(<CourseDetails currentProfile={currentProfile} />)} />
+        <Route path="/my-learning" element={<AuthenticatedRoute>{renderPublicRoute(<MyLearning />)}</AuthenticatedRoute>} />
+
         {/* Public Auth Route */}
         <Route 
           path="/login" 
           element={
-            currentProfile ? (
-              <Navigate to={isCreatorOrAdmin ? "/admin/courses" : "/dashboard/courses"} replace />
-            ) : (
+            <GuestOnlyRoute fallbackPath="/courses">
               <AuthLayout>
                 <AuthTab onLoginSuccess={fetchProfile} />
               </AuthLayout>
-            )
+            </GuestOnlyRoute>
           } 
         />
 
@@ -59,21 +79,17 @@ const App = () => {
         <Route 
           path="/dashboard/*" 
           element={
-            !currentProfile ? (
-              <Navigate to="/login" replace />
-            ) : isCreatorOrAdmin ? (
-               <Navigate to="/admin/courses" replace />
-            ) : (
+            <RoleRoute allowedRoles={["STUDENT"]} redirectPath="/courses">
               <StudentLayout profile={currentProfile} onLogout={handleLogout}>
                 <Routes>
-                  <Route path="courses" element={<CourseTab currentProfile={currentProfile} />} />
-                  <Route path="courses/:courseId" element={<CourseDetails currentProfile={currentProfile} />} />
+                  <Route path="courses" element={<Navigate to="/courses" replace />} />
+                  <Route path="courses/:courseId" element={<NavigateToCourse />} />
                   <Route path="checkout/:courseId" element={<CheckoutPage currentProfile={currentProfile} />} />
                   <Route path="settings" element={<SettingsTab profile={currentProfile} onLogoutSuccess={handleLogout} />} />
-                  <Route path="*" element={<Navigate to="courses" replace />} />
+                  <Route path="*" element={<Navigate to="/courses" replace />} />
                 </Routes>
               </StudentLayout>
-            )
+            </RoleRoute>
           } 
         />
 
@@ -81,22 +97,18 @@ const App = () => {
         <Route 
           path="/admin/*" 
           element={
-            !currentProfile ? (
-              <Navigate to="/login" replace />
-            ) : !isCreatorOrAdmin ? (
-              <Navigate to="/dashboard/courses" replace />
-            ) : (
+            <RoleRoute allowedRoles={["CREATOR", "ADMIN"]} redirectPath="/courses">
               <AdminLayout profile={currentProfile} onLogout={handleLogout}>
                 <Routes>
-                  <Route path="courses" element={<CourseTab currentProfile={currentProfile} defaultViewMode="my-courses" />} />
-                  <Route path="courses/:courseId" element={<CourseDetails currentProfile={currentProfile} />} />
+                  <Route path="courses" element={<Navigate to="/courses?view=my-courses" replace />} />
+                  <Route path="courses/:courseId" element={<NavigateToCourse />} />
                   <Route path="media" element={<FileTab currentProfile={currentProfile} />} />
                   <Route path="users" element={<RbacTab currentProfile={currentProfile} />} />
                   <Route path="settings" element={<SettingsTab profile={currentProfile} onLogoutSuccess={handleLogout} />} />
-                  <Route path="*" element={<Navigate to="courses" replace />} />
+                  <Route path="*" element={<Navigate to="/courses" replace />} />
                 </Routes>
               </AdminLayout>
-            )
+            </RoleRoute>
           } 
         />
 
@@ -104,16 +116,14 @@ const App = () => {
         <Route
           path="/classroom/:courseId"
           element={
-            !currentProfile ? (
-              <Navigate to="/login" replace />
-            ) : (
+            <AuthenticatedRoute>
               <LearningDashboard />
-            )
+            </AuthenticatedRoute>
           }
         />
 
         {/* Default Redirect */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/courses" replace />} />
       </Routes>
     </Router>
   );

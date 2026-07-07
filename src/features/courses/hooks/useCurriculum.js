@@ -47,6 +47,7 @@ export const useCurriculum = (courseId, isCreatorOrAdmin) => {
       queryClient.invalidateQueries({ queryKey: ["sections", courseId] });
       queryClient.invalidateQueries({ queryKey: ["lessons"] });
       queryClient.invalidateQueries({ queryKey: ["enrollment", courseId] });
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
     },
   });
 

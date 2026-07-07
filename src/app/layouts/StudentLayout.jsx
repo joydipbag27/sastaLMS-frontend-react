@@ -12,7 +12,8 @@ const StudentLayout = ({ profile, onLogout, children }) => {
   };
 
   const navLinks = [
-    { name: "My Learning", path: "/dashboard/courses", icon: BookOpen },
+    { name: "Explore Catalog", path: "/courses", icon: Search },
+    { name: "My Learning", path: "/my-learning", icon: BookOpen },
     { name: "Settings", path: "/dashboard/settings", icon: Settings },
   ];
 
@@ -28,7 +29,7 @@ const StudentLayout = ({ profile, onLogout, children }) => {
         
         <nav className="flex-1 p-4 space-y-1.5">
           {navLinks.map((link) => {
-            const isActive = location.pathname.startsWith(link.path);
+            const isActive = location.pathname === link.path;
             const Icon = link.icon;
             return (
               <Link

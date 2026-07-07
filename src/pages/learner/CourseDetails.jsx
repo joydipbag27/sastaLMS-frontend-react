@@ -39,7 +39,7 @@ const formatDuration = (seconds) => {
   return `${secs}s`;
 };
 
-const LessonRow = ({ les, canEdit }) => {
+const LessonRow = ({ les, canEdit, isEnrolled }) => {
   return (
     <div className="flex justify-between items-center p-3.5 rounded-lg bg-slate-900/20 border border-slate-900 hover:border-slate-800 transition-all">
       <div className="flex items-center gap-3 min-w-0">
@@ -55,7 +55,7 @@ const LessonRow = ({ les, canEdit }) => {
           <span className="bg-emerald-950/60 text-emerald-400 border border-emerald-900/60 px-2 py-0.5 rounded text-[9px] font-bold flex items-center gap-1 font-outfit">
             <Unlock size={10} /> PREVIEW
           </span>
-        ) : !canEdit ? (
+        ) : (!canEdit && !isEnrolled) ? (
           <span className="text-slate-600 flex items-center gap-1 font-outfit text-[9px] tracking-wider">
             <Lock size={10} /> LOCKED
           </span>
@@ -72,11 +72,35 @@ const SectionItem = ({
   courseId,
   onEditSectionClick,
   onDeleteSection,
+  currentProfile,
+  isEnrolled,
+  handleEnroll,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { lessons, lessonsLoading, createLesson, updateLesson, deleteLesson } = useLessons(sect._id, isCreatorOrAdmin, isExpanded);
+  const { lessons, lessonsLoading, createLesson, updateLesson, deleteLesson, refetchLessons } = useLessons(sect._id, isCreatorOrAdmin, isExpanded);
   const { getLessonVideoHook } = useMedia();
   const [uploadingLessonId, setUploadingLessonId] = useState(null);
+  const navigate = useNavigate();
+
+  const handleLessonClick = (les) => {
+    if (isCreatorOrAdmin || isEnrolled) {
+      navigate(`/classroom/${courseId}?lesson=${les._id}`);
+      return;
+    }
+    if (les.isPreview) {
+      if (!currentProfile) {
+        navigate(`/login?returnTo=${encodeURIComponent(`/classroom/${courseId}?lesson=${les._id}`)}`);
+      } else {
+        navigate(`/classroom/${courseId}?lesson=${les._id}`);
+      }
+      return;
+    }
+    if (!currentProfile) {
+      navigate(`/login?returnTo=${encodeURIComponent(`/courses/${courseId}`)}`);
+    } else {
+      handleEnroll();
+    }
+  };
 
   // Lesson Form states
   const [showLessonForm, setShowLessonForm] = useState(false);
@@ -212,8 +236,12 @@ const SectionItem = ({
           ) : (
             <div className="space-y-2">
               {lessons.map((les) => (
-                <div key={les._id} className="relative group border border-slate-900 rounded bg-slate-950/45 overflow-hidden">
-                  <LessonRow les={les} canEdit={canEdit} />
+                <div 
+                  key={les._id} 
+                  onClick={() => handleLessonClick(les)}
+                  className="relative group border border-slate-900 rounded bg-slate-950/45 overflow-hidden cursor-pointer hover:bg-slate-900/30 transition-all"
+                >
+                  <LessonRow les={les} canEdit={canEdit} isEnrolled={isEnrolled} />
                   {canEdit && (
                     <div className="px-3 pb-2 pt-1.5 bg-slate-950/40 flex flex-wrap items-center justify-between border-t border-slate-900/60">
                       <div className="flex items-center gap-2">
@@ -394,6 +422,11 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
   const [sectionFormLoading, setSectionFormLoading] = useState(false);
 
   const handleEnroll = async () => {
+    if (enrollLoading) return;
+    if (!currentProfile) {
+      navigate("/login");
+      return;
+    }
     if (course.price > 0) {
       navigate(`/dashboard/checkout/${course._id}`);
       return;
@@ -546,7 +579,22 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
             </div>
 
             <div className="space-y-2.5 pt-2">
-              {isEnrolled ? (
+              {!currentProfile ? (
+                <Button
+                  onClick={() => navigate(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`)}
+                  variant="primary"
+                  className="w-full py-2.5 text-xs font-bold font-outfit uppercase tracking-wider"
+                >
+                  {course.price === 0 ? "Login to Enroll" : "Login to Buy"}
+                </Button>
+              ) : isCreatorOrAdmin ? (
+                <Link to={`/classroom/${course._id}`} className="block">
+                  <Button variant="success" className="w-full py-2.5 text-xs font-bold font-outfit uppercase tracking-wider flex items-center justify-center gap-2">
+                    <GraduationCap size={16} />
+                    Start Learning (Creator)
+                  </Button>
+                </Link>
+              ) : isEnrolled ? (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 p-2.5 bg-emerald-950/20 border border-emerald-900/50 rounded-lg text-emerald-300 text-[10px] font-bold font-sans">
                     <CheckCircle size={16} className="shrink-0" />
@@ -555,7 +603,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
                   <Link to={`/classroom/${course._id}`} className="block">
                     <Button variant="success" className="w-full py-2.5 text-xs font-bold font-outfit uppercase tracking-wider flex items-center justify-center gap-2">
                       <GraduationCap size={16} />
-                      Start Learning
+                      Continue Learning
                     </Button>
                   </Link>
                 </div>
@@ -566,7 +614,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
                   isLoading={enrollLoading}
                   className="w-full py-2.5 text-xs font-bold font-outfit uppercase tracking-wider"
                 >
-                  {course.price === 0 ? "Enroll for Free" : `Enroll — $${course.price}`}
+                  {course.price === 0 ? "Enroll for Free" : "Buy Course"}
                 </Button>
               )}
             </div>
@@ -648,6 +696,9 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
                 courseId={course._id}
                 onEditSectionClick={handleEditSectionClick}
                 onDeleteSection={handleDeleteSection}
+                currentProfile={currentProfile}
+                isEnrolled={isEnrolled}
+                handleEnroll={handleEnroll}
               />
             ))}
           </div>

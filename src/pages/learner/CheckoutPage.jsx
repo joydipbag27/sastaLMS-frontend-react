@@ -68,6 +68,10 @@ const CheckoutPage = ({ currentProfile }) => {
     let attempts = 0;
     const maxAttempts = 15; // 15 attempts * 2s = 30 seconds
 
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+    }
+
     pollIntervalRef.current = setInterval(async () => {
       attempts++;
       try {
@@ -75,6 +79,8 @@ const CheckoutPage = ({ currentProfile }) => {
         if (res.success) {
           clearInterval(pollIntervalRef.current);
           queryClient.invalidateQueries({ queryKey: ["enrollment", courseId] });
+          queryClient.invalidateQueries({ queryKey: ["enrollment-check", courseId] });
+          queryClient.invalidateQueries({ queryKey: ["enrollments"] });
           queryClient.invalidateQueries({ queryKey: ["sections", courseId] });
           queryClient.invalidateQueries({ queryKey: ["lessons"] });
           setPaymentState("success");
@@ -222,7 +228,7 @@ const CheckoutPage = ({ currentProfile }) => {
             <Button onClick={() => setPaymentState("processing")} variant="primary" className="py-2.5 text-xs font-bold font-outfit uppercase">
               Retry Checking Status
             </Button>
-            <Link to="/dashboard/courses" className="block">
+            <Link to="/courses" className="block">
               <Button variant="secondary" className="w-full py-2.5 text-xs font-bold font-outfit uppercase">
                 Back to Dashboard
               </Button>

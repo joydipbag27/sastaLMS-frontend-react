@@ -15,8 +15,9 @@ const AdminLayout = ({ profile, onLogout, children }) => {
   const isAdmin = profile?.role === "ADMIN";
 
   const navLinks = [
-    isCreator && { name: "Dashboard", path: "/admin", icon: LayoutDashboard, exact: true },
-    isCreator && { name: "Course Creator", path: "/admin/courses", icon: BookOpen },
+    { name: "Explore Catalog", path: "/courses", icon: LayoutDashboard },
+    { name: "My Learning", path: "/my-learning", icon: BookOpen },
+    isCreator && { name: "Course Creator", path: "/courses?view=my-courses", icon: BookOpen },
     isCreator && { name: "Media Manager", path: "/admin/media", icon: Image },
     isAdmin && { name: "RBAC Control", path: "/admin/users", icon: Users },
     { name: "Settings", path: "/admin/settings", icon: Settings },
@@ -34,9 +35,12 @@ const AdminLayout = ({ profile, onLogout, children }) => {
         
         <nav className="flex-1 p-4 space-y-1.5">
           {navLinks.map((link) => {
-            const isActive = link.exact 
-              ? location.pathname === link.path 
-              : location.pathname.startsWith(link.path) && link.path !== "/admin";
+            const hasViewParam = link.path.includes("view=");
+            const isActive = hasViewParam
+              ? (location.pathname === "/courses" && location.search.includes(link.path.split("?")[1]))
+              : link.exact 
+                ? location.pathname === link.path 
+                : (location.pathname === link.path || (location.pathname.startsWith(link.path) && link.path !== "/courses" && link.path !== "/my-learning"));
               
             const Icon = link.icon;
             
