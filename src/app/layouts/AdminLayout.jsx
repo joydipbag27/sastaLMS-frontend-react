@@ -1,15 +1,28 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, BookOpen, Users, Image, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, BookOpen, Users, Settings, LogOut, User } from "lucide-react";
 import { makeRequest } from "../../services/api/apiClient";
 
 const AdminLayout = ({ profile, onLogout, children }) => {
   const location = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleLogout = async () => {
     await makeRequest("/user/logout", { method: "POST" });
     onLogout();
   };
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const isCreator = profile?.role === "CREATOR" || profile?.role === "ADMIN";
   const isAdmin = profile?.role === "ADMIN";
@@ -17,87 +30,101 @@ const AdminLayout = ({ profile, onLogout, children }) => {
   const navLinks = [
     { name: "Explore Catalog", path: "/courses", icon: LayoutDashboard },
     { name: "My Learning", path: "/my-learning", icon: BookOpen },
-    isCreator && { name: "Course Creator", path: "/courses?view=my-courses", icon: BookOpen },
-    isCreator && { name: "Media Manager", path: "/admin/media", icon: Image },
+    isCreator && { name: "Course Creator", path: "/admin/courses", icon: BookOpen },
     isAdmin && { name: "RBAC Control", path: "/admin/users", icon: Users },
     { name: "Settings", path: "/admin/settings", icon: Settings },
   ].filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-slate-900 flex text-slate-200 font-sans">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-950 border-r border-slate-800 flex flex-col hidden md:flex shadow-xl z-10">
-        <div className="h-16 flex items-center px-6 border-b border-slate-800">
-          <h1 className="text-2xl font-black text-sky-500 tracking-tight flex items-center gap-2">
-            veoLMS <span className="text-[10px] bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-slate-300 font-bold uppercase tracking-wider">STUDIO</span>
-          </h1>
-        </div>
-        
-        <nav className="flex-1 p-4 space-y-1.5">
-          {navLinks.map((link) => {
-            const hasViewParam = link.path.includes("view=");
-            const isActive = hasViewParam
-              ? (location.pathname === "/courses" && location.search.includes(link.path.split("?")[1]))
-              : link.exact 
-                ? location.pathname === link.path 
-                : (location.pathname === link.path || (location.pathname.startsWith(link.path) && link.path !== "/courses" && link.path !== "/my-learning"));
-              
-            const Icon = link.icon;
-            
-            return (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-semibold ${
-                  isActive 
-                    ? "bg-sky-600 text-white shadow-md" 
-                    : "text-slate-400 hover:bg-slate-900 hover:text-slate-100"
-                }`}
-              >
-                <Icon size={20} className={isActive ? "text-white" : "text-slate-500"} />
-                {link.name}
-              </Link>
-            );
-          })}
-        </nav>
+    <div className="min-h-screen bg-[#F8F9FD] flex flex-col text-slate-800 font-sans">
+      {/* Top Header Navbar */}
+      <header className="sticky top-0 h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 sm:px-8 shadow-sm z-30 shrink-0">
+        <div className="flex items-center gap-6">
+          <Link to="/courses" className="text-2xl font-black text-indigo-650 tracking-tight flex items-center gap-2">
+            veoLMS
+          </Link>
+          <span className="bg-amber-500/10 text-amber-550 border border-amber-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-outfit hidden sm:inline">
+            STUDIO
+          </span>
 
-        <div className="p-4 border-t border-slate-800">
+          {/* Horizontal Navbar Navigation Links */}
+          <nav className="flex items-center gap-1">
+            {navLinks.map((link) => {
+              const hasViewParam = link.path.includes("view=");
+              const isActive = hasViewParam
+                ? (location.pathname === "/courses" && location.search.includes(link.path.split("?")[1]))
+                : link.exact 
+                  ? location.pathname === link.path 
+                  : (location.pathname === link.path || (location.pathname.startsWith(link.path) && link.path !== "/courses" && link.path !== "/my-learning"));
+                
+              const Icon = link.icon;
+
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-semibold text-xs ${
+                    isActive 
+                      ? "bg-indigo-600 text-white shadow-sm" 
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
+                >
+                  <Icon size={14} className={isActive ? "text-white" : "text-slate-400"} />
+                  <span className="hidden md:inline">{link.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Profile Dropdown Area */}
+        <div className="relative shrink-0" ref={dropdownRef}>
           <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 w-full text-left rounded-lg text-slate-400 hover:bg-slate-900 hover:text-rose-400 transition-colors font-semibold"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200/60 transition-all select-none"
           >
-            <LogOut size={20} className="text-slate-500" />
-            Sign Out
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header */}
-        <header className="h-16 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-8 shadow-sm z-0">
-          <div className="flex items-center gap-3 flex-1">
-             <h1 className="md:hidden text-xl font-black text-sky-500 tracking-tight">veoLMS</h1>
-             <span className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider hidden sm:block">
-               {profile?.role}
-             </span>
-          </div>
-          <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-bold text-slate-200">{profile?.username}</div>
-              <div className="text-xs text-slate-500 font-medium">{profile?.email}</div>
+              <div className="text-xs font-bold text-slate-700 leading-tight">{profile?.username}</div>
+              <div className="text-[9px] text-slate-400 font-medium">{profile?.email}</div>
             </div>
-            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-bold border border-slate-600 text-slate-300">
+            <div className="w-8 h-8 rounded-full bg-amber-50 border border-amber-150 text-amber-600 flex items-center justify-center font-bold text-xs">
               {profile?.username?.charAt(0).toUpperCase()}
             </div>
-          </div>
-        </header>
-        
-        {/* Page Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#0b1120]">
-          <div className="max-w-6xl mx-auto">
-            {children}
-          </div>
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl p-1.5 z-30 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="px-3 py-2 border-b border-slate-100 sm:hidden">
+                <div className="text-xs font-bold text-slate-800">{profile?.username}</div>
+                <div className="text-[9px] text-slate-400 truncate">{profile?.email}</div>
+              </div>
+              <Link 
+                to="/admin/settings"
+                onClick={() => setDropdownOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+              >
+                <User size={14} className="text-slate-400" />
+                <span>Studio Settings</span>
+              </Link>
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  handleLogout();
+                }}
+                className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50/50 transition-colors border-t border-slate-50 mt-1"
+              >
+                <LogOut size={14} className="text-rose-450" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </header>
+      
+      {/* Page Content */}
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F8F9FD] w-full">
+        <div className="max-w-6xl mx-auto">
+          {children}
         </div>
       </main>
     </div>

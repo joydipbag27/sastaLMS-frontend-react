@@ -5,13 +5,13 @@ import Button from "../../components/ui/Button";
 
 const PublicLayout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col text-slate-200 font-sans">
-      <header className="h-16 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-8 shadow-sm z-10 shrink-0">
+    <div className="min-h-screen bg-[#F8F9FD] flex flex-col text-slate-800 font-sans">
+      <header className="sticky top-0 h-16 bg-white border-b border-slate-100 flex items-center justify-between px-8 shadow-sm z-30 shrink-0">
         <div className="flex items-center gap-6">
           <Link to="/courses">
-            <h1 className="text-2xl font-black text-sky-500 tracking-tight">veoLMS</h1>
+            <h1 className="text-2xl font-black text-indigo-650 tracking-tight">veoLMS</h1>
           </Link>
-          <span className="bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider hidden sm:block">
+          <span className="bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider hidden sm:block">
             Course Catalog
           </span>
         </div>
@@ -24,7 +24,7 @@ const PublicLayout = ({ children }) => {
           </Link>
         </div>
       </header>
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#0b1120]">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F8F9FD]">
         <div className="max-w-6xl mx-auto">{children}</div>
       </main>
     </div>

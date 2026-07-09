@@ -10,7 +10,7 @@ import PublicLayout from "./app/layouts/PublicLayout";
 import AuthTab from "./pages/auth/AuthTab";
 import SettingsTab from "./pages/learner/SettingsTab";
 import RbacTab from "./pages/creator/RbacTab";
-import FileTab from "./pages/creator/FileTab";
+import CreatorDashboard from "./pages/creator/CreatorDashboard";
 import CourseTab from "./pages/learner/CourseTab";
 import CourseDetails from "./pages/learner/CourseDetails";
 import CheckoutPage from "./pages/learner/CheckoutPage";
@@ -100,9 +100,8 @@ const App = () => {
             <RoleRoute allowedRoles={["CREATOR", "ADMIN"]} redirectPath="/courses">
               <AdminLayout profile={currentProfile} onLogout={handleLogout}>
                 <Routes>
-                  <Route path="courses" element={<Navigate to="/courses?view=my-courses" replace />} />
+                  <Route path="courses" element={<CreatorDashboard currentProfile={currentProfile} />} />
                   <Route path="courses/:courseId" element={<NavigateToCourse />} />
-                  <Route path="media" element={<FileTab currentProfile={currentProfile} />} />
                   <Route path="users" element={<RbacTab currentProfile={currentProfile} />} />
                   <Route path="settings" element={<SettingsTab profile={currentProfile} onLogoutSuccess={handleLogout} />} />
                   <Route path="*" element={<Navigate to="/courses" replace />} />

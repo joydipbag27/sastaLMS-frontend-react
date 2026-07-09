@@ -5,6 +5,7 @@ import { makeRequest } from "../../services/api/apiClient";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import { ShieldCheck, CreditCard, Loader2, CheckCircle2, AlertTriangle, ChevronLeft, GraduationCap } from "lucide-react";
+
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
     if (document.getElementById("razorpay-checkout-script")) {
@@ -127,11 +128,9 @@ const CheckoutPage = ({ currentProfile }) => {
         currency,
         name: "veoLMS",
         description: `Purchase: ${course.title}`,
-        image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&h=100&fit=crop",
+        image: "/logo.png",
         order_id: orderId,
-        handler: async function (response) {
-          // Razorpay payment succeeded. Razorpay Webhooks will process enrollment.
-          // Transition to processing (polling) state.
+        handler: function (response) {
           startEnrollmentPolling();
         },
         prefill: {
@@ -139,7 +138,7 @@ const CheckoutPage = ({ currentProfile }) => {
           email: currentProfile?.email || "",
         },
         theme: {
-          color: "#0ea5e9", // Sky-500
+          color: "#4f46e5", // Indigo-600
         },
         modal: {
           ondismiss: function () {
@@ -161,9 +160,9 @@ const CheckoutPage = ({ currentProfile }) => {
 
   if (courseLoading || enrollmentLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-400">
-        <Loader2 className="w-10 h-10 border-t-sky-500 animate-spin text-sky-400 mb-4" />
-        <p className="font-mono text-[10px] uppercase font-bold tracking-widest text-sky-400">Securing checkout session...</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-500">
+        <Loader2 className="w-10 h-10 border-t-indigo-500 animate-spin text-indigo-650 mb-4" />
+        <p className="font-mono text-[10px] uppercase font-bold tracking-widest text-indigo-650">Securing checkout session...</p>
       </div>
     );
   }
@@ -171,14 +170,13 @@ const CheckoutPage = ({ currentProfile }) => {
   if (isEnrolled || paymentState === "success") {
     return (
       <div className="max-w-md mx-auto py-12 px-4">
-        <div className="bg-slate-950/40 border border-emerald-500/30 rounded-2xl p-8 text-center backdrop-blur-xl shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-500/20 via-emerald-400 to-emerald-500/20" />
-          <div className="mx-auto w-16 h-16 bg-emerald-950/30 border border-emerald-500/30 rounded-full flex items-center justify-center mb-6 text-emerald-400">
+        <div className="bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-lg relative overflow-hidden">
+          <div className="mx-auto w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center mb-6 text-emerald-600">
             <CheckCircle2 size={36} className="animate-pulse" />
           </div>
           
-          <h2 className="text-xl font-bold text-slate-100 font-outfit mb-3">Tuition Payment Received!</h2>
-          <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-8">
+          <h2 className="text-xl font-bold text-slate-800 font-outfit mb-3">Tuition Payment Received!</h2>
+          <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-8">
             You are enrolled in **{course?.title}**. Classroom access has been unlocked.
           </p>
 
@@ -196,14 +194,13 @@ const CheckoutPage = ({ currentProfile }) => {
   if (paymentState === "processing") {
     return (
       <div className="max-w-md mx-auto py-12 px-4">
-        <div className="bg-slate-950/40 border border-sky-500/20 rounded-2xl p-8 text-center backdrop-blur-xl shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-sky-500/20 via-sky-400 to-sky-500/20" />
-          <div className="mx-auto w-16 h-16 bg-sky-950/30 border border-sky-500/30 rounded-full flex items-center justify-center mb-6 text-sky-400">
+        <div className="bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-lg relative overflow-hidden">
+          <div className="mx-auto w-16 h-16 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center mb-6 text-indigo-600">
             <Loader2 size={36} className="animate-spin" />
           </div>
           
-          <h2 className="text-xl font-bold text-slate-100 font-outfit mb-3">Processing Transaction</h2>
-          <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+          <h2 className="text-xl font-bold text-slate-800 font-outfit mb-3">Processing Transaction</h2>
+          <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
             We are confirming your payment with Razorpay. This will take just a few seconds. Do not refresh or close this window.
           </p>
         </div>
@@ -214,13 +211,13 @@ const CheckoutPage = ({ currentProfile }) => {
   if (paymentState === "timeout") {
     return (
       <div className="max-w-md mx-auto py-12 px-4">
-        <div className="bg-slate-950/40 border border-amber-500/30 rounded-2xl p-8 text-center backdrop-blur-xl shadow-2xl">
-          <div className="mx-auto w-16 h-16 bg-amber-950/30 border border-amber-500/30 rounded-full flex items-center justify-center mb-6 text-amber-400">
+        <div className="bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-lg">
+          <div className="mx-auto w-16 h-16 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center mb-6 text-amber-600">
             <AlertTriangle size={36} />
           </div>
           
-          <h2 className="text-xl font-bold text-slate-100 font-outfit mb-3">Enrollment Pending</h2>
-          <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-8">
+          <h2 className="text-xl font-bold text-slate-800 font-outfit mb-3">Enrollment Pending</h2>
+          <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-8">
             Your payment was successful, but the confirmation is taking longer than expected. Please wait a moment or go back to your dashboard to check classroom access.
           </p>
 
@@ -240,11 +237,11 @@ const CheckoutPage = ({ currentProfile }) => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 px-4">
+    <div className="max-w-3xl mx-auto space-y-6 px-4 pb-16">
       {/* Back Link */}
       <button 
         onClick={() => navigate(-1)} 
-        className="flex items-center gap-1 text-slate-500 hover:text-slate-350 text-xs font-bold uppercase tracking-wider font-outfit transition-all"
+        className="flex items-center gap-1 text-slate-500 hover:text-slate-700 text-xs font-bold uppercase tracking-wider font-outfit transition-all"
       >
         <ChevronLeft size={16} /> Back to details
       </button>
@@ -254,23 +251,29 @@ const CheckoutPage = ({ currentProfile }) => {
         {/* Left Column: Summary (3 cols) */}
         <div className="md:col-span-3 space-y-4">
           <Card title="Order Details" subtitle="Review your selected classroom seat">
-            <div className="flex gap-4 items-start pb-4 border-b border-slate-900/80">
-              <img 
-                src={course?.thumbnailUrl || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300"} 
-                alt={course?.title} 
-                className="w-20 h-16 object-cover rounded-lg border border-slate-900 bg-slate-950 shrink-0"
-              />
+            <div className="flex gap-4 items-start pb-4 border-b border-slate-100">
+              {course?.thumbnailUrl ? (
+                <img 
+                  src={course.thumbnailUrl} 
+                  alt={course.title} 
+                  className="w-20 h-16 object-cover rounded-lg border border-slate-100 bg-slate-50 shrink-0"
+                />
+              ) : (
+                <div className="w-20 h-16 bg-gradient-to-br from-indigo-500 to-indigo-650 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm">
+                  <GraduationCap size={20} />
+                </div>
+              )}
               <div className="min-w-0">
-                <h3 className="font-bold text-slate-200 text-sm truncate leading-tight">{course?.title}</h3>
+                <h3 className="font-bold text-slate-800 text-sm truncate leading-tight">{course?.title}</h3>
                 <p className="text-xs text-slate-500 mt-1 font-outfit">Level: {course?.level} | Category: {course?.category}</p>
-                <p className="text-[10px] text-slate-650 mt-0.5">Instructor: {course?.creator?.username || "Tutor"}</p>
+                <p className="text-[10px] text-slate-400 mt-0.5">Instructor: {course?.creator?.username || "Tutor"}</p>
               </div>
             </div>
 
-            <div className="pt-4 flex items-start gap-3 bg-slate-900/10 p-3.5 rounded-xl border border-slate-900/80 text-slate-400 text-xs leading-relaxed">
-              <ShieldCheck className="text-emerald-500 shrink-0 mt-0.5" size={16} />
+            <div className="pt-4 flex items-start gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-slate-500 text-xs leading-relaxed">
+              <ShieldCheck className="text-emerald-600 shrink-0 mt-0.5" size={16} />
               <div>
-                <p className="font-bold text-slate-300">Secure Course Purchase</p>
+                <p className="font-bold text-slate-700">Secure Course Purchase</p>
                 <p className="text-[10px] mt-0.5">VeoLMS does not store your card details. Payment processing is handled end-to-end via Razorpay's bank-grade secure layers.</p>
               </div>
             </div>
@@ -279,27 +282,25 @@ const CheckoutPage = ({ currentProfile }) => {
 
         {/* Right Column: Pricing & Checkout Button (2 cols) */}
         <div className="md:col-span-2 space-y-4">
-          <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col justify-between gap-5 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-sky-500/10 via-sky-400/20 to-sky-500/10" />
-            
+          <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-md flex flex-col justify-between gap-5 relative overflow-hidden">
             <div className="space-y-4">
               <span className="text-slate-500 text-[10px] font-bold block uppercase tracking-wider font-outfit">Checkout Summary</span>
               
               <div className="space-y-2.5 text-xs">
-                <div className="flex justify-between text-slate-400">
+                <div className="flex justify-between text-slate-500">
                   <span>Subtotal</span>
                   <span className="font-bold">${course?.price?.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-slate-400">
+                <div className="flex justify-between text-slate-500">
                   <span>Taxes & Fees</span>
                   <span className="font-bold">$0.00</span>
                 </div>
-                <div className="border-t border-slate-900 my-2 pt-2 flex justify-between items-baseline">
-                  <span className="text-slate-300 font-bold">Total (USD)</span>
-                  <span className="text-xl font-black text-slate-200 font-outfit">${course?.price?.toFixed(2)}</span>
+                <div className="border-t border-slate-100 my-2 pt-2 flex justify-between items-baseline">
+                  <span className="text-slate-700 font-bold">Total (USD)</span>
+                  <span className="text-xl font-black text-slate-800 font-outfit">${course?.price?.toFixed(2)}</span>
                 </div>
                 {course?.price && (
-                  <div className="text-[10px] text-slate-500 text-right font-medium">
+                  <div className="text-[10px] text-slate-400 text-right font-medium">
                     (Processed in INR at checkout)
                   </div>
                 )}
@@ -307,7 +308,7 @@ const CheckoutPage = ({ currentProfile }) => {
             </div>
 
             {paymentState === "error" && (
-              <div className="p-3 bg-rose-950/20 border border-rose-900/50 rounded-lg text-rose-400 text-xs font-medium">
+              <div className="p-3 bg-rose-50 border border-rose-100 rounded-lg text-rose-600 text-xs font-medium">
                 {errorMessage}
               </div>
             )}

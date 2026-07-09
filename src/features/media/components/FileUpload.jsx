@@ -1,24 +1,28 @@
 import React, { useState, useRef, useCallback } from "react";
 import { Upload, FileUp, X, CheckCircle, AlertCircle } from "lucide-react";
+import { useS3Upload } from "../hooks/useS3Upload";
 
 const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
   const { getUploadUrl, confirmUpload } = useMediaHook;
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadPercent, setUploadPercent] = useState(0);
-  const [uploadStage, setUploadStage] = useState(""); // "presign" | "uploading" | "confirming" | "done" | "error"
-  const [statusText, setStatusText] = useState("");
   const fileInputRef = useRef(null);
+
+  const {
+    isUploading,
+    uploadPercent,
+    uploadStage,
+    statusText,
+    uploadFile,
+    resetUpload,
+  } = useS3Upload();
 
   const handleFileSelect = useCallback((file) => {
     if (file) {
       setSelectedFile(file);
-      setStatusText("");
-      setUploadPercent(0);
-      setUploadStage("");
+      resetUpload();
     }
-  }, []);
+  }, [resetUpload]);
 
   const handleFileChange = (e) => {
     handleFileSelect(e.target.files[0]);
@@ -45,82 +49,28 @@ const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
     handleFileSelect(file);
   };
 
-  const resetForm = () => {
+  const handleResetForm = () => {
     setSelectedFile(null);
-    setUploadPercent(0);
-    setUploadStage("");
-    setStatusText("");
+    resetUpload();
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleUpload = async () => {
     if (!selectedFile) return;
 
-    const mimeType = selectedFile.type || "application/octet-stream";
-
-    setIsUploading(true);
-    setUploadPercent(0);
-
     try {
-      // Stage 1: Get presigned upload URL
-      setUploadStage("presign");
-      setStatusText("Generating secure upload URL...");
-      const { uploadUrl, mediaId } = await getUploadUrl(mimeType);
-
-      // Stage 2: Upload binary to B2 via XHR (for progress tracking)
-      setUploadStage("uploading");
-      setStatusText("Uploading to cloud storage...");
-
-      await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-
-        xhr.upload.addEventListener("progress", (event) => {
-          if (event.lengthComputable) {
-            setUploadPercent(Math.round((event.loaded / event.total) * 100));
-          }
+      const result = await uploadFile(selectedFile, getUploadUrl, confirmUpload);
+      if (result) {
+        onUploadSuccess({
+          ...result.media,
+          originalName: selectedFile.name,
         });
 
-        xhr.addEventListener("load", () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
-          } else {
-            reject(new Error(`Upload failed with HTTP ${xhr.status}`));
-          }
-        });
-
-        xhr.addEventListener("error", () => reject(new Error("Network error during upload")));
-        xhr.addEventListener("abort", () => reject(new Error("Upload was cancelled")));
-
-        xhr.open("PUT", uploadUrl);
-        xhr.setRequestHeader("Content-Type", mimeType);
-        xhr.send(selectedFile);
-      });
-
-      // Stage 3: Confirm upload with backend
-      setUploadStage("confirming");
-      setStatusText("Confirming with server...");
-      const result = await confirmUpload({
-        mediaId,
-        mimeType,
-        size: selectedFile.size,
-      });
-
-      // Success!
-      setUploadStage("done");
-      setStatusText("Upload complete!");
-
-      onUploadSuccess({
-        ...result.media,
-        originalName: selectedFile.name,
-      });
-
-      // Auto-reset after a brief moment
-      setTimeout(resetForm, 1500);
+        // Auto-reset after a brief moment
+        setTimeout(handleResetForm, 1500);
+      }
     } catch (err) {
-      setUploadStage("error");
-      setStatusText(err.message || "Upload failed");
-    } finally {
-      setIsUploading(false);
+      console.error("Upload error details:", err);
     }
   };
 
@@ -202,7 +152,7 @@ const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
               </div>
               {!isUploading && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); resetForm(); }}
+                  onClick={(e) => { e.stopPropagation(); handleResetForm(); }}
                   className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-500 hover:text-slate-300 transition-colors"
                 >
                   <X size={16} />
@@ -263,7 +213,7 @@ const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
                   Upload File
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); resetForm(); }}
+                  onClick={(e) => { e.stopPropagation(); handleResetForm(); }}
                   className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-medium text-sm transition-colors border border-slate-700"
                 >
                   Cancel

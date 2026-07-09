@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply antialiased text-slate-200 bg-[#080d1a];
+    @apply antialiased text-slate-800 bg-[#F8F9FD];
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -17,16 +17,16 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.3);
+    background: rgba(241, 245, 249, 0.5);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.2);
+    background: rgba(148, 163, 184, 0.3);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.4);
+    background: rgba(148, 163, 184, 0.5);
   }
 }
 

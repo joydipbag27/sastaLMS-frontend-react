@@ -68,6 +68,40 @@ export const useMedia = () => {
     },
   });
 
+  // ── Manual ingestion: Step 1 — create media record ─────────────────────────
+  /**
+   * POST /media/manual
+   * Creates a PROCESSING media document and links it to the given lesson.
+   * Returns { mediaId } — the creator uses this ID as the B2 folder name.
+   */
+  const createManualMediaMutation = useMutation({
+    mutationFn: async (lessonId) => {
+      const res = await makeRequest("/media/manual", {
+        method: "POST",
+        body: { lessonId },
+      });
+      if (!res.success) throw new Error(res.data?.error || "Failed to create manual media");
+      return res.data; // { mediaId }
+    },
+  });
+
+  // ── Manual ingestion: Step 3 — verify B2 upload ────────────────────────────
+  /**
+   * POST /media/manual/:mediaId/verify
+   * Backend lists B2 objects, validates playlists + segments + MIME types,
+   * then marks the media READY and syncs duration to the lesson.
+   * Returns { media } with status READY.
+   */
+  const verifyManualMediaMutation = useMutation({
+    mutationFn: async (mediaId) => {
+      const res = await makeRequest(`/media/manual/${mediaId}/verify`, {
+        method: "POST",
+      });
+      if (!res.success) throw new Error(res.data?.error || "Verification failed");
+      return res.data; // { media }
+    },
+  });
+
   return {
     // Lesson-scoped upload helpers
     getLessonVideoHook,
@@ -82,5 +116,11 @@ export const useMedia = () => {
     // Admin retry
     retryTransfer: retryTransferMutation.mutateAsync,
     isRetrying: retryTransferMutation.isPending,
+
+    // Manual ingestion
+    createManualMedia: createManualMediaMutation.mutateAsync,
+    isCreatingManual: createManualMediaMutation.isPending,
+    verifyManualMedia: verifyManualMediaMutation.mutateAsync,
+    isVerifyingManual: verifyManualMediaMutation.isPending,
   };
 };
