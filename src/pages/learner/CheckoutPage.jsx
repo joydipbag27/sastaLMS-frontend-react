@@ -265,8 +265,8 @@ const CheckoutPage = ({ currentProfile }) => {
               )}
               <div className="min-w-0">
                 <h3 className="font-bold text-slate-800 text-sm truncate leading-tight">{course?.title}</h3>
-                <p className="text-xs text-slate-500 mt-1 font-outfit">Level: {course?.level} | Category: {course?.category}</p>
-                <p className="text-[10px] text-slate-400 mt-0.5">Instructor: {course?.creator?.username || "Tutor"}</p>
+                <p className="text-xs text-slate-500 mt-1 font-outfit">Level: {course?.level}</p>
+                <p className="text-[10px] text-slate-400 mt-0.5">Instructor: {course?.displayName || course?.creator?.username || "Tutor"}</p>
               </div>
             </div>
 

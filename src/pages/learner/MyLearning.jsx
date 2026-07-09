@@ -76,9 +76,6 @@ const MyLearning = () => {
                 )}
                 <div className="p-4 space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded text-indigo-650 font-bold uppercase tracking-wider font-outfit">
-                      {course.category}
-                    </span>
                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${
                       isCompleted ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-indigo-50 text-indigo-600 border-indigo-100"
                     }`}>
@@ -87,7 +84,7 @@ const MyLearning = () => {
                   </div>
 
                   <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-1">{course.title}</h3>
-                  <p className="text-[10px] text-slate-500 font-medium">Instructor: {course.creator?.username || "Tutor"}</p>
+                  <p className="text-[10px] text-slate-500 font-medium">Instructor: {course.displayName || course.creator?.username || "Tutor"}</p>
 
                   {isUnavailable && (
                     <div className="flex gap-2 p-2.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-600 text-[10px] leading-relaxed">

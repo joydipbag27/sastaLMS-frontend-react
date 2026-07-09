@@ -29,7 +29,7 @@ export const useCourses = (viewMode, filters, limit = 10) => {
         : `/course?limit=${limit}`;
 
       if (filters.status) url += `&status=${filters.status}`;
-      if (filters.category) url += `&category=${encodeURIComponent(filters.category)}`;
+      if (filters.displayName) url += `&displayName=${encodeURIComponent(filters.displayName)}`;
       if (filters.level) url += `&level=${encodeURIComponent(filters.level)}`;
       if (pageParam) url += `&cursor=${pageParam}`;
 

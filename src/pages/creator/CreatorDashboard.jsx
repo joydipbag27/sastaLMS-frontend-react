@@ -9,7 +9,7 @@ import Input from "../../components/ui/Input";
 import FileUpload from "../../features/media/components/FileUpload";
 import { useS3Upload } from "../../features/media/hooks/useS3Upload";
 
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Play } from "lucide-react";
 
 const CourseImage = ({ src, alt, className = "" }) => {
   const [hasError, setHasError] = useState(false);
@@ -67,13 +67,15 @@ const CreatorDashboard = ({ currentProfile }) => {
   const [courseTitle, setCourseTitle] = useState("");
   const [courseDesc, setCourseDesc] = useState("");
   const [courseThumbnail, setCourseThumbnail] = useState("");
+  const [courseTrailer, setCourseTrailer] = useState("");
   const [coursePrice, setCoursePrice] = useState(0);
-  const [courseCategory, setCourseCategory] = useState("");
+  const [courseDisplayName, setCourseDisplayName] = useState("");
   const [courseLevel, setCourseLevel] = useState("Beginner"); 
   const [courseStatus, setCourseStatus] = useState("Draft"); 
   const [originalStatus, setOriginalStatus] = useState("Draft");
   const [formLoading, setFormLoading] = useState(false);
   const [pendingThumbnailFile, setPendingThumbnailFile] = useState(null);
+  const [pendingTrailerFile, setPendingTrailerFile] = useState(null);
 
   const {
     isUploading: isThumbnailUploading,
@@ -81,6 +83,14 @@ const CreatorDashboard = ({ currentProfile }) => {
     statusText: thumbnailStatusText,
     uploadFile: uploadThumbnail,
     resetUpload: resetThumbnailUpload,
+  } = useS3Upload();
+
+  const {
+    isUploading: isTrailerUploading,
+    uploadPercent: trailerPercent,
+    statusText: trailerStatusText,
+    uploadFile: uploadTrailer,
+    resetUpload: resetTrailerUpload,
   } = useS3Upload();
 
   const setFilterStatus = (val) => {
@@ -93,12 +103,13 @@ const CreatorDashboard = ({ currentProfile }) => {
 
   const handleCourseSubmit = async (e) => {
     e.preventDefault();
+    if (formLoading) return;
     setFormLoading(true);
     const body = {
       title: courseTitle,
       description: courseDesc,
       price: coursePrice,
-      category: courseCategory,
+      displayName: courseDisplayName,
       level: courseLevel,
     };
 
@@ -129,6 +140,7 @@ const CreatorDashboard = ({ currentProfile }) => {
         }
       }
 
+      // Upload Thumbnail
       if (pendingThumbnailFile) {
         await uploadThumbnail(
           pendingThumbnailFile,
@@ -137,7 +149,7 @@ const CreatorDashboard = ({ currentProfile }) => {
               method: "POST",
               body: { mimeType },
             });
-            if (!presignRes.success) throw new Error(presignRes.data?.error || "Failed to generate upload URL");
+            if (!presignRes.success) throw new Error(presignRes.data?.error || "Failed to generate thumbnail upload URL");
             return presignRes.data;
           },
           async ({ mediaId }) => {
@@ -145,7 +157,30 @@ const CreatorDashboard = ({ currentProfile }) => {
               method: "POST",
               body: { mediaId },
             });
-            if (!confirmRes.success) throw new Error(confirmRes.data?.error || "Failed to confirm upload");
+            if (!confirmRes.success) throw new Error(confirmRes.data?.error || "Failed to confirm thumbnail upload");
+            return confirmRes.data;
+          }
+        );
+      }
+
+      // Upload Trailer
+      if (pendingTrailerFile) {
+        await uploadTrailer(
+          pendingTrailerFile,
+          async (mimeType) => {
+            const presignRes = await makeRequest(`/course/${courseId}/trailer/upload-url`, {
+              method: "POST",
+              body: { mimeType },
+            });
+            if (!presignRes.success) throw new Error(presignRes.data?.error || "Failed to generate trailer upload URL");
+            return presignRes.data;
+          },
+          async ({ mediaId }) => {
+            const confirmRes = await makeRequest(`/course/${courseId}/trailer/confirm`, {
+              method: "POST",
+              body: { mediaId },
+            });
+            if (!confirmRes.success) throw new Error(confirmRes.data?.error || "Failed to confirm trailer upload");
             return confirmRes.data;
           }
         );
@@ -171,8 +206,9 @@ const CreatorDashboard = ({ currentProfile }) => {
     setCourseTitle(crs.title);
     setCourseDesc(crs.description);
     setCourseThumbnail(crs.thumbnailUrl || crs.thumbnail || "");
+    setCourseTrailer(crs.trailerUrl || crs.trailer || "");
     setCoursePrice(crs.price || 0);
-    setCourseCategory(crs.category);
+    setCourseDisplayName(crs.displayName || "");
     setCourseLevel(crs.level || "Beginner");
     setCourseStatus(crs.status || "Draft");
     setOriginalStatus(crs.status || "Draft");
@@ -194,14 +230,17 @@ const CreatorDashboard = ({ currentProfile }) => {
     setCourseTitle("");
     setCourseDesc("");
     setCourseThumbnail("");
+    setCourseTrailer("");
     setCoursePrice(0);
-    setCourseCategory("");
+    setCourseDisplayName("");
     setCourseLevel("Beginner");
     setCourseStatus("Draft");
     setOriginalStatus("Draft");
     setEditingCourseId(null);
     setPendingThumbnailFile(null);
+    setPendingTrailerFile(null);
     resetThumbnailUpload();
+    resetTrailerUpload();
     setShowForm(false);
   };
 
@@ -219,6 +258,23 @@ const CreatorDashboard = ({ currentProfile }) => {
       alert("Thumbnail deleted successfully!");
     } catch (err) {
       alert(err.message || "Failed to delete thumbnail");
+    }
+  };
+
+  const handleDeleteTrailer = async () => {
+    if (!confirm("Are you sure you want to delete the course trailer from storage?")) return;
+    try {
+      const res = await makeRequest(`/course/${editingCourseId}/trailer`, {
+        method: "DELETE",
+      });
+      if (!res.success) throw new Error(res.data?.error || "Failed to delete trailer");
+      
+      setCourseTrailer("");
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course", editingCourseId] });
+      alert("Trailer deleted successfully!");
+    } catch (err) {
+      alert(err.message || "Failed to delete trailer");
     }
   };
 
@@ -248,12 +304,11 @@ const CreatorDashboard = ({ currentProfile }) => {
                 onChange={(e) => setCourseTitle(e.target.value)}
               />
               <Input
-                label="Category"
-                id="course-category"
-                required
-                placeholder="e.g. Web Development, Data Science"
-                value={courseCategory}
-                onChange={(e) => setCourseCategory(e.target.value)}
+                label="Instructor Name"
+                id="course-display-name"
+                placeholder="e.g. Dr. Jane Doe, Jane Smith"
+                value={courseDisplayName}
+                onChange={(e) => setCourseDisplayName(e.target.value)}
               />
             </div>
             
@@ -304,90 +359,167 @@ const CreatorDashboard = ({ currentProfile }) => {
               </div>
             </div>
 
-            <div className="space-y-3 bg-slate-50 border border-slate-200 p-4 rounded-xl">
-              <span className="text-xs font-semibold text-slate-500 block">Course Thumbnail</span>
-              
-              {courseThumbnail || pendingThumbnailFile ? (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                  <img 
-                    src={pendingThumbnailFile ? URL.createObjectURL(pendingThumbnailFile) : courseThumbnail} 
-                    alt="Course Thumbnail" 
-                    className="w-32 h-20 object-cover rounded-lg border border-slate-200 shadow-md bg-slate-100"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.style.display = "none";
-                    }}
-                  />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Thumbnail Section */}
+              <div className="space-y-3 bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                <span className="text-xs font-semibold text-slate-500 block">Course Thumbnail</span>
+                
+                {courseThumbnail || pendingThumbnailFile ? (
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <img 
+                      src={pendingThumbnailFile ? URL.createObjectURL(pendingThumbnailFile) : courseThumbnail} 
+                      alt="Course Thumbnail" 
+                      className="w-32 h-20 object-cover rounded-lg border border-slate-200 shadow-md bg-slate-100"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.style.display = "none";
+                      }}
+                    />
+                    <div className="space-y-2">
+                      <p className="text-xs text-slate-500">
+                        {pendingThumbnailFile ? "New thumbnail selected (pending save)" : "Current course thumbnail"}
+                      </p>
+                      <Button 
+                        type="button" 
+                        variant="danger" 
+                        className="py-1 px-3 text-[11px] font-bold font-outfit"
+                        onClick={() => {
+                          if (pendingThumbnailFile) {
+                            setPendingThumbnailFile(null);
+                          } else {
+                            handleDeleteThumbnail();
+                          }
+                        }}
+                      >
+                        Remove Thumbnail
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
                   <div className="space-y-2">
                     <p className="text-xs text-slate-500">
-                      {pendingThumbnailFile ? "New thumbnail selected (pending save)" : "Current course thumbnail"}
+                      No thumbnail selected. Select a PNG, JPEG, or WEBP image (Max size: 2MB).
                     </p>
-                    <Button 
-                      type="button" 
-                      variant="danger" 
-                      className="py-1 px-3 text-[11px] font-bold font-outfit"
-                      onClick={() => {
-                        if (pendingThumbnailFile) {
-                          setPendingThumbnailFile(null);
-                        } else {
-                          handleDeleteThumbnail();
+                    
+                    <div 
+                      onClick={() => document.getElementById("thumbnail-file-input").click()}
+                      className="border border-dashed border-slate-350 hover:border-indigo-500 bg-white rounded-lg p-4 text-center cursor-pointer transition-colors text-xs text-slate-500 font-medium"
+                    >
+                      Click to select thumbnail image
+                    </div>
+                    
+                    <input
+                      id="thumbnail-file-input"
+                      type="file"
+                      accept="image/png, image/jpeg, image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          if (file.size > 2 * 1024 * 1024) {
+                            alert("File size exceeds 2MB limit.");
+                            return;
+                          }
+                          setPendingThumbnailFile(file);
                         }
                       }}
-                    >
-                      Remove Thumbnail
-                    </Button>
+                    />
                   </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <p className="text-xs text-slate-500">
-                    No thumbnail selected. Select a PNG, JPEG, or WEBP image (Max size: 2MB).
-                  </p>
-                  
-                  <div 
-                    onClick={() => document.getElementById("thumbnail-file-input").click()}
-                    className="border border-dashed border-slate-350 hover:border-indigo-500 bg-white rounded-lg p-4 text-center cursor-pointer transition-colors text-xs text-slate-500 font-medium"
-                  >
-                    Click to select thumbnail image
-                  </div>
-                  
-                  <input
-                    id="thumbnail-file-input"
-                    type="file"
-                    accept="image/png, image/jpeg, image/webp"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        if (file.size > 2 * 1024 * 1024) {
-                          alert("File size exceeds 2MB limit.");
-                          return;
-                        }
-                        setPendingThumbnailFile(file);
-                      }
-                    }}
-                  />
-                </div>
-              )}
+                )}
 
-              {isThumbnailUploading && (
-                <div className="mt-3 space-y-1.5 border border-slate-200 p-2.5 rounded bg-slate-50">
-                  <div className="flex justify-between items-center text-[10px] text-indigo-650 font-bold font-mono">
-                    <span>{thumbnailStatusText}</span>
-                    <span>{thumbnailPercent}%</span>
+                {isThumbnailUploading && (
+                  <div className="mt-3 space-y-1.5 border border-slate-200 p-2.5 rounded bg-slate-50">
+                    <div className="flex justify-between items-center text-[10px] text-indigo-650 font-bold font-mono">
+                      <span>{thumbnailStatusText}</span>
+                      <span>{thumbnailPercent}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                      <div className="bg-indigo-600 h-full transition-all duration-200" style={{ width: `${thumbnailPercent}%` }} />
+                    </div>
                   </div>
-                  <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                    <div className="bg-indigo-600 h-full transition-all duration-200" style={{ width: `${thumbnailPercent}%` }} />
+                )}
+              </div>
+
+              {/* Trailer Section */}
+              <div className="space-y-3 bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                <span className="text-xs font-semibold text-slate-500 block">Course Trailer Video</span>
+                
+                {courseTrailer || pendingTrailerFile ? (
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div className="w-32 h-20 bg-slate-900 rounded-lg flex items-center justify-center border border-slate-200 shadow-md">
+                      <Play className="text-white w-6 h-6" />
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-xs text-slate-500">
+                        {pendingTrailerFile ? "New trailer selected (pending save)" : "Current course trailer video"}
+                      </p>
+                      <Button 
+                        type="button" 
+                        variant="danger" 
+                        className="py-1 px-3 text-[11px] font-bold font-outfit"
+                        onClick={() => {
+                          if (pendingTrailerFile) {
+                            setPendingTrailerFile(null);
+                          } else {
+                            handleDeleteTrailer();
+                          }
+                        }}
+                      >
+                        Remove Trailer
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-xs text-slate-500">
+                      No trailer video selected. Select an MP4, WebM, or MOV video (Max size: 100MB).
+                    </p>
+                    
+                    <div 
+                      onClick={() => document.getElementById("trailer-file-input").click()}
+                      className="border border-dashed border-slate-350 hover:border-indigo-500 bg-white rounded-lg p-4 text-center cursor-pointer transition-colors text-xs text-slate-500 font-medium"
+                    >
+                      Click to select trailer video
+                    </div>
+                    
+                    <input
+                      id="trailer-file-input"
+                      type="file"
+                      accept="video/mp4, video/webm, video/quicktime, video/x-matroska"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          if (file.size > 100 * 1024 * 1024) {
+                            alert("File size exceeds 100MB limit.");
+                            return;
+                          }
+                          setPendingTrailerFile(file);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+
+                {isTrailerUploading && (
+                  <div className="mt-3 space-y-1.5 border border-slate-200 p-2.5 rounded bg-slate-50">
+                    <div className="flex justify-between items-center text-[10px] text-indigo-650 font-bold font-mono">
+                      <span>{trailerStatusText}</span>
+                      <span>{trailerPercent}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                      <div className="bg-indigo-600 h-full transition-all duration-200" style={{ width: `${trailerPercent}%` }} />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex gap-3 pt-2">
-              <Button type="submit" variant="success" isLoading={formLoading || isThumbnailUploading} className="font-outfit">
+              <Button type="submit" variant="success" isLoading={formLoading || isThumbnailUploading || isTrailerUploading} disabled={formLoading || isThumbnailUploading || isTrailerUploading} className="font-outfit">
                 {editingCourseId ? "Save Changes" : "Create Course"}
               </Button>
-              <Button onClick={resetForm} variant="secondary" className="font-outfit">
+              <Button onClick={resetForm} disabled={formLoading} variant="secondary" className="font-outfit">
                 Cancel
               </Button>
             </div>
@@ -445,9 +577,6 @@ const CreatorDashboard = ({ currentProfile }) => {
                       <div className="pt-3 space-y-2">
                         <div className="flex items-center gap-2">
                           <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider font-outfit">
-                            {crs.category}
-                          </span>
-                          <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider font-outfit">
                             {crs.level}
                           </span>
                         </div>
@@ -455,6 +584,9 @@ const CreatorDashboard = ({ currentProfile }) => {
                         <h4 className="text-sm sm:text-base font-extrabold text-slate-800 font-sans tracking-tight leading-snug line-clamp-2 min-h-[2.5rem]" title={crs.title}>
                           {crs.title}
                         </h4>
+                        <p className="text-xs text-slate-450 font-medium">
+                          {crs.displayName || "LMS Creator"}
+                        </p>
                       </div>
                     </div>
 

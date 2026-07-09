@@ -656,9 +656,6 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
       <div className="relative z-10 border-b border-slate-200 pb-8 space-y-4">
         <div className="flex flex-wrap gap-2">
           <span className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-outfit">
-            {course.category}
-          </span>
-          <span className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-outfit">
             {course.level}
           </span>
         </div>
@@ -670,7 +667,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
         <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
           <div className="flex items-center gap-1.5">
             <span className="text-slate-400">Instructor:</span>
-            <span className="font-semibold text-indigo-600">{course.creator?.username || course.creator || "LMS Tutor"}</span>
+            <span className="font-semibold text-indigo-650">{course.displayName || course.creator?.username || course.creator || "LMS Tutor"}</span>
           </div>
         </div>
       </div>
@@ -770,8 +767,17 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
 
         {/* Right Area: Dynamic Action Enrollment CTA Card */}
         <div className="space-y-6 md:sticky md:top-24">
-          <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm bg-white">
-            <CourseImage src={course.thumbnailUrl} alt={course.title} />
+          <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm bg-white aspect-video relative">
+            {course.trailerUrl ? (
+              <video 
+                src={course.trailerUrl} 
+                poster={course.thumbnailUrl} 
+                controls 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <CourseImage src={course.thumbnailUrl} alt={course.title} />
+            )}
           </div>
 
           <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-md shadow-slate-100/50 space-y-5">

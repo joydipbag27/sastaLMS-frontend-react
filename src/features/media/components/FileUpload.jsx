@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { Upload, FileUp, X, CheckCircle, AlertCircle } from "lucide-react";
 import { useS3Upload } from "../hooks/useS3Upload";
 
-const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
+const FileUpload = ({ onUploadSuccess, useMediaHook, accept = "video/*" }) => {
   const { getUploadUrl, confirmUpload } = useMediaHook;
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -19,10 +19,14 @@ const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
 
   const handleFileSelect = useCallback((file) => {
     if (file) {
+      if (accept && accept.startsWith("video/") && !file.type.startsWith("video/")) {
+        alert("Only video files are allowed.");
+        return;
+      }
       setSelectedFile(file);
       resetUpload();
     }
-  }, [resetUpload]);
+  }, [resetUpload, accept]);
 
   const handleFileChange = (e) => {
     handleFileSelect(e.target.files[0]);
@@ -115,6 +119,7 @@ const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
         <input
           ref={fileInputRef}
           type="file"
+          accept={accept}
           onChange={handleFileChange}
           disabled={isUploading}
           className="hidden"
@@ -125,15 +130,15 @@ const FileUpload = ({ onUploadSuccess, useMediaHook }) => {
             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${isDragging ? "bg-sky-500/20 scale-110" : "bg-slate-800/80"}`}>
               <Upload size={28} className={`transition-colors ${isDragging ? "text-sky-400" : "text-slate-500"}`} />
             </div>
-            <p className="text-sm font-semibold text-slate-300 mb-1">
-              {isDragging ? "Drop your file here" : "Drag & drop a file here"}
-            </p>
-            <p className="text-xs text-slate-500">
-              or <span className="text-sky-400 hover:text-sky-300 font-medium">browse from your computer</span>
-            </p>
-            <p className="text-[11px] text-slate-600 mt-3">
-              Supports video, images, documents, and archives
-            </p>
+             <p className="text-sm font-semibold text-slate-300 mb-1">
+               {isDragging ? "Drop your video here" : "Drag & drop a video here"}
+             </p>
+             <p className="text-xs text-slate-500">
+               or <span className="text-sky-400 hover:text-sky-300 font-medium">browse from your computer</span>
+             </p>
+             <p className="text-[11px] text-slate-650 mt-3 font-semibold">
+               Only video files are allowed
+             </p>
           </div>
         ) : (
           <div className="p-5">

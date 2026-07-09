@@ -98,9 +98,6 @@ const CourseTab = ({ currentProfile }) => {
                     <div className="pt-3 space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider font-outfit">
-                          {crs.category}
-                        </span>
-                        <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider font-outfit">
                           {crs.level}
                         </span>
                       </div>
@@ -110,7 +107,7 @@ const CourseTab = ({ currentProfile }) => {
                       </h4>
                       
                       <p className="text-xs text-slate-450 font-medium">
-                        {crs.creator?.username || "LMS Tutor"}
+                        {crs.displayName || crs.creator?.username || "LMS Tutor"}
                       </p>
                     </div>
                   </div>
