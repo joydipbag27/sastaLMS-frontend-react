@@ -4,7 +4,7 @@ import { useCourses } from "../../features/courses/hooks/useCourses";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import CourseDetails from "./CourseDetails";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Layers, BookOpen } from "lucide-react";
 
 const CourseImage = ({ src, alt, className = "" }) => {
   const [hasError, setHasError] = useState(false);
@@ -109,6 +109,18 @@ const CourseTab = ({ currentProfile }) => {
                       <p className="text-xs text-slate-450 font-medium">
                         {crs.displayName || crs.creator?.username || "LMS Tutor"}
                       </p>
+
+                      <div className="flex items-center gap-3 text-[10px] text-slate-400 font-semibold font-outfit mt-1">
+                        <span className="flex items-center gap-1">
+                          <Layers size={11} className="text-slate-400" />
+                          {crs.stats?.sectionCount || 0} {crs.stats?.sectionCount === 1 ? "Section" : "Sections"}
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <BookOpen size={11} className="text-slate-400" />
+                          {crs.stats?.lessonCount || 0} {crs.stats?.lessonCount === 1 ? "Lesson" : "Lessons"}
+                        </span>
+                      </div>
                     </div>
                   </div>
 

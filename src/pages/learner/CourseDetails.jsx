@@ -669,6 +669,16 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
             <span className="text-slate-400">Instructor:</span>
             <span className="font-semibold text-indigo-650">{course.displayName || course.creator?.username || course.creator || "LMS Tutor"}</span>
           </div>
+          <span className="text-slate-300">|</span>
+          <div className="flex items-center gap-1.5">
+            <Layers size={13} className="text-slate-405" />
+            <span className="font-medium text-slate-600">{course.stats?.sectionCount || 0} {course.stats?.sectionCount === 1 ? "Section" : "Sections"}</span>
+          </div>
+          <span className="text-slate-300">|</span>
+          <div className="flex items-center gap-1.5">
+            <BookOpen size={13} className="text-slate-405" />
+            <span className="font-medium text-slate-600">{course.stats?.lessonCount || 0} {course.stats?.lessonCount === 1 ? "Lesson" : "Lessons"}</span>
+          </div>
         </div>
       </div>
 

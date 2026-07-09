@@ -30,84 +30,12 @@
   }
 }
 
-
-/*
- * Custom CSS necessity explanation:
- * 1. Tooltip overlap: Video.js renders two tooltips on hover (current time and mouse hover position). To prevent overlap, we hide the playhead tooltip on hover.
- * 2. Progress Bar animation: Video.js does not have built-in APIs to toggle styles, scale elements, or animate timeline tracks on hover. We write minimal CSS to:
- *    - Transition the track (.vjs-progress-holder) height from a slim 4px to 8px within 180ms.
- *    - Scale the seek thumb handle (.vjs-play-progress:before) from 0 to 1.3 on hover, similar to YouTube's sleek scrubber knob animation.
- */
-.video-js .vjs-progress-control:hover .vjs-play-progress .vjs-time-tooltip {
-  display: none !important;
+/* Custom Plyr Layout Styles */
+.plyr-theme-custom .plyr {
+  height: 100% !important;
+  width: 100% !important;
 }
-
-/* Slim progress track in normal state & smooth transition height */
-.video-js .vjs-progress-holder {
-  height: 3px !important;
-  transition: height 0.18s ease-in-out !important;
-}
-
-/* Expand progress track height on hover */
-.video-js .vjs-progress-control:hover .vjs-progress-holder {
-  height: 6px !important;
-}
-
-/* Hide scrubber knob in normal state and transition its scale */
-.video-js .vjs-play-progress:before {
-  top: 50% !important;
-  margin-top: -0.2em !important;
-  transform: scale(0) !important;
-  transition: transform 0.18s ease-in-out !important;
-  z-index: 5 !important;
-}
-
-/* Reveal and scale up scrubber knob on hover, matching YouTube style */
-.video-js .vjs-progress-control:hover .vjs-play-progress:before {
-  transform: scale(1.1) !important;
-}
-
-/*
- * Custom CSS necessity explanation:
- * Video.js does not have built-in Javascript APIs to enable backdrop-blur (glassmorphism),
- * apply semi-transparent background fills to controls, or change the default timeline accent color.
- * To implement a "blue and glass" theme similar to YouTube:
- * 1. Overriding .vjs-control-bar adds a blurred backdrop, dark slate transparency, and border.
- * 2. Overriding .vjs-play-progress, .vjs-volume-level, and .vjs-play-progress:before applies the blue accent.
- * 3. Overriding .vjs-button:hover updates control icons to blue on cursor hover.
- */
-
-/* Glassmorphic Control Bar background & larger base size */
-.video-js .vjs-control-bar {
-  background-color: rgba(15, 23, 42, 0.65) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
-  font-size: 12px !important;
-  /* Scaled up from default 10px to make controllers larger */
-  height: 3.6em !important;
-  /* Adjusted control bar height proportionally */
-}
-
-/* Blue Play Progress Timeline */
-.video-js .vjs-play-progress {
-  background-color: #0ea5e9 !important;
-  /* Sky Blue progress */
-}
-
-/* Blue timeline scrubber knob */
-.video-js .vjs-play-progress:before {
-  color: #0ea5e9 !important;
-  /* Sky Blue knob */
-}
-
-/* Blue volume levels slider bar */
-.video-js .vjs-volume-level {
-  background-color: #0ea5e9 !important;
-}
-
-/* Hover style for control bar buttons */
-.video-js .vjs-button:hover {
-  color: #38bdf8 !important;
-  /* Light sky blue hover accent */
+.plyr-theme-custom .plyr__video-wrapper {
+  height: 100% !important;
+  width: 100% !important;
 }

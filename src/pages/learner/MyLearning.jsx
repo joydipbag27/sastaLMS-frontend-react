@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useEnrollments } from "../../features/learning/hooks/useEnrollments";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
-import { GraduationCap, Play, AlertCircle, Loader2 } from "lucide-react";
+import { GraduationCap, Play, AlertCircle, Loader2, Layers, BookOpen } from "lucide-react";
 
 const MyLearning = () => {
   const { data: enrollments, isLoading, error } = useEnrollments();
@@ -85,6 +85,18 @@ const MyLearning = () => {
 
                   <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-1">{course.title}</h3>
                   <p className="text-[10px] text-slate-500 font-medium">Instructor: {course.displayName || course.creator?.username || "Tutor"}</p>
+
+                  <div className="flex items-center gap-3 text-[10px] text-slate-400 font-semibold font-outfit mt-1">
+                    <span className="flex items-center gap-1">
+                      <Layers size={11} className="text-slate-400" />
+                      {course.stats?.sectionCount || 0} {course.stats?.sectionCount === 1 ? "Section" : "Sections"}
+                    </span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <BookOpen size={11} className="text-slate-400" />
+                      {course.stats?.lessonCount || 0} {course.stats?.lessonCount === 1 ? "Lesson" : "Lessons"}
+                    </span>
+                  </div>
 
                   {isUnavailable && (
                     <div className="flex gap-2 p-2.5 bg-rose-50 border border-rose-100 rounded-lg text-rose-600 text-[10px] leading-relaxed">

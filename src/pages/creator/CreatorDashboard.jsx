@@ -9,7 +9,7 @@ import Input from "../../components/ui/Input";
 import FileUpload from "../../features/media/components/FileUpload";
 import { useS3Upload } from "../../features/media/hooks/useS3Upload";
 
-import { GraduationCap, Play } from "lucide-react";
+import { GraduationCap, Play, Layers, BookOpen } from "lucide-react";
 
 const CourseImage = ({ src, alt, className = "" }) => {
   const [hasError, setHasError] = useState(false);
@@ -587,6 +587,18 @@ const CreatorDashboard = ({ currentProfile }) => {
                         <p className="text-xs text-slate-450 font-medium">
                           {crs.displayName || "LMS Creator"}
                         </p>
+
+                        <div className="flex items-center gap-3 text-[10px] text-slate-400 font-semibold font-outfit mt-1">
+                          <span className="flex items-center gap-1">
+                            <Layers size={11} className="text-slate-400" />
+                            {crs.stats?.sectionCount || 0} {crs.stats?.sectionCount === 1 ? "Section" : "Sections"}
+                          </span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <BookOpen size={11} className="text-slate-400" />
+                            {crs.stats?.lessonCount || 0} {crs.stats?.lessonCount === 1 ? "Lesson" : "Lessons"}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
