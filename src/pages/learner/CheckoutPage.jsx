@@ -170,9 +170,9 @@ const CheckoutPage = ({ currentProfile }) => {
   if (isEnrolled || paymentState === "success") {
     return (
       <div className="max-w-md mx-auto py-12 px-4">
-        <div className="bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-lg relative overflow-hidden">
-          <div className="mx-auto w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center mb-6 text-emerald-600">
-            <CheckCircle2 size={36} className="animate-pulse" />
+        <div className="bg-white border border-slate-200 rounded-xl p-8 text-center shadow-sm relative overflow-hidden">
+          <div className="mx-auto w-16 h-16 bg-emerald-50 border border-emerald-200 rounded-full flex items-center justify-center mb-6 text-emerald-600">
+            <CheckCircle2 size={36} />
           </div>
           
           <h2 className="text-xl font-bold text-slate-800 font-outfit mb-3">Tuition Payment Received!</h2>
@@ -194,8 +194,8 @@ const CheckoutPage = ({ currentProfile }) => {
   if (paymentState === "processing") {
     return (
       <div className="max-w-md mx-auto py-12 px-4">
-        <div className="bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-lg relative overflow-hidden">
-          <div className="mx-auto w-16 h-16 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center mb-6 text-indigo-600">
+        <div className="bg-white border border-slate-200 rounded-xl p-8 text-center shadow-sm relative overflow-hidden">
+          <div className="mx-auto w-16 h-16 bg-indigo-50 border border-indigo-200 rounded-full flex items-center justify-center mb-6 text-indigo-600">
             <Loader2 size={36} className="animate-spin" />
           </div>
           
@@ -211,8 +211,8 @@ const CheckoutPage = ({ currentProfile }) => {
   if (paymentState === "timeout") {
     return (
       <div className="max-w-md mx-auto py-12 px-4">
-        <div className="bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-lg">
-          <div className="mx-auto w-16 h-16 bg-amber-50 border border-amber-100 rounded-full flex items-center justify-center mb-6 text-amber-600">
+        <div className="bg-white border border-slate-200 rounded-xl p-8 text-center shadow-sm">
+          <div className="mx-auto w-16 h-16 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center mb-6 text-amber-600">
             <AlertTriangle size={36} />
           </div>
           
@@ -251,12 +251,12 @@ const CheckoutPage = ({ currentProfile }) => {
         {/* Left Column: Summary (3 cols) */}
         <div className="md:col-span-3 space-y-4">
           <Card title="Order Details" subtitle="Review your selected classroom seat">
-            <div className="flex gap-4 items-start pb-4 border-b border-slate-100">
+            <div className="flex gap-4 items-start pb-4 border-b border-slate-200">
               {course?.thumbnailUrl ? (
                 <img 
                   src={course.thumbnailUrl} 
                   alt={course.title} 
-                  className="w-20 h-16 object-cover rounded-lg border border-slate-100 bg-slate-50 shrink-0"
+                  className="w-20 h-16 object-cover rounded-lg border border-slate-200 bg-slate-50 shrink-0"
                 />
               ) : (
                 <div className="w-20 h-16 bg-gradient-to-br from-indigo-500 to-indigo-650 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm">
@@ -270,7 +270,7 @@ const CheckoutPage = ({ currentProfile }) => {
               </div>
             </div>
 
-            <div className="pt-4 flex items-start gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-slate-500 text-xs leading-relaxed">
+            <div className="pt-4 flex items-start gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-slate-500 text-xs leading-relaxed">
               <ShieldCheck className="text-emerald-600 shrink-0 mt-0.5" size={16} />
               <div>
                 <p className="font-bold text-slate-700">Secure Course Purchase</p>
@@ -282,7 +282,7 @@ const CheckoutPage = ({ currentProfile }) => {
 
         {/* Right Column: Pricing & Checkout Button (2 cols) */}
         <div className="md:col-span-2 space-y-4">
-          <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-md flex flex-col justify-between gap-5 relative overflow-hidden">
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between gap-5 relative overflow-hidden">
             <div className="space-y-4">
               <span className="text-slate-500 text-[10px] font-bold block uppercase tracking-wider font-outfit">Checkout Summary</span>
               
@@ -295,7 +295,7 @@ const CheckoutPage = ({ currentProfile }) => {
                   <span>Taxes & Fees</span>
                   <span className="font-bold">$0.00</span>
                 </div>
-                <div className="border-t border-slate-100 my-2 pt-2 flex justify-between items-baseline">
+                <div className="border-t border-slate-200 my-2 pt-2 flex justify-between items-baseline">
                   <span className="text-slate-700 font-bold">Total (USD)</span>
                   <span className="text-xl font-black text-slate-800 font-outfit">${course?.price?.toFixed(2)}</span>
                 </div>
@@ -308,7 +308,7 @@ const CheckoutPage = ({ currentProfile }) => {
             </div>
 
             {paymentState === "error" && (
-              <div className="p-3 bg-rose-50 border border-rose-100 rounded-lg text-rose-600 text-xs font-medium">
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-600 text-xs font-medium">
                 {errorMessage}
               </div>
             )}

@@ -13,7 +13,6 @@ const StudentLayout = ({ profile, onLogout, children }) => {
     onLogout();
   };
 
-  // Close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -30,34 +29,39 @@ const StudentLayout = ({ profile, onLogout, children }) => {
     { name: "Settings", path: "/dashboard/settings", icon: Settings },
   ];
 
+  const isActive = (path) => {
+    if (path === "/courses") return location.pathname === "/courses";
+    if (path === "/my-learning") return location.pathname === "/my-learning";
+    return location.pathname.startsWith(path);
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F9FD] flex flex-col text-slate-800 font-sans">
-      {/* Top Header Navbar */}
-      <header className="sticky top-0 h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 sm:px-8 shadow-sm z-30 shrink-0">
+      <header className="sticky top-0 h-14 bg-white/80 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-30 shrink-0">
         <div className="flex items-center gap-6">
-          <Link to="/courses" className="text-2xl font-black text-indigo-650 tracking-tight flex items-center gap-2">
+          <Link to="/courses" className="text-xl font-black text-indigo-650 tracking-tight flex items-center gap-2">
             veoLMS
           </Link>
-          <span className="bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-outfit hidden sm:inline">
+          <span className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-outfit hidden sm:inline">
             STUDENT
           </span>
-          
-          {/* Horizontal Navbar Navigation Links */}
-          <nav className="flex items-center gap-1">
+
+          <nav className="flex items-center gap-1" role="navigation" aria-label="Main navigation">
             {navLinks.map((link) => {
-              const isActive = location.pathname === link.path;
+              const active = isActive(link.path);
               const Icon = link.icon;
               return (
                 <Link
                   key={link.name}
                   to={link.path}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-semibold text-xs ${
-                    isActive 
-                      ? "bg-indigo-600 text-white shadow-sm" 
-                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                  aria-current={active ? "page" : undefined}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-150 font-semibold text-xs ${
+                    active
+                      ? "bg-indigo-650 text-white shadow-sm"
+                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                   }`}
                 >
-                  <Icon size={14} className={isActive ? "text-white" : "text-slate-400"} />
+                  <Icon size={14} className={active ? "text-white" : "text-slate-400"} />
                   <span className="hidden md:inline">{link.name}</span>
                 </Link>
               );
@@ -65,31 +69,33 @@ const StudentLayout = ({ profile, onLogout, children }) => {
           </nav>
         </div>
 
-        {/* Profile Dropdown Area */}
         <div className="relative shrink-0" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200/60 transition-all select-none"
+            aria-expanded={dropdownOpen}
+            aria-haspopup="true"
+            className="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all duration-150 select-none"
           >
             <div className="text-right hidden sm:block">
               <div className="text-xs font-bold text-slate-700 leading-tight">{profile?.username}</div>
-              <div className="text-[9px] text-slate-400 font-medium">{profile?.email}</div>
+              <div className="text-[10px] text-slate-400 font-medium">{profile?.email}</div>
             </div>
-            <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-150 text-indigo-650 flex items-center justify-center font-bold text-xs">
+            <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-650 flex items-center justify-center font-bold text-xs">
               {profile?.username?.charAt(0).toUpperCase()}
             </div>
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl p-1.5 z-30 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg p-1 z-30 animate-zoom-in-95" role="menu">
               <div className="px-3 py-2 border-b border-slate-100 sm:hidden">
                 <div className="text-xs font-bold text-slate-800">{profile?.username}</div>
-                <div className="text-[9px] text-slate-400 truncate">{profile?.email}</div>
+                <div className="text-[10px] text-slate-400 truncate">{profile?.email}</div>
               </div>
-              <Link 
+              <Link
                 to="/dashboard/settings"
                 onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                role="menuitem"
               >
                 <User size={14} className="text-slate-400" />
                 <span>My Settings</span>
@@ -99,19 +105,19 @@ const StudentLayout = ({ profile, onLogout, children }) => {
                   setDropdownOpen(false);
                   handleLogout();
                 }}
-                className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50/50 transition-colors border-t border-slate-50 mt-1"
+                className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors border-t border-slate-100 mt-1"
+                role="menuitem"
               >
-                <LogOut size={14} className="text-rose-450" />
+                <LogOut size={14} className="text-rose-400" />
                 <span>Sign Out</span>
               </button>
             </div>
           )}
         </div>
       </header>
-      
-      {/* Page Content */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F8F9FD] w-full">
-        <div className="max-w-6xl mx-auto">
+
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {children}
         </div>
       </main>

@@ -6,7 +6,7 @@ import Button from "../../../components/ui/Button";
 import StepFlow from "../../../components/shared/StepFlow";
 
 const ChangePassword = ({ email, onSuccess }) => {
-  const [step, setStep] = useState(1); // 1: Send OTP, 2: Verify OTP, 3: Change Password
+  const [step, setStep] = useState(1);
   const [otp, setOtp] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -71,13 +71,13 @@ const ChangePassword = ({ email, onSuccess }) => {
     <Card title="Change Password" subtitle="Update account password (requires old password)">
       <StepFlow currentStep={step} />
 
-      {error && <div className="text-xs text-rose-400 font-bold bg-rose-950/20 p-2.5 rounded border border-rose-900/40 mb-3">{error}</div>}
-      {message && <div className="text-xs text-emerald-400 font-bold bg-emerald-950/20 p-2.5 rounded border border-emerald-900/40 mb-3">{message}</div>}
+      {error && <div className="text-xs text-rose-600 font-medium bg-rose-50 p-2.5 rounded-lg border border-rose-200 mb-3">{error}</div>}
+      {message && <div className="text-xs text-emerald-600 font-medium bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 mb-3">{message}</div>}
 
       {step === 1 && (
         <div className="space-y-3">
-          <div className="text-xs text-slate-400 bg-slate-900/40 p-2.5 rounded border border-slate-800">
-            For security, we will send an OTP verification email to your registered address: <span className="text-sky-300 font-bold">{email}</span>
+          <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+            For security, we will send an OTP verification email to your registered address: <span className="text-indigo-650 font-bold">{email}</span>
           </div>
           <Button onClick={handleSendOtp} variant="primary" isLoading={loading} className="w-full">
             Send Change Password OTP

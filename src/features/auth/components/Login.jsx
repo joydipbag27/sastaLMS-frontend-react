@@ -54,7 +54,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
   return (
     <>
       <div className="flex justify-center mb-4">
-        <div className="w-12 h-12 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm">
+        <div className="w-12 h-12 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-center text-indigo-600">
           <LogIn size={20} className="stroke-[2.5]" />
         </div>
       </div>
@@ -69,7 +69,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
       </div>
 
       {error && (
-        <div className="mb-4 p-3.5 text-xs font-bold text-rose-500 bg-rose-50 border border-rose-100 rounded-2xl flex items-center space-x-2 animate-shake">
+        <div className="mb-4 p-3.5 text-xs font-bold text-rose-500 bg-rose-50 border border-rose-200 rounded-xl flex items-center space-x-2 animate-shake">
           <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-rose-500 text-white font-extrabold text-[10px]">
             !
           </span>
@@ -91,7 +91,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
               required
             />
           </div>
@@ -110,7 +110,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full pl-12 pr-12 py-3 bg-white border border-slate-200 rounded-2xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+              className="w-full pl-12 pr-12 py-3 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
               required
             />
             <button
@@ -136,7 +136,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3.5 bg-gradient-to-tr from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-600/15 hover:shadow-indigo-600/25 active:scale-[0.98] transition-all duration-300 disabled:opacity-50 text-sm cursor-pointer mt-3 flex items-center justify-center"
+          className="w-full py-3.5 bg-indigo-650 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer mt-3 flex items-center justify-center"
         >
           {isLoading ? (
             <>
@@ -150,7 +150,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
       </form>
 
       <div className="relative my-4 text-center">
-        <div className="absolute inset-y-1/2 left-0 right-0 border-t border-slate-100"></div>
+        <div className="absolute inset-y-1/2 left-0 right-0 border-t border-slate-200"></div>
         <span className="relative z-10 px-3 bg-white text-[9px] font-black text-slate-400 uppercase tracking-wider">
           or continue with
         </span>

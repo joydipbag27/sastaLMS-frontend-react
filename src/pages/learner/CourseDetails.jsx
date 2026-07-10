@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCurriculum, useLessons } from "../../features/courses/hooks/useCurriculum";
@@ -30,8 +30,53 @@ import {
   Video,
   Layers,
   Users,
-  Calendar
+  Calendar,
+  MoreHorizontal
 } from "lucide-react";
+
+// Reusable Accessible Dropdown Menu Component
+const DropdownMenu = ({ trigger, items }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
+  return (
+    <div className="relative inline-block text-left" ref={dropdownRef}>
+      <div onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }} className="cursor-pointer">
+        {trigger}
+      </div>
+      {isOpen && (
+        <div className="absolute right-0 mt-1 w-44 rounded-xl bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-30 py-1.5 border border-slate-200 animate-zoom-in-95">
+          {items.map((item, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(false);
+                item.onClick(e);
+              }}
+              className={`w-full text-left px-3.5 py-2 text-xs font-semibold flex items-center gap-2 hover:bg-slate-50 transition-colors ${item.className || "text-slate-700"}`}
+            >
+              <span className="shrink-0">{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const CourseImage = ({ src, alt, className = "" }) => {
   const [hasError, setHasError] = useState(false);
@@ -42,11 +87,11 @@ const CourseImage = ({ src, alt, className = "" }) => {
 
   if (hasError || !src) {
     return (
-      <div className={`relative group overflow-hidden w-full h-56 bg-gradient-to-br from-indigo-50 to-sky-50 flex flex-col items-center justify-center text-indigo-400 gap-1.5 ${className}`}>
-        <GraduationCap size={36} className="stroke-[1.5] animate-pulse" />
+      <div className={`relative group overflow-hidden w-full aspect-video bg-gradient-to-br from-indigo-50 to-sky-50 flex flex-col items-center justify-center text-indigo-400 gap-1.5 ${className}`}>
+        <GraduationCap size={36} className="stroke-[1.5]" />
         <span className="text-[10px] font-bold tracking-wider font-outfit uppercase">veoLMS Class</span>
-        <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-          <div className="p-4 rounded-full bg-indigo-650/20 border border-indigo-400/40 text-indigo-600 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-lg shadow-indigo-500/10">
+        <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+          <div className="p-4 rounded-full bg-white/80 border border-slate-200 text-indigo-650 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-sm">
             <Play size={28} className="fill-current ml-0.5" />
           </div>
         </div>
@@ -55,15 +100,15 @@ const CourseImage = ({ src, alt, className = "" }) => {
   }
 
   return (
-    <div className="relative group overflow-hidden">
+    <div className="relative group overflow-hidden w-full aspect-video">
       <img
         src={src}
         alt={alt}
         onError={() => setHasError(true)}
-        className={`w-full h-56 object-cover transform transition-transform duration-500 group-hover:scale-105 ${className}`}
+        className={`w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105 ${className}`}
       />
-      <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-        <div className="p-4 rounded-full bg-indigo-650/20 border border-indigo-400/40 text-indigo-600 transform scale-90 group-hover:scale-100 transition-all duration-300 shadow-lg shadow-indigo-500/10">
+      <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+        <div className="p-4 rounded-full bg-white/80 border border-slate-200 text-indigo-650 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-sm">
           <Play size={28} className="fill-current ml-0.5" />
         </div>
       </div>
@@ -81,35 +126,128 @@ const formatDuration = (seconds) => {
   return `${secs}s`;
 };
 
-const LessonRow = ({ les, canEdit, isEnrolled }) => {
+const LessonRow = ({
+  les,
+  canEdit,
+  isEnrolled,
+  onEdit,
+  onDelete,
+  onUploadVideo,
+  onManualIngestion,
+  isUploading,
+  handleLessonClick
+}) => {
   return (
-    <div className="flex justify-between items-center p-3.5 rounded-xl bg-white border border-slate-100 hover:bg-slate-50/50 hover:border-indigo-100 transition-all duration-200">
-      <div className="flex items-center gap-3.5 min-w-0">
-        <span className="text-[10px] font-mono shrink-0 bg-indigo-50 text-indigo-650 font-bold px-2 py-0.5 rounded border border-indigo-100">
+    <div 
+      className="group/lesson flex items-center justify-between p-3.5 hover:bg-slate-50/50 transition-all duration-200 cursor-pointer"
+      onClick={() => handleLessonClick(les)}
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="text-[10px] font-mono shrink-0 bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded border border-slate-200/60">
           L{les.order}
         </span>
         <div className="min-w-0">
-          <p className="font-semibold text-slate-800 text-xs sm:text-sm truncate leading-tight hover:text-indigo-650 transition-colors">
+          <p className="font-bold text-slate-800 text-xs sm:text-sm truncate leading-tight group-hover/lesson:text-indigo-650 transition-colors">
             {les.title}
           </p>
-          <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1.5 mt-0.5">
-            <Video size={10} className="text-slate-400" />
+          <span className="text-[10px] text-slate-450 font-semibold flex items-center gap-1.5 mt-1">
+            <Video size={11} className="text-slate-400" />
             Video {les.duration > 0 ? `(${formatDuration(les.duration)})` : ""}
           </span>
         </div>
       </div>
-      
-      <div className="flex items-center gap-2 shrink-0 ml-3">
+
+      <div className="flex items-center gap-3 shrink-0 ml-3" onClick={(e) => e.stopPropagation()}>
         {les.isPreview ? (
-          <span className="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1 font-outfit tracking-wide animate-pulse">
+          <span className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 font-outfit tracking-wide">
             <Unlock size={10} /> PREVIEW
           </span>
         ) : (!canEdit && !isEnrolled) ? (
-          <span className="text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full text-[9px] font-medium flex items-center gap-1 font-outfit tracking-wider">
+          <span className="text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 font-outfit tracking-wider">
             <Lock size={10} /> LOCKED
           </span>
         ) : null}
+
+        {canEdit && (
+          les.video ? (
+            <span className="text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 font-outfit tracking-wide">
+              Video Attached
+            </span>
+          ) : (
+            <span className="text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 font-outfit tracking-wide">
+              Missing Video
+            </span>
+          )
+        )}
+
+        {canEdit && (
+          <DropdownMenu
+            trigger={
+              <button className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-150 transition-all" aria-label="Lesson actions">
+                <MoreHorizontal size={14} />
+              </button>
+            }
+            items={[
+              {
+                label: "Edit Lesson",
+                icon: <Edit size={12} />,
+                onClick: () => onEdit(les),
+              },
+              ...(!les.video ? [
+                {
+                  label: isUploading ? "Close Uploader" : "Upload Video",
+                  icon: <Video size={12} />,
+                  onClick: () => onUploadVideo(les._id),
+                },
+                {
+                  label: "Manual Ingestion",
+                  icon: <Sparkles size={12} />,
+                  onClick: () => onManualIngestion(les._id),
+                }
+              ] : []),
+              {
+                label: "Delete Lesson",
+                icon: <Trash2 size={12} className="text-rose-500" />,
+                onClick: () => onDelete(les._id),
+                className: "text-rose-600 hover:bg-rose-50/50",
+              }
+            ]}
+          />
+        )}
+        
+        <ChevronRight size={14} className="text-slate-350 group-hover/lesson:translate-x-0.5 transition-transform" />
       </div>
+    </div>
+  );
+};
+
+const CourseOverview = ({ description }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isLong = description && description.length > 350;
+
+  return (
+    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative space-y-4">
+      <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider font-outfit">Course Overview</h3>
+      <div className="relative">
+        <div
+          className={`text-slate-650 text-sm leading-relaxed whitespace-pre-line font-sans transition-all duration-300 ${
+            !isExpanded && isLong ? "max-h-36 overflow-hidden" : ""
+          }`}
+        >
+          {description || "No description provided for this course yet."}
+        </div>
+        {!isExpanded && isLong && (
+          <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+        )}
+      </div>
+      {isLong && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-xs font-bold font-outfit text-indigo-650 hover:text-indigo-500 transition-colors flex items-center gap-1 focus:outline-none"
+        >
+          {isExpanded ? "Show less" : "Show more"}
+        </button>
+      )}
     </div>
   );
 };
@@ -226,53 +364,78 @@ const SectionItem = ({
     setShowLessonForm(false);
   };
 
+  const handleUploadVideoToggle = (lesId) => {
+    setUploadMode("standard");
+    setUploadingLessonId(uploadingLessonId === lesId && uploadMode === "standard" ? null : lesId);
+  };
+
+  const handleManualIngestionToggle = (lesId) => {
+    setUploadMode("manual");
+    setUploadingLessonId(uploadingLessonId === lesId && uploadMode === "manual" ? null : lesId);
+  };
+
+  const displayLessonCount = sect.lessons?.length || (isExpanded && lessons ? lessons.length : 0);
+
   return (
-    <div className="border border-slate-100 rounded-xl bg-white overflow-hidden shadow-sm hover:border-indigo-100 transition-all duration-300">
+    <div className="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm hover:border-indigo-200 transition-all duration-200">
       {/* Section Header */}
       <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex justify-between items-center p-4 cursor-pointer bg-slate-50/20 hover:bg-slate-50/50 transition-all select-none"
+        className="flex justify-between items-center p-4 cursor-pointer bg-slate-50 hover:bg-slate-100/50 transition-all select-none border-b border-transparent"
       >
-        <div className="flex items-center gap-3">
-          <span className="text-indigo-650 font-mono font-bold text-[10px] bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-lg">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <span className="text-indigo-650 font-mono font-bold text-[10px] bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-lg shrink-0">
             S{sect.order}
           </span>
           <div className="min-w-0">
-            <span className="font-bold text-slate-800 text-sm">{sect.title}</span>
-            {sect.description && (
-              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{sect.description}</p>
-            )}
+            <span className="font-bold text-slate-800 text-sm block truncate leading-snug">{sect.title}</span>
+            <div className="flex items-center gap-2 mt-0.5">
+              {sect.description && (
+                <p className="text-[11px] text-slate-405 truncate max-w-[200px] sm:max-w-xs">{sect.description}</p>
+              )}
+              {sect.description && displayLessonCount > 0 && <span className="text-[11px] text-slate-350">•</span>}
+              {displayLessonCount > 0 && (
+                <span className="text-[11px] text-slate-405 font-medium">{displayLessonCount} {displayLessonCount === 1 ? "lesson" : "lessons"}</span>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-3 shrink-0" onClick={(e) => e.stopPropagation()}>
           {canEdit && (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <Button
                 onClick={() => {
                   setIsExpanded(true);
                   setShowLessonForm(true);
                   setEditingLessonId(null);
                 }}
-                variant="success"
-                className="px-2 py-1 text-[10px] font-bold text-white bg-emerald-600 hover:bg-emerald-500 font-outfit"
+                variant="secondary"
+                className="px-2 py-1 text-[10px] font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 font-outfit"
               >
                 + Lesson
               </Button>
-              <Button
-                onClick={() => onEditSectionClick(sect)}
-                variant="secondary"
-                className="px-2 py-1 text-[10px] font-bold font-outfit"
-              >
-                Edit
-              </Button>
-              <Button
-                onClick={() => onDeleteSection(sect._id)}
-                variant="danger"
-                className="px-2 py-1 text-[10px] font-bold font-outfit"
-              >
-                Delete
-              </Button>
+              
+              <DropdownMenu
+                trigger={
+                  <button className="p-1.5 rounded-lg text-slate-450 hover:text-slate-700 hover:bg-slate-100 transition-all" aria-label="Section options">
+                    <MoreHorizontal size={16} />
+                  </button>
+                }
+                items={[
+                  {
+                    label: "Edit Section",
+                    icon: <Edit size={12} />,
+                    onClick: () => onEditSectionClick(sect),
+                  },
+                  {
+                    label: "Delete Section",
+                    icon: <Trash2 size={12} className="text-rose-500" />,
+                    onClick: () => onDeleteSection(sect._id),
+                    className: "text-rose-600 hover:bg-rose-50/50",
+                  }
+                ]}
+              />
             </div>
           )}
           <span className="text-slate-400 p-1 hover:text-slate-600 transition-colors">
@@ -283,66 +446,36 @@ const SectionItem = ({
 
       {/* Section Lessons Body */}
       {isExpanded && (
-        <div className="p-4 border-t border-slate-100 space-y-2 bg-slate-50/30">
+        <div className="p-4 border-t border-slate-200 bg-slate-50/50 space-y-3">
           {lessonsLoading ? (
-            <div className="text-center py-4 italic text-slate-500 text-[11px] font-mono">Retrieving lessons...</div>
+            <div className="text-center py-4 italic text-slate-400 text-[11px] font-mono">Retrieving lessons...</div>
           ) : lessons.length === 0 ? (
-            <div className="text-center py-6 border border-dashed border-slate-200 rounded-xl italic text-slate-450 text-[11px] font-mono bg-white">
+            <div className="text-center py-6 border border-dashed border-slate-200 rounded-xl italic text-slate-400 text-[11px] font-mono bg-white">
               No lessons inside this section yet.
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
               {lessons.map((les) => (
-                <div 
-                  key={les._id} 
-                  className="relative group border border-slate-100 rounded-xl bg-white overflow-hidden shadow-sm"
-                >
-                  <div 
-                    onClick={() => handleLessonClick(les)}
-                    className="cursor-pointer transition-all"
-                  >
-                    <LessonRow les={les} canEdit={canEdit} isEnrolled={isEnrolled} />
-                  </div>
-                  {canEdit && (
-                    <div 
-                      className="px-3 py-2 bg-slate-50/50 flex flex-wrap items-center justify-between border-t border-slate-100"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="flex items-center gap-2">
-                        {les.video ? (
-                          <span className="text-emerald-600 font-bold font-mono text-[9px] flex items-center gap-1">
-                            ✅ Video Attached
-                          </span>
-                        ) : (
-                          <span className="text-amber-600 font-medium font-mono text-[9px] flex items-center gap-1">
-                            ⚠️ No Video Attached
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {!les.video && (
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setUploadingLessonId(uploadingLessonId === les._id ? null : les._id);
-                            }}
-                            variant="secondary"
-                            className="px-2 py-0.5 text-[9px] font-mono text-slate-600 hover:text-slate-800"
-                          >
-                            {uploadingLessonId === les._id ? "Close Uploader" : "Upload Video"}
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                <div key={les._id} className="relative">
+                  <LessonRow
+                    les={les}
+                    canEdit={canEdit}
+                    isEnrolled={isEnrolled}
+                    onEdit={handleEditLessonClick}
+                    onDelete={handleDeleteLesson}
+                    onUploadVideo={handleUploadVideoToggle}
+                    onManualIngestion={handleManualIngestionToggle}
+                    isUploading={uploadingLessonId === les._id}
+                    handleLessonClick={handleLessonClick}
+                  />
 
                   {canEdit && uploadingLessonId === les._id && (
                     <div 
-                      className="p-4 border-t border-slate-100 bg-slate-50 space-y-4"
+                      className="p-4 border-t border-slate-200 bg-slate-50 space-y-4"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {/* Mode Toggle */}
-                      <div className="flex gap-2 border-b border-slate-100 pb-3">
+                      <div className="flex gap-2 border-b border-slate-200 pb-3">
                         <button
                           type="button"
                           onClick={() => setUploadMode("standard")}
@@ -387,34 +520,6 @@ const SectionItem = ({
                       )}
                     </div>
                   )}
-
-                  {canEdit && (
-                    <div 
-                      className="absolute right-2 top-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditLessonClick(les);
-                        }}
-                        variant="secondary"
-                        className="px-1.5 py-0.5 text-[9px] font-mono"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteLesson(les._id);
-                        }}
-                        variant="danger"
-                        className="px-1.5 py-0.5 text-[9px] font-mono"
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -425,7 +530,7 @@ const SectionItem = ({
             <Button
               onClick={() => setShowLessonForm(true)}
               variant="secondary"
-              className="w-full py-1.5 text-[10px] font-mono border border-dashed border-slate-200 hover:border-slate-350 bg-white"
+              className="w-full py-2 text-[10px] font-bold border border-slate-200 hover:bg-slate-50 bg-white"
             >
               + Add Lesson to Section
             </Button>
@@ -433,8 +538,8 @@ const SectionItem = ({
 
           {/* Add/Edit Lesson Form block */}
           {canEdit && showLessonForm && (
-            <div className="bg-white p-4 rounded-xl border border-slate-100 space-y-3 mt-3 shadow-sm">
-              <h5 className="font-bold text-indigo-650 border-b border-slate-100 pb-2 mb-2 font-mono text-xs flex items-center gap-1.5">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-3 mt-3 shadow-sm">
+              <h5 className="font-bold text-indigo-650 border-b border-slate-200 pb-2 mb-2 font-mono text-xs flex items-center gap-1.5">
                 <Sparkles size={13} />
                 {editingLessonId ? "Modify Lesson" : "New Lesson for Section"}
               </h5>
@@ -516,7 +621,6 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
   const course = initialCourse || fetchedCourse;
 
   const canEdit = currentProfile && ["CREATOR", "ADMIN"].includes(currentProfile.role);
-  const isStudent = currentProfile && currentProfile.role === "STUDENT";
   const isCreatorOrAdmin = canEdit;
 
   // React Query hook for sections and enrollment
@@ -632,20 +736,23 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
   }
 
   const handleBack = onBack || (() => navigate(-1));
+  const sCount = course.stats?.sectionCount || sections.length || 0;
+  const lCount = course.stats?.lessonCount || 0;
 
   return (
-    <div className="space-y-8 font-sans text-sm relative pb-16">
-      {/* Background Decorative Glow */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none z-0" />
-
+    <div className="space-y-6 font-sans text-sm relative pb-16">
       {/* Navigation and Top Bar */}
       <div className="flex items-center justify-between relative z-10">
-        <Button onClick={handleBack} variant="secondary" className="px-4 py-2 font-bold font-outfit text-xs border border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-2">
+        <Button 
+          onClick={handleBack} 
+          variant="secondary" 
+          className="px-3.5 py-1.5 font-bold font-outfit text-xs border border-slate-200 bg-white hover:bg-slate-50 flex items-center gap-2"
+        >
           <ArrowLeft size={14} /> Back to Catalog
         </Button>
         {isCreatorOrAdmin && (
           <Link to={`/classroom/${course._id}`}>
-            <Button variant="primary" className="px-4 py-2 font-bold font-outfit text-xs flex items-center gap-1.5">
+            <Button variant="primary" className="px-3.5 py-1.5 font-bold font-outfit text-xs flex items-center gap-1.5">
               <GraduationCap size={15} /> Preview Classroom
             </Button>
           </Link>
@@ -653,46 +760,42 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
       </div>
 
       {/* Hero Header Section */}
-      <div className="relative z-10 border-b border-slate-200 pb-8 space-y-4">
+      <div className="relative z-10 border-b border-slate-200 pb-5 space-y-3">
         <div className="flex flex-wrap gap-2">
-          <span className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-outfit">
+          <span className="bg-indigo-50 text-indigo-650 border border-indigo-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-outfit">
             {course.level}
           </span>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-black font-outfit text-slate-800 tracking-tight leading-tight max-w-4xl">
+        <h1 className="text-2xl sm:text-3xl font-black font-outfit text-slate-850 tracking-tight leading-tight max-w-4xl">
           {course.title}
         </h1>
 
-        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+          <div className="flex items-center gap-1">
             <span className="text-slate-400">Instructor:</span>
             <span className="font-semibold text-indigo-650">{course.displayName || course.creator?.username || course.creator || "LMS Tutor"}</span>
           </div>
-          <span className="text-slate-300">|</span>
+          <span className="text-slate-350">•</span>
           <div className="flex items-center gap-1.5">
-            <Layers size={13} className="text-slate-405" />
-            <span className="font-medium text-slate-600">{course.stats?.sectionCount || 0} {course.stats?.sectionCount === 1 ? "Section" : "Sections"}</span>
+            <Layers size={13} className="text-slate-400" />
+            <span className="font-medium text-slate-600">{sCount} {sCount === 1 ? "Section" : "Sections"}</span>
           </div>
-          <span className="text-slate-300">|</span>
+          <span className="text-slate-350">•</span>
           <div className="flex items-center gap-1.5">
-            <BookOpen size={13} className="text-slate-405" />
-            <span className="font-medium text-slate-600">{course.stats?.lessonCount || 0} {course.stats?.lessonCount === 1 ? "Lesson" : "Lessons"}</span>
+            <BookOpen size={13} className="text-slate-400" />
+            <span className="font-medium text-slate-600">{lCount} {lCount === 1 ? "Lesson" : "Lessons"}</span>
           </div>
         </div>
       </div>
 
-      {/* Two Column Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10 items-start">
-        {/* Left Area: Main Content */}
-        <div className="md:col-span-2 space-y-6">
-          {/* Description Section */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-bold font-outfit text-slate-800 tracking-wide">Course Overview</h3>
-            <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.01)] leading-relaxed text-xs sm:text-sm text-slate-600 space-y-4">
-              <p>{course.description || "No description provided for this course yet."}</p>
-            </div>
-          </div>
+      {/* Responsive Two Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10 items-start">
+        
+        {/* Main Column: Overview & Curriculum */}
+        <div className="lg:col-span-2 order-2 lg:order-1 space-y-6">
+          {/* Overview Card */}
+          <CourseOverview description={course.description} />
 
           {/* Section Creation Form (Admins only) */}
           {showSectionForm && (
@@ -739,10 +842,19 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
 
           {/* Curriculum Accordion */}
           <div className="space-y-4">
-            <div className="flex justify-between items-center flex-wrap gap-3 border-b border-slate-100 pb-3">
-              <h3 className="text-lg font-bold font-outfit text-slate-800 tracking-wide">Course Curriculum</h3>
+            <div className="flex justify-between items-center flex-wrap gap-3 border-b border-slate-200 pb-3">
+              <div>
+                <h3 className="text-lg font-bold font-outfit text-slate-800 tracking-wide">Course Curriculum</h3>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  {sCount} {sCount === 1 ? "section" : "sections"} • {lCount} {lCount === 1 ? "lesson" : "lessons"}
+                </p>
+              </div>
               {canEdit && !showSectionForm && (
-                <Button onClick={() => setShowSectionForm(true)} variant="primary" className="py-1.5 px-3 font-outfit text-xs flex items-center gap-1.5">
+                <Button 
+                  onClick={() => setShowSectionForm(true)} 
+                  variant="secondary" 
+                  className="py-1.5 px-3 font-outfit text-xs flex items-center gap-1.5 text-slate-700 border border-slate-200 hover:bg-slate-50"
+                >
                   <Plus size={14} /> Add Section
                 </Button>
               )}
@@ -751,7 +863,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
             {loading ? (
               <div className="text-center py-10 italic text-slate-400 text-xs">Loading curriculum details...</div>
             ) : sections.length === 0 ? (
-              <div className="text-center py-12 border border-dashed border-slate-200 rounded-2xl italic text-slate-400 text-xs bg-white shadow-sm">
+              <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl italic text-slate-400 text-xs bg-white shadow-sm">
                 No curriculum sections added yet.
               </div>
             ) : (
@@ -775,9 +887,11 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
           </div>
         </div>
 
-        {/* Right Area: Dynamic Action Enrollment CTA Card */}
-        <div className="space-y-6 md:sticky md:top-24">
-          <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm bg-white aspect-video relative">
+        {/* Sidebar Column: Media & Enrollment */}
+        <div className="lg:col-span-1 order-1 lg:order-2 space-y-6 lg:sticky lg:top-24">
+          
+          {/* Media Preview Card */}
+          <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white aspect-video relative">
             {course.trailerUrl ? (
               <video 
                 src={course.trailerUrl} 
@@ -790,17 +904,23 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
             )}
           </div>
 
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-md shadow-slate-100/50 space-y-5">
+          {/* Access Status Card */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-5">
             <div>
-              <span className="text-slate-400 text-[10px] font-bold block uppercase tracking-widest mb-1.5 font-outfit">
-                {isEnrolled ? "YOUR ACCESS STATUS" : "COURSE TUITION"}
+              <span className="text-slate-500 text-[10px] font-bold block uppercase tracking-widest mb-1.5 font-outfit">
+                YOUR ACCESS STATUS
               </span>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-black text-slate-800 font-outfit tracking-tight">
                   {isEnrolled ? "UNLOCKED" : course.price === 0 ? "FREE" : `$${course.price}`}
                 </span>
-                {!isEnrolled && course.price > 0 && <span className="text-xs text-slate-400 font-bold font-outfit">USD</span>}
+                {!isEnrolled && course.price > 0 && <span className="text-xs text-slate-500 font-bold font-outfit">USD</span>}
               </div>
+              {isCreatorOrAdmin && (
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-650 mt-3 border border-indigo-200 font-outfit uppercase tracking-wider">
+                  <Shield size={10} /> Creator Access
+                </div>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -816,7 +936,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
                 <Link to={`/classroom/${course._id}`} className="block">
                   <Button variant="success" className="w-full py-3 text-xs font-bold font-outfit uppercase tracking-wider flex items-center justify-center gap-2">
                     <GraduationCap size={16} />
-                    Start Learning (Creator)
+                    Start Learning
                   </Button>
                 </Link>
               ) : isEnrolled ? (
@@ -845,6 +965,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

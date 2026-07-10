@@ -28,33 +28,32 @@ const ProfileCard = ({ profile, onLogoutSuccess }) => {
 
   return (
     <Card title="Your Profile" subtitle="Active session details">
-      <div className="space-y-3.5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-900/40 p-4 rounded-lg border border-slate-800/80">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm bg-slate-50 p-4 rounded-lg border border-slate-100">
           <div>
-            <span className="text-slate-500 block">Username</span>
-            <span className="text-slate-200 font-bold text-sm">{profile.username}</span>
+            <span className="text-slate-500 text-xs block mb-1">Username</span>
+            <span className="text-slate-800 font-bold">{profile.username}</span>
           </div>
           <div>
-            <span className="text-slate-500 block">Email Address</span>
-            <span className="text-slate-200 font-mono">{profile.email}</span>
+            <span className="text-slate-500 text-xs block mb-1">Email Address</span>
+            <span className="text-slate-700 font-mono text-xs">{profile.email}</span>
           </div>
           <div>
-            <span className="text-slate-500 block">Role Assignment</span>
-            <span className={`inline-block px-2 py-0.5 mt-1 rounded font-bold text-[10px] uppercase border ${
-              profile.role === "Owner" ? "bg-purple-950 text-purple-300 border-purple-800" :
-              profile.role === "Admin" ? "bg-rose-950 text-rose-300 border-rose-800" :
-              profile.role === "Manager" ? "bg-sky-950 text-sky-300 border-sky-850" :
-              "bg-slate-800 text-slate-400 border-slate-700"
+            <span className="text-slate-500 text-xs block mb-1">Role Assignment</span>
+            <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
+              profile.role === "ADMIN" ? "bg-rose-50 text-rose-600 border-rose-200" :
+              profile.role === "CREATOR" ? "bg-indigo-50 text-indigo-600 border-indigo-200" :
+              "bg-slate-100 text-slate-600 border-slate-200"
             }`}>
               {profile.role || "User"}
             </span>
           </div>
           <div>
-            <span className="text-slate-500 block">Password Status</span>
-            <span className={`inline-block px-2 py-0.5 mt-1 rounded font-bold text-[10px] uppercase border ${
+            <span className="text-slate-500 text-xs block mb-1">Password Status</span>
+            <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
               profile.isPassAvailable
-                ? "bg-emerald-950 text-emerald-300 border-emerald-800"
-                : "bg-amber-950 text-amber-300 border-amber-800"
+                ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                : "bg-amber-50 text-amber-600 border-amber-200"
             }`}>
               {profile.isPassAvailable ? "Password Set" : "Google Sign-In Only"}
             </span>
@@ -65,7 +64,7 @@ const ProfileCard = ({ profile, onLogoutSuccess }) => {
           <Button onClick={handleLogout} variant="secondary" isLoading={loading} className="flex-1 min-w-[140px]">
             Sign Out
           </Button>
-          <Button onClick={handleLogoutAll} variant="danger" isLoading={killLoading} className="flex-1 min-w-[140px] text-rose-300 border-rose-800 hover:bg-rose-950/20 bg-rose-950/10">
+          <Button onClick={handleLogoutAll} variant="danger" isLoading={killLoading} className="flex-1 min-w-[140px]">
             Sign Out All Devices
           </Button>
         </div>

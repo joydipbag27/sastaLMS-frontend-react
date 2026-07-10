@@ -6,7 +6,7 @@ import Button from "../../../components/ui/Button";
 import StepFlow from "../../../components/shared/StepFlow";
 
 const SetPassword = ({ email, onSuccess }) => {
-  const [step, setStep] = useState(1); // 1: Send OTP, 2: Verify OTP, 3: Set Password
+  const [step, setStep] = useState(1);
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -70,14 +70,14 @@ const SetPassword = ({ email, onSuccess }) => {
     <Card title="Set Password" subtitle="Establish a password credential for your account">
       <StepFlow currentStep={step} />
 
-      {error && <div className="text-xs text-rose-400 font-bold bg-rose-950/20 p-2.5 rounded border border-rose-900/40 mb-3">{error}</div>}
-      {message && <div className="text-xs text-emerald-400 font-bold bg-emerald-950/20 p-2.5 rounded border border-emerald-900/40 mb-3">{message}</div>}
+      {error && <div className="text-xs text-rose-600 font-medium bg-rose-50 p-2.5 rounded-lg border border-rose-200 mb-3">{error}</div>}
+      {message && <div className="text-xs text-emerald-600 font-medium bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 mb-3">{message}</div>}
 
       {step === 1 && (
         <div className="space-y-3">
-          <div className="text-xs text-slate-400 bg-slate-900/40 p-2.5 rounded border border-slate-800">
+          <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
             You do not currently have a password. Setting a password allows you to sign in directly without Google.
-            We will send a validation code to: <span className="text-sky-300 font-bold">{email}</span>
+            We will send a validation code to: <span className="text-indigo-650 font-bold">{email}</span>
           </div>
           <Button onClick={handleSendOtp} variant="primary" isLoading={loading} className="w-full">
             Send Set Password OTP

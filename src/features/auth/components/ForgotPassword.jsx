@@ -114,7 +114,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
   return (
     <>
       <div className="flex justify-center mb-3">
-        <div className="w-12 h-12 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-center text-indigo-650 mx-auto shadow-sm">
+        <div className="w-12 h-12 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-center text-indigo-650 mx-auto">
           <KeyRound size={20} className="stroke-[2.5]" />
         </div>
       </div>
@@ -129,7 +129,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
       </div>
 
       {error && (
-        <div className="mb-4 p-3.5 text-xs font-bold text-rose-500 bg-rose-50 border border-rose-100 rounded-2xl flex items-center space-x-2">
+        <div className="mb-4 p-3.5 text-xs font-bold text-rose-500 bg-rose-50 border border-rose-200 rounded-xl flex items-center space-x-2">
           <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-rose-500 text-white font-extrabold text-[10px]">
             !
           </span>
@@ -152,7 +152,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
                 required
               />
             </div>
@@ -161,7 +161,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-gradient-to-tr from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-600/15 transition-all duration-300 disabled:opacity-50 text-sm cursor-pointer flex items-center justify-center"
+            className="w-full py-3.5 bg-indigo-650 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer flex items-center justify-center"
           >
             {loading ? (
               <Loader2 className="animate-spin mr-2" size={16} />
@@ -187,7 +187,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 placeholder="Enter 6-digit code"
-                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 tracking-widest placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 tracking-widest placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
                 required
               />
             </div>
@@ -196,7 +196,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-gradient-to-tr from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-600/15 transition-all duration-300 disabled:opacity-50 text-sm cursor-pointer flex items-center justify-center"
+            className="w-full py-3.5 bg-indigo-650 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer flex items-center justify-center"
           >
             {loading ? (
               <Loader2 className="animate-spin mr-2" size={16} />
@@ -227,7 +227,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
         <form onSubmit={handleResetPassword} className="space-y-4">
           {success ? (
             <div className="text-center py-6 space-y-3 animate-fade-in">
-              <div className="w-12 h-12 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center text-emerald-500 mx-auto shadow-sm">
+              <div className="w-12 h-12 bg-emerald-50 border border-emerald-200 rounded-full flex items-center justify-center text-emerald-500 mx-auto">
                 <CheckCircle2 size={24} />
               </div>
               <h4 className="text-sm font-black text-slate-800">Password Changed Successfully!</h4>
@@ -248,7 +248,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="At least 6 characters"
-                    className="w-full pl-12 pr-12 py-3 bg-white border border-slate-200 rounded-2xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+                    className="w-full pl-12 pr-12 py-3 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
                     required
                     minLength="6"
                   />
@@ -275,7 +275,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm new password"
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
                     required
                   />
                 </div>
@@ -284,7 +284,7 @@ const ForgotPassword = ({ onResetSuccess, onBackToLogin }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-gradient-to-tr from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-black rounded-2xl shadow-lg shadow-indigo-600/15 transition-all duration-300 disabled:opacity-50 text-sm cursor-pointer flex items-center justify-center"
+                className="w-full py-3.5 bg-indigo-650 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer flex items-center justify-center"
               >
                 {loading ? (
                   <Loader2 className="animate-spin mr-2" size={16} />

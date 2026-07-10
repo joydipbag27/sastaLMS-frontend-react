@@ -7,7 +7,7 @@ const AuthLayout = ({ children }) => {
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-200/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-200/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <div className="w-full max-w-6xl lg:h-[90vh] lg:max-h-[700px] bg-white/40 backdrop-blur-xl border border-white/50 rounded-[40px] shadow-[0_24px_80px_rgba(0,0,0,0.02),0_4px_16px_rgba(0,0,0,0.005)] p-4 md:p-6 lg:p-8 lg:grid lg:grid-cols-12 lg:gap-8 items-stretch relative z-10">
+      <div className="w-full max-w-6xl lg:h-[90vh] lg:max-h-[700px] bg-white border border-slate-200 rounded-[40px] shadow-xl p-4 md:p-6 lg:p-8 lg:grid lg:grid-cols-12 lg:gap-8 items-stretch relative z-10">
         <div className="hidden lg:flex lg:col-span-6 flex-col justify-between p-4 h-full">
           <div className="space-y-4 flex-1 flex flex-col justify-between">
             <div>
@@ -27,7 +27,7 @@ const AuthLayout = ({ children }) => {
               </div>
             </div>
 
-            <div className="flex-1 min-h-[140px] my-3 w-full rounded-[28px] bg-slate-50/50 border border-slate-100/50 border-dashed flex items-center justify-center relative overflow-hidden">
+            <div className="flex-1 min-h-[140px] my-3 w-full rounded-[28px] bg-slate-50 border border-slate-200 border-dashed flex items-center justify-center relative overflow-hidden">
               <div
                 className="absolute inset-0 bg-gradient-to-tr from-slate-100/20 to-indigo-50/10 animate-pulse"
                 style={{ animationDuration: "4s" }}
@@ -44,9 +44,9 @@ const AuthLayout = ({ children }) => {
             </div>
           </div>
 
-          <div className="bg-white/80 border border-slate-100/80 rounded-3xl p-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] grid grid-cols-3 gap-2 mt-2">
+          <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm grid grid-cols-3 gap-2 mt-2">
             <div className="text-center space-y-0.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-1 shadow-sm shadow-indigo-100/50">
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-1">
                 <Shield size={16} />
               </div>
               <h4 className="font-extrabold text-slate-800 text-xs">
@@ -58,7 +58,7 @@ const AuthLayout = ({ children }) => {
             </div>
 
             <div className="text-center space-y-0.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-1 shadow-sm shadow-indigo-100/50">
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-1">
                 <BarChart3 size={16} />
               </div>
               <h4 className="font-extrabold text-slate-800 text-xs">
@@ -70,7 +70,7 @@ const AuthLayout = ({ children }) => {
             </div>
 
             <div className="text-center space-y-0.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-1 shadow-sm shadow-indigo-100/50">
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-1">
                 <Zap size={16} />
               </div>
               <h4 className="font-extrabold text-slate-800 text-xs">
@@ -84,7 +84,7 @@ const AuthLayout = ({ children }) => {
         </div>
 
         <div className="lg:col-span-6 flex items-center justify-center p-2 h-full">
-          <div className="w-full max-w-[450px] bg-white border border-slate-100 rounded-[32px] p-6 lg:p-8 shadow-[0_16px_40px_rgba(0,0,0,0.02)] flex flex-col justify-center h-full">
+          <div className="w-full max-w-[450px] bg-white border border-slate-200 rounded-[32px] p-6 lg:p-8 shadow-lg flex flex-col justify-center h-full">
             {children}
           </div>
         </div>

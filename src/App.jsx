@@ -34,10 +34,10 @@ const App = () => {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-sky-400 font-bold tracking-widest uppercase text-sm">Loading veoLMS</p>
+      <div className="min-h-screen bg-[#F8F9FD] flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-indigo-650 font-bold tracking-widest uppercase text-xs font-outfit">Loading veoLMS</p>
         </div>
       </div>
     );

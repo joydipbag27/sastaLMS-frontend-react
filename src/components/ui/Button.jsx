@@ -10,14 +10,15 @@ const Button = ({
   isLoading = false,
 }) => {
   const baseStyle =
-    "px-4 py-2 rounded-lg font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm flex items-center justify-center gap-2 transform active:scale-[0.98] hover:scale-[1.01]";
+    "inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed text-sm select-none active:scale-[0.98]";
 
   const variants = {
-    primary: "bg-gradient-to-r from-indigo-650 to-indigo-600 hover:from-indigo-600 hover:to-indigo-500 text-white shadow-md shadow-indigo-100/30 focus:ring-indigo-500",
-    success: "bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-md shadow-emerald-950/20 focus:ring-emerald-500",
-    danger: "bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white shadow-md shadow-rose-950/20 focus:ring-rose-500",
-    warning: "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white shadow-md shadow-amber-950/20 focus:ring-amber-500",
+    primary: "bg-indigo-650 hover:bg-indigo-600 text-white shadow-sm shadow-indigo-100/30 focus:ring-indigo-500",
+    success: "bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shadow-emerald-100/30 focus:ring-emerald-500",
+    danger: "bg-rose-600 hover:bg-rose-500 text-white shadow-sm shadow-rose-100/30 focus:ring-rose-500",
+    warning: "bg-amber-500 hover:bg-amber-400 text-white shadow-sm shadow-amber-100/30 focus:ring-amber-500",
     secondary: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 focus:ring-indigo-500",
+    ghost: "bg-transparent hover:bg-slate-50 text-slate-600 focus:ring-indigo-500",
   };
 
   return (
