@@ -28,7 +28,16 @@ export const useLessonProgress = (lessonId, isCreatorOrAdmin) => {
       throw new Error(res.data?.error || "Failed to update progress");
     },
     onSuccess: (updatedProgress) => {
-      queryClient.setQueryData(["lessonProgress", lessonId], updatedProgress);
+      queryClient.setQueryData(["lessonProgress", lessonId], (oldProgress) => {
+        if (!oldProgress) return updatedProgress;
+        if (
+          oldProgress.maxPositionReached > updatedProgress.maxPositionReached ||
+          (oldProgress.completed && !updatedProgress.completed)
+        ) {
+          return oldProgress;
+        }
+        return updatedProgress;
+      });
     },
   });
 

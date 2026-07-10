@@ -89,7 +89,7 @@ export const VideoPlayer = ({
         onSeeked?.(plyrInstance.currentTime);
       });
 
-      plyrInstance.on("ended", () => onEnded?.());
+      plyrInstance.on("ended", () => onEnded?.(plyrInstance.duration));
 
       plyrInstance.on("ready", () => {
         setIsReady(true);

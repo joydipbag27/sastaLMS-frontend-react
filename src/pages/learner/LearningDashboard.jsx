@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
+  ChevronLeft,
   ChevronRight,
   ChevronDown,
   CheckCircle,
@@ -21,10 +22,12 @@ import {
   PanelRightOpen,
   X
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../features/auth/hooks/useAuth";
-import { useCurriculum, useLessons, useLesson } from "../../features/courses/hooks/useCurriculum";
-import { useCourses } from "../../features/courses/hooks/useCourses";
+import { useCurriculum, useLesson } from "../../features/courses/hooks/useCurriculum";
 import { useLessonProgress } from "../../features/learning/hooks/useLessonProgress";
+import { useLearningSectionData } from "../../features/learning/hooks/useLearningSectionData";
+import { useCourseProgress } from "../../features/learning/hooks/useCourseProgress";
 import Button from "../../components/ui/Button";
 import VideoPlayer from "../../components/shared/VideoPlayer";
 import { makeRequest } from "../../services/api/apiClient";
@@ -66,50 +69,53 @@ const ShareButton = ({ courseId, lessonId }) => {
   );
 };
 
-// Separate Section Accordion item for the sidebar
+// Separate Section Accordion item for the sidebar.
+// Uses the new Learning Section endpoint to load lessons + inline progress
+// in a single request, replacing the previous dual useLessons + progress-map approach.
 const SidebarSectionItem = ({
   sect,
+  courseId,
   isCreatorOrAdmin,
   activeLessonId,
   onSelectLesson,
-  completedLessons,
 }) => {
   const [isOpen, setIsOpen] = useState(sect.order === 1);
-  const { lessons, lessonsLoading } = useLessons(sect._id, isCreatorOrAdmin, isOpen);
 
-  const completedCount = lessons.filter(l => completedLessons[l._id]).length;
-  const progressPercent = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0;
+  // Fetch lessons + per-lesson progress from the aggregated Learning endpoint.
+  // Only fires when the accordion is open (lazy loading per section).
+  const { data, isLoading: sectionLoading } = useLearningSectionData(
+    courseId,
+    sect._id,
+    { enabled: isOpen }
+  );
+
+  const lessons = data?.section?.lessons ?? [];
+
+  // Derive completion counts directly from server-side progress fields.
+  const completedCount = lessons.filter((l) => l.progress?.completed).length;
 
   return (
-    <div className="border-b border-slate-200 last:border-b-0">
+    <div className="border-b border-slate-100 last:border-b-0 bg-white">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-all duration-150 text-left group"
+        className="w-full flex items-center justify-between p-4 bg-white hover:bg-slate-50 transition-all duration-150 text-left group"
       >
         <div className="min-w-0 flex-1">
-          <h4 className="font-bold text-slate-800 text-sm leading-snug font-outfit group-hover:text-indigo-650 transition-colors">{sect.title}</h4>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px] text-slate-500 font-medium font-sans">
-              {completedCount}/{lessons.length} complete
-            </span>
-            {lessons.length > 0 && (
-              <div className="w-16 h-1 bg-slate-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-            )}
-          </div>
+          <h4 className="font-bold text-slate-800 text-sm leading-snug font-outfit group-hover:text-indigo-650 transition-colors">
+            {sect.title}
+          </h4>
+          <span className="text-[11px] text-slate-550 font-medium font-sans mt-0.5 block">
+            {completedCount} of {lessons.length}
+          </span>
         </div>
-        <span className="text-slate-400 ml-2 transition-transform duration-200" style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(0deg)' }}>
+        <span className="text-slate-400 ml-2">
           {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </span>
       </button>
 
       {isOpen && (
-        <div className="bg-white divide-y divide-slate-100">
-          {lessonsLoading ? (
+        <div className="bg-[#F8F9FD]/40 divide-y divide-slate-100">
+          {sectionLoading ? (
             <div className="p-4 flex items-center justify-center gap-2 text-xs text-slate-400">
               <Loader2 size={14} className="animate-spin" />
               <span>Loading lessons...</span>
@@ -122,43 +128,42 @@ const SidebarSectionItem = ({
           ) : (
             lessons.map((les, index) => {
               const isSelected = activeLessonId === les._id;
-              const isCompleted = !!completedLessons[les._id];
+              const isCompleted = !!les.progress?.completed;
               const displayOrder = (index + 1).toString().padStart(2, "0");
 
               return (
                 <div
                   key={les._id}
                   onClick={() => onSelectLesson(les._id)}
-                  className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all duration-150 ${
+                  className={`flex items-center justify-between px-5 py-3 cursor-pointer transition-all duration-150 border-l-4 ${
                     isSelected
-                      ? "bg-indigo-50 border-l-2 border-indigo-650"
-                      : "hover:bg-slate-50 border-l-2 border-transparent"
+                      ? "bg-indigo-50/70 border-indigo-650"
+                      : "hover:bg-slate-50 border-transparent"
                   }`}
                 >
                   <div className="flex gap-3 flex-1 min-w-0 pr-2">
-                    <span className={`text-[10px] font-mono font-bold shrink-0 w-5 h-5 rounded-md flex items-center justify-center ${
-                      isSelected
-                        ? "bg-indigo-650 text-white"
-                        : isCompleted
-                          ? "bg-emerald-100 text-emerald-600"
-                          : "bg-slate-100 text-slate-500"
-                    }`}>
-                      {isCompleted ? <CheckCircle size={12} /> : displayOrder}
-                    </span>
                     <div className="min-w-0">
-                      <p className={`text-xs font-semibold leading-tight truncate ${
+                      <p className={`text-xs font-semibold leading-tight ${
                         isSelected ? "text-indigo-650" : "text-slate-700"
                       }`}>
+                        <span className="text-slate-400 font-mono mr-1.5">{displayOrder}</span>
                         {les.title}
                       </p>
-                      <span className="text-[9px] text-slate-400 font-medium font-outfit uppercase tracking-wider">
-                        {formatDuration(les.duration) || "Video"}
+                      <span className="text-[10px] text-slate-400 font-medium font-outfit mt-1 block">
+                        Video • {formatDuration(les.duration) || "Video"}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                    <ShareButton courseId={les.course} lessonId={les._id} />
+                  <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                    {isCompleted ? (
+                      <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                        <Check size={11} strokeWidth={3} />
+                      </span>
+                    ) : (
+                      <span className="w-5 h-5 rounded-full border border-slate-200 flex items-center justify-center shrink-0" />
+                    )}
+                    <ShareButton courseId={courseId} lessonId={les._id} />
                   </div>
                 </div>
               );
@@ -206,19 +211,28 @@ const LearningDashboard = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const queryClient = useQueryClient();
 
   const isCreatorOrAdmin = ["CREATOR", "ADMIN"].includes(profile?.role);
 
-  // Curriculum and course details
+  // Curriculum (sections list) and server-authoritative course progress
   const { sections, sectionsLoading } = useCurriculum(courseId, isCreatorOrAdmin);
-  const { courses } = useCourses("catalog", {}, 1);
-  const currentCourse = courses?.find(c => c._id === courseId) || { title: "Course Learning Panel" };
+  const { courseProgress, invalidateCourseProgress } = useCourseProgress(courseId, {
+    enabled: !!courseId,
+  });
+
+  // Fetch the first section's learning data eagerly — the response includes
+  // course.title which we use in the header, without an extra catalog call.
+  const firstSectionId = sections?.[0]?._id ?? null;
+  const { data: firstSectionData } = useLearningSectionData(courseId, firstSectionId, {
+    enabled: !!firstSectionId,
+  });
+  const courseTitle = firstSectionData?.course?.title ?? "Course Classroom";
 
   // UI state
   const [activeLessonId, setActiveLessonId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("description"); // description | resources | qna
-  const [completedLessons, setCompletedLessons] = useState({});
   const [isPlaying, setIsPlaying] = useState(false);
 
   // Q&A Comments State
@@ -247,18 +261,6 @@ const LearningDashboard = () => {
     currentPositionRef.current = initialPos;
   }, [activeLessonId, progressLoading, progress?.lastPosition]);
 
-  // Sync completion status to local mapping to reflect instantly in the sidebar
-  useEffect(() => {
-    if (activeLessonId && progress) {
-      setTimeout(() => {
-        setCompletedLessons(prev => ({
-          ...prev,
-          [activeLessonId]: progress.completed,
-        }));
-      }, 0);
-    }
-  }, [activeLessonId, progress]);
-
   // Ref to hold the latest saveProgress function to avoid dependency updates in the debounced function
   const saveProgressRef = useRef();
   useEffect(() => {
@@ -266,13 +268,47 @@ const LearningDashboard = () => {
       if (isCreatorOrAdmin || !lessonId) return;
       try {
         console.log(`[Progress] Saving position ${position} for lesson ${lessonId}`);
-        await updateProgress(position);
+        const updatedProgress = await updateProgress(position);
         lastSavedPositionRef.current = position;
+
+        // If completion status newly transitions to true, update cache in-place
+        // and invalidate global course progress.
+        if (updatedProgress?.completed) {
+          if (activeLesson?.section) {
+            const sectionQueryKey = ["learningSectionData", courseId, activeLesson.section];
+            queryClient.setQueryData(sectionQueryKey, (oldData) => {
+              if (!oldData || !oldData.section || !oldData.section.lessons) return oldData;
+              const updatedLessons = oldData.section.lessons.map((les) => {
+                if (les._id === lessonId) {
+                  return {
+                    ...les,
+                    progress: {
+                      completed: updatedProgress.completed,
+                      completedAt: updatedProgress.completedAt,
+                      lastPosition: updatedProgress.lastPosition,
+                      maxPositionReached: updatedProgress.maxPositionReached,
+                      watchDuration: updatedProgress.duration,
+                    },
+                  };
+                }
+                return les;
+              });
+              return {
+                ...oldData,
+                section: {
+                  ...oldData.section,
+                  lessons: updatedLessons,
+                },
+              };
+            });
+          }
+          invalidateCourseProgress();
+        }
       } catch (err) {
         console.error("Failed to save progress:", err);
       }
     };
-  }, [updateProgress, isCreatorOrAdmin]);
+  }, [updateProgress, isCreatorOrAdmin, activeLesson, courseId, queryClient, invalidateCourseProgress]);
 
   // Setup debounced progress updater
   const saveProgressDebouncedRef = useRef(null);
@@ -345,13 +381,16 @@ const LearningDashboard = () => {
     }
   };
 
-  const handleEnded = () => {
+  const handleEnded = (duration) => {
     setIsPlaying(false);
     if (!isCreatorOrAdmin && activeLessonId) {
-      console.log("[Progress] Event: Ended. Saving immediately.");
+      console.log("[Progress] Event: Ended. Saving immediately with position:", duration);
+      const finalPosition = duration && duration > 0 ? duration : currentPositionRef.current;
       if (saveProgressDebouncedRef.current) {
-        saveProgressDebouncedRef.current(activeLessonId, currentPositionRef.current);
-        saveProgressDebouncedRef.current.flush();
+        saveProgressDebouncedRef.current.cancel();
+      }
+      if (saveProgressRef.current) {
+        saveProgressRef.current(activeLessonId, finalPosition);
       }
     }
   };
@@ -464,54 +503,100 @@ const LearningDashboard = () => {
     setNewQuestion("");
   };
 
-  const overallCompletedCount = Object.keys(completedLessons).filter(k => completedLessons[k]).length;
-  const totalLessons = Object.keys(completedLessons).length;
-  const overallProgress = totalLessons > 0 ? Math.round((overallCompletedCount / totalLessons) * 100) : 0;
+  const overallCompletedCount = courseProgress?.completedLessons ?? 0;
+  const totalLessons = courseProgress?.totalLessons ?? 0;
+  const overallProgress = courseProgress?.progressPercentage ?? 0;
 
   const handleBack = () => {
     navigate(isCreatorOrAdmin ? `/admin/courses` : `/dashboard/courses`);
+  };
+
+  const handlePrevLesson = async () => {
+    if (!activeLesson || !sections || sections.length === 0) return;
+    const currentSectionId = activeLesson.section;
+    
+    const currentSectionRes = await queryClient.ensureQueryData({
+      queryKey: ["learningSectionData", courseId, currentSectionId],
+      queryFn: () => makeRequest(`/learning/courses/${courseId}/sections/${currentSectionId}`).then(r => r.data)
+    });
+    
+    const currentSectionLessons = currentSectionRes?.section?.lessons || [];
+    const currentIndex = currentSectionLessons.findIndex(l => l._id === activeLessonId);
+    
+    if (currentIndex > 0) {
+      setActiveLessonId(currentSectionLessons[currentIndex - 1]._id);
+    } else {
+      const currentSectionIdx = sections.findIndex(s => s._id === currentSectionId);
+      if (currentSectionIdx > 0) {
+        const prevSection = sections[currentSectionIdx - 1];
+        const prevSectionRes = await queryClient.ensureQueryData({
+          queryKey: ["learningSectionData", courseId, prevSection._id],
+          queryFn: () => makeRequest(`/learning/courses/${courseId}/sections/${prevSection._id}`).then(r => r.data)
+        });
+        const prevSectionLessons = prevSectionRes?.section?.lessons || [];
+        if (prevSectionLessons.length > 0) {
+          setActiveLessonId(prevSectionLessons[prevSectionLessons.length - 1]._id);
+        }
+      }
+    }
+  };
+
+  const handleNextLesson = async () => {
+    if (!activeLesson || !sections || sections.length === 0) return;
+    const currentSectionId = activeLesson.section;
+    
+    const currentSectionRes = await queryClient.ensureQueryData({
+      queryKey: ["learningSectionData", courseId, currentSectionId],
+      queryFn: () => makeRequest(`/learning/courses/${courseId}/sections/${currentSectionId}`).then(r => r.data)
+    });
+    
+    const currentSectionLessons = currentSectionRes?.section?.lessons || [];
+    const currentIndex = currentSectionLessons.findIndex(l => l._id === activeLessonId);
+    
+    if (currentIndex >= 0 && currentIndex < currentSectionLessons.length - 1) {
+      setActiveLessonId(currentSectionLessons[currentIndex + 1]._id);
+    } else {
+      const currentSectionIdx = sections.findIndex(s => s._id === currentSectionId);
+      if (currentSectionIdx >= 0 && currentSectionIdx < sections.length - 1) {
+        const nextSection = sections[currentSectionIdx + 1];
+        const nextSectionRes = await queryClient.ensureQueryData({
+          queryKey: ["learningSectionData", courseId, nextSection._id],
+          queryFn: () => makeRequest(`/learning/courses/${courseId}/sections/${nextSection._id}`).then(r => r.data)
+        });
+        const nextSectionLessons = nextSectionRes?.section?.lessons || [];
+        if (nextSectionLessons.length > 0) {
+          setActiveLessonId(nextSectionLessons[0]._id);
+        }
+      }
+    }
   };
 
   return (
     <div className="h-screen flex flex-col bg-[#F8F9FD] text-slate-800 font-sans overflow-hidden">
       {/* Classroom Header */}
       <header className="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between shrink-0 select-none z-20">
-        <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-3.5 min-w-0">
           <button
             onClick={handleBack}
-            className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 hover:border-slate-300 transition-all shrink-0"
+            className="w-8 h-8 rounded-full bg-[#EBF0F5] hover:bg-[#D9E2EC] flex items-center justify-center text-slate-700 hover:text-slate-900 transition-all shrink-0 cursor-pointer"
             aria-label="Go back"
           >
             <ArrowLeft size={16} />
           </button>
 
-          <h1 className="font-bold text-xs sm:text-sm text-slate-700 truncate pr-4 font-outfit max-w-[200px] md:max-w-md" title={currentCourse.title}>
-            {currentCourse.title}
+          <h1 className="font-bold text-sm sm:text-base text-slate-800 truncate font-outfit max-w-[200px] md:max-w-md" title={courseTitle}>
+            {courseTitle}
           </h1>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          {/* Progress indicator */}
-          <div className="hidden sm:flex items-center gap-2.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg">
-            <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-                style={{ width: `${overallProgress}%` }}
-              />
-            </div>
-            <span className="text-[10px] text-slate-600 font-bold font-outfit whitespace-nowrap">
-              {overallCompletedCount}/{totalLessons || "?"}
+          {/* Progress indicator pill */}
+          <div className="hidden sm:flex items-center gap-2 bg-[#F1F3F9] px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-700">
+            <Film size={13} className="text-slate-500 fill-slate-500 stroke-none" />
+            <span>
+              {overallCompletedCount} of {totalLessons > 0 ? totalLessons : "?"} complete
             </span>
           </div>
-
-          {/* Sidebar toggle */}
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all"
-            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-          >
-            {sidebarOpen ? <PanelRightClose size={16} /> : <PanelRightOpen size={16} />}
-          </button>
 
           <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center font-bold text-xs text-indigo-650">
             {profile?.username?.charAt(0).toUpperCase()}
@@ -524,9 +609,9 @@ const LearningDashboard = () => {
         {/* Left Side: Video Player and Tabs Info */}
         <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8F9FD]">
           {/* Main Video Viewport Wrapper */}
-          <div className="w-full pt-5 px-4 md:pt-6 md:px-6 pb-2 flex flex-col items-center justify-center relative select-none">
+          <div className="w-full pt-5 px-4 md:pt-6 md:px-10 pb-2 relative select-none max-w-5xl mx-auto">
             {/* The Aspect Ratio Video Box */}
-            <div className="w-full max-w-5xl aspect-video relative flex items-center justify-center bg-slate-950 rounded-xl overflow-hidden">
+            <div className="w-full aspect-video relative flex items-center justify-center bg-slate-950 rounded-xl overflow-hidden shadow-lg border border-slate-100/10">
               {lessonLoading || videoUrlLoading || playbackStatus === "loading" || progressLoading ? (
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-10 h-10 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
@@ -613,69 +698,47 @@ const LearningDashboard = () => {
           </div>
 
           {/* Under-Player Metadata & Tabs */}
-          <div className="flex-1 max-w-4xl w-full mx-auto px-4 md:px-6 py-5 space-y-4">
-            {/* Lesson Title + Status */}
-            <div className="flex items-start justify-between gap-4">
+          <div className="max-w-5xl w-full mx-auto px-4 md:px-10 py-5">
+            {/* Header row with Title on left and Tabs on right */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-3 mb-5">
               <div className="min-w-0">
-                <h2 className="text-base sm:text-lg font-bold text-slate-800 font-outfit leading-snug">
+                <h2 className="text-lg md:text-xl font-bold text-slate-850 font-outfit leading-tight">
                   {activeLesson ? activeLesson.title : "Select a lesson"}
                 </h2>
                 {activeLesson?.duration && (
-                  <span className="text-[11px] text-slate-500 font-sans mt-1 block">
-                    {formatDuration(activeLesson.duration)}
-                    {activeLesson?.description && (
-                      <span className="text-slate-300 mx-1.5">·</span>
-                    )}
-                    {activeLesson?.description?.substring(0, 80)}
-                    {activeLesson?.description?.length > 80 ? "..." : ""}
+                  <span className="text-[11px] text-slate-400 font-sans mt-1 block">
+                    Duration: {formatDuration(activeLesson.duration)}
                   </span>
                 )}
               </div>
 
-              {activeLesson && !isCreatorOrAdmin && (
-                <div className={`flex items-center gap-1.5 py-1 px-3 text-[10px] font-bold shrink-0 font-outfit rounded-full border ${
-                  completedLessons[activeLesson._id]
-                    ? "bg-emerald-50 text-emerald-600 border-emerald-200"
-                    : "bg-slate-50 text-slate-500 border-slate-200"
-                }`}>
-                  {completedLessons[activeLesson._id] ? (
-                    <><CheckCircle size={12} /> Completed</>
-                  ) : (
-                    <><Play size={10} /> In Progress</>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Tab Navigation */}
-            <div className="flex gap-0 border-b border-slate-200">
-              {[
-                { key: "description", label: "Description", icon: FileText },
-                { key: "resources", label: "Resources", icon: FileText },
-                { key: "qna", label: "Q&A", icon: MessageSquare },
-              ].map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveTab(key)}
-                  className={`relative px-4 py-3 text-xs font-bold font-outfit tracking-wide transition-colors ${
-                    activeTab === key
-                      ? "text-indigo-650"
-                      : "text-slate-500 hover:text-slate-800"
-                  }`}
-                >
-                  {label}
-                  {activeTab === key && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-650 rounded-t-full" />
-                  )}
-                </button>
-              ))}
+              {/* Tab Navigation */}
+              <div className="flex gap-4">
+                {[
+                  { key: "description", label: "Description" },
+                  { key: "resources", label: "Resources" },
+                  { key: "qna", label: "Q&A" },
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setActiveTab(key)}
+                    className={`relative pb-3 text-sm font-bold font-outfit tracking-wide transition-colors cursor-pointer ${
+                      activeTab === key
+                        ? "text-indigo-650 border-b-2 border-indigo-650"
+                        : "text-slate-500 hover:text-slate-800"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Tab Content */}
-            <div className="text-xs sm:text-sm leading-relaxed text-slate-600 font-sans">
+            <div className="text-xs sm:text-sm leading-relaxed text-slate-655 font-sans">
               {activeTab === "description" && (
-                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                  <p className="text-slate-600 leading-relaxed">
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                  <p className="text-slate-600 leading-relaxed font-outfit">
                     {activeLesson?.description || "No description provided for this lesson."}
                   </p>
                 </div>
@@ -684,7 +747,7 @@ const LearningDashboard = () => {
               {activeTab === "resources" && (
                 <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
                   <FileText size={24} className="text-slate-300 mx-auto mb-2" />
-                  <p className="text-slate-400 text-xs">
+                  <p className="text-slate-400 text-xs font-outfit">
                     No resources attached to this lesson yet.
                   </p>
                 </div>
@@ -709,7 +772,7 @@ const LearningDashboard = () => {
                     {qnaList.length === 0 ? (
                       <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center">
                         <HelpCircle size={24} className="text-slate-300 mx-auto mb-2" />
-                        <p className="text-slate-400 text-xs">
+                        <p className="text-slate-400 text-xs font-outfit">
                           No questions yet. Be the first to ask!
                         </p>
                       </div>
@@ -745,14 +808,23 @@ const LearningDashboard = () => {
             sidebarOpen ? "w-80 lg:w-96" : "w-0 border-l-0"
           }`}
         >
+          {/* Sliding collapse toggle button on the left edge */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="absolute left-[-16px] top-1/2 -translate-y-1/2 w-4 h-12 bg-white border border-slate-200 border-r-0 rounded-l-md flex items-center justify-center text-slate-400 hover:text-slate-600 shadow-sm z-20 cursor-pointer"
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            {sidebarOpen ? <ChevronRight size={10} /> : <ChevronLeft size={10} />}
+          </button>
+
           {sidebarOpen && (
             <div className="w-full h-full flex flex-col overflow-hidden">
               {/* Sidebar Header */}
               <div className="px-4 py-3 border-b border-slate-200 bg-white flex items-center justify-between shrink-0">
-                <h3 className="font-outfit font-bold text-slate-800 text-xs uppercase tracking-wider">Curriculum</h3>
+                <h3 className="font-outfit font-bold text-slate-800 text-sm uppercase tracking-wider">Content</h3>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
+                  className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
                   aria-label="Close sidebar"
                 >
                   <X size={14} />
@@ -760,7 +832,7 @@ const LearningDashboard = () => {
               </div>
 
               {/* Sidebar Content */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto bg-white">
                 {sectionsLoading ? (
                   <div className="p-6 flex flex-col items-center justify-center gap-2 text-xs text-slate-400">
                     <Loader2 size={16} className="animate-spin text-slate-300" />
@@ -776,10 +848,10 @@ const LearningDashboard = () => {
                     <SidebarSectionItem
                       key={sect._id}
                       sect={sect}
+                      courseId={courseId}
                       isCreatorOrAdmin={isCreatorOrAdmin}
                       activeLessonId={activeLessonId}
                       onSelectLesson={setActiveLessonId}
-                      completedLessons={completedLessons}
                     />
                   ))
                 )}
