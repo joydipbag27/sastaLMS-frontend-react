@@ -72,7 +72,7 @@ const SetPassword = ({ email, onSuccess }) => {
       <div className="space-y-4">
         {/* Card Header */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-650 shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-200 shrink-0">
             <KeyRound size={16} />
           </div>
           <div>
@@ -101,7 +101,7 @@ const SetPassword = ({ email, onSuccess }) => {
             <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
               You don't have a password yet. Setting one allows you to sign in directly without Google.
               We'll send a verification code to{" "}
-              <span className="text-indigo-650 font-bold">{email}</span>
+              <span className="text-brand-200 font-bold">{email}</span>
             </div>
             <Button onClick={handleSendOtp} variant="primary" isLoading={loading} className="w-full">
               Send Verification Code

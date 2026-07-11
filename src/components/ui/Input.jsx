@@ -31,7 +31,7 @@ const Input = ({
         className={`bg-white border ${
           error
             ? "border-rose-300 focus:border-rose-500 focus:ring-rose-500/20"
-            : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/10"
+            : "border-slate-200 focus:border-brand-300 focus:ring-brand/10"
         } text-slate-800 rounded-lg px-3 py-2 text-sm transition-all focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-slate-400`}
         {...props}
       />

@@ -87,11 +87,11 @@ const CourseImage = ({ src, alt, className = "" }) => {
 
   if (hasError || !src) {
     return (
-      <div className={`relative group overflow-hidden w-full aspect-video bg-gradient-to-br from-indigo-50 to-sky-50 flex flex-col items-center justify-center text-indigo-400 gap-1.5 ${className}`}>
+      <div className={`relative group overflow-hidden w-full aspect-video bg-gradient-to-br from-brand-50 to-sky-50 flex flex-col items-center justify-center text-brand-200 gap-1.5 ${className}`}>
         <GraduationCap size={36} className="stroke-[1.5]" />
         <span className="text-[10px] font-bold tracking-wider font-outfit uppercase">veoLMS Class</span>
         <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-          <div className="p-4 rounded-full bg-white/80 border border-slate-200 text-indigo-650 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-sm">
+          <div className="p-4 rounded-full bg-white/80 border border-slate-200 text-brand-200 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-sm">
             <Play size={28} className="fill-current ml-0.5" />
           </div>
         </div>
@@ -108,7 +108,7 @@ const CourseImage = ({ src, alt, className = "" }) => {
         className={`w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105 ${className}`}
       />
       <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-        <div className="p-4 rounded-full bg-white/80 border border-slate-200 text-indigo-650 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-sm">
+        <div className="p-4 rounded-full bg-white/80 border border-slate-200 text-brand-200 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-sm">
           <Play size={28} className="fill-current ml-0.5" />
         </div>
       </div>
@@ -147,7 +147,7 @@ const LessonRow = ({
           L{les.order}
         </span>
         <div className="min-w-0">
-          <p className="font-bold text-slate-800 text-xs sm:text-sm truncate leading-tight group-hover/lesson:text-indigo-650 transition-colors">
+          <p className="font-bold text-slate-800 text-xs sm:text-sm truncate leading-tight group-hover/lesson:text-brand-200 transition-colors">
             {les.title}
           </p>
           <span className="text-[10px] text-slate-450 font-semibold flex items-center gap-1.5 mt-1">
@@ -243,7 +243,7 @@ const CourseOverview = ({ description }) => {
       {isLong && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-xs font-bold font-outfit text-indigo-650 hover:text-indigo-500 transition-colors flex items-center gap-1 focus:outline-none"
+          className="text-xs font-bold font-outfit text-brand-200 hover:text-brand-300 transition-colors flex items-center gap-1 focus:outline-none"
         >
           {isExpanded ? "Show less" : "Show more"}
         </button>
@@ -377,14 +377,14 @@ const SectionItem = ({
   const displayLessonCount = sect.lessons?.length || (isExpanded && lessons ? lessons.length : 0);
 
   return (
-    <div className="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm hover:border-indigo-200 transition-all duration-200">
+    <div className="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm hover:border-brand-100 transition-all duration-200">
       {/* Section Header */}
       <div
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex justify-between items-center p-4 cursor-pointer bg-slate-50 hover:bg-slate-100/50 transition-all select-none border-b border-transparent"
       >
         <div className="flex items-center gap-3.5 min-w-0">
-          <span className="text-indigo-650 font-mono font-bold text-[10px] bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-lg shrink-0">
+          <span className="text-brand-200 font-mono font-bold text-[10px] bg-brand-50 border-brand-100 px-2 py-0.5 rounded-lg shrink-0">
             S{sect.order}
           </span>
           <div className="min-w-0">
@@ -481,7 +481,7 @@ const SectionItem = ({
                           onClick={() => setUploadMode("standard")}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                             uploadMode === "standard"
-                              ? "bg-indigo-650 text-white shadow-sm"
+                              ? "bg-brand-200 text-[#111111] shadow-sm"
                               : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 border border-slate-200"
                           }`}
                         >
@@ -492,7 +492,7 @@ const SectionItem = ({
                           onClick={() => setUploadMode("manual")}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                             uploadMode === "manual"
-                              ? "bg-indigo-650 text-white shadow-sm"
+                              ? "bg-brand-200 text-[#111111] shadow-sm"
                               : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 border border-slate-200"
                           }`}
                         >
@@ -539,7 +539,7 @@ const SectionItem = ({
           {/* Add/Edit Lesson Form block */}
           {canEdit && showLessonForm && (
             <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-3 mt-3 shadow-sm">
-              <h5 className="font-bold text-indigo-650 border-b border-slate-200 pb-2 mb-2 font-mono text-xs flex items-center gap-1.5">
+              <h5 className="font-bold text-brand-200 border-b border-slate-200 pb-2 mb-2 font-mono text-xs flex items-center gap-1.5">
                 <Sparkles size={13} />
                 {editingLessonId ? "Modify Lesson" : "New Lesson for Section"}
               </h5>
@@ -569,7 +569,7 @@ const SectionItem = ({
                         type="checkbox"
                         checked={lessonIsPreview}
                         onChange={(e) => setLessonIsPreview(e.target.checked)}
-                        className="bg-white border border-slate-300 rounded text-indigo-600 focus:ring-indigo-500/20"
+                        className="bg-white border border-slate-300 rounded text-brand-200 focus:ring-brand/20"
                       />
                       <span className="text-xs text-slate-700 font-bold">Enable Preview</span>
                     </label>
@@ -718,8 +718,8 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
   if (courseLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-slate-400 relative">
-        <div className="w-10 h-10 border-[3px] border-indigo-600 border-t-transparent rounded-full animate-spin mb-5"></div>
-        <p className="font-mono text-xs uppercase font-bold tracking-widest text-indigo-650">Loading Course Details...</p>
+        <div className="w-10 h-10 border-[3px] border-brand-200 border-t-transparent rounded-full animate-spin mb-5"></div>
+        <p className="font-mono text-xs uppercase font-bold tracking-widest text-brand-200">Loading Course Details...</p>
       </div>
     );
   }
@@ -762,7 +762,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
       {/* Hero Header Section */}
       <div className="relative z-10 border-b border-slate-200 pb-5 space-y-3">
         <div className="flex flex-wrap gap-2">
-          <span className="bg-indigo-50 text-indigo-650 border border-indigo-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-outfit">
+          <span className="bg-brand-50 text-brand-200 border-brand-100 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-outfit">
             {course.level}
           </span>
         </div>
@@ -774,7 +774,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
         <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
           <div className="flex items-center gap-1">
             <span className="text-slate-400">Instructor:</span>
-            <span className="font-semibold text-indigo-650">{course.displayName || course.creator?.username || course.creator || "LMS Tutor"}</span>
+            <span className="font-semibold text-brand-200">{course.displayName || course.creator?.username || course.creator || "LMS Tutor"}</span>
           </div>
           <span className="text-slate-350">•</span>
           <div className="flex items-center gap-1.5">
@@ -917,7 +917,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
                 {!isEnrolled && course.price > 0 && <span className="text-xs text-slate-500 font-bold font-outfit">INR</span>}
               </div>
               {isCreatorOrAdmin && (
-                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-650 mt-3 border border-indigo-200 font-outfit uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-200 mt-3 border-brand-100 font-outfit uppercase tracking-wider">
                   <Shield size={10} /> Creator Access
                 </div>
               )}

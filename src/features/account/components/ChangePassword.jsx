@@ -101,7 +101,7 @@ const ChangePassword = ({ email, onSuccess }) => {
           <div className="space-y-3">
             <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
               For security, we will send a verification code to{" "}
-              <span className="text-indigo-650 font-bold">{email}</span>
+              <span className="text-brand-200 font-bold">{email}</span>
             </div>
             <Button onClick={handleSendOtp} variant="primary" isLoading={loading} className="w-full">
               Send Verification Code

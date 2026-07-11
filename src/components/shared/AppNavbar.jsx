@@ -52,7 +52,7 @@ const AppNavbar = () => {
       <div className="flex items-center gap-6">
         <Link
           to="/courses"
-          className="text-xl font-black text-indigo-650 tracking-tight flex items-center gap-2"
+          className="text-xl font-black text-brand-200 tracking-tight flex items-center gap-2"
         >
           veoLMS
         </Link>
@@ -62,12 +62,12 @@ const AppNavbar = () => {
           </span>
         )}
         {isStudent && (
-          <span className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-outfit hidden sm:inline">
+          <span className="bg-brand-50 text-brand-200 border border-brand-100 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-outfit hidden sm:inline">
             STUDENT
           </span>
         )}
         {!profile && (
-          <span className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider hidden sm:inline">
+          <span className="bg-brand-50 text-brand-200 border border-brand-100 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider hidden sm:inline">
             Course Catalog
           </span>
         )}
@@ -88,13 +88,13 @@ const AppNavbar = () => {
                 aria-current={active ? "page" : undefined}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-150 font-semibold text-xs ${
                   active
-                    ? "bg-indigo-650 text-white shadow-sm"
+                    ? "bg-brand-200 text-[#111111] shadow-sm"
                     : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                 }`}
               >
                 <Icon
                   size={14}
-                  className={active ? "text-white" : "text-slate-400"}
+                  className={active ? "text-[#111111]" : "text-slate-400"}
                 />
                 <span className="hidden md:inline">{link.name}</span>
               </Link>
@@ -110,7 +110,7 @@ const AppNavbar = () => {
             onClick={() => setPanelOpen(!panelOpen)}
             aria-expanded={panelOpen}
             aria-haspopup="dialog"
-            className="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all duration-150 select-none outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+            className="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all duration-150 select-none outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
           >
             <div className="text-right hidden sm:block">
               <div className="text-xs font-bold text-slate-700 leading-tight">
@@ -122,9 +122,9 @@ const AppNavbar = () => {
             </div>
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                isCreator
-                  ? "bg-amber-50 border border-amber-100 text-amber-600"
-                  : "bg-indigo-50 border border-indigo-100 text-indigo-650"
+                  isCreator
+                    ? "bg-amber-50 border border-amber-100 text-amber-600"
+                    : "bg-brand-50 border border-brand-100 text-brand-200"
               }`}
             >
               {profile.username?.charAt(0).toUpperCase()}

@@ -13,12 +13,12 @@ const Button = ({
     "inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed text-sm select-none active:scale-[0.98]";
 
   const variants = {
-    primary: "bg-indigo-650 hover:bg-indigo-600 text-white shadow-sm shadow-indigo-100/30 focus:ring-indigo-500",
+    primary: "bg-brand hover:bg-brand-300 text-[#111111] shadow-sm shadow-brand-100/30 focus:ring-brand",
     success: "bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shadow-emerald-100/30 focus:ring-emerald-500",
     danger: "bg-rose-600 hover:bg-rose-500 text-white shadow-sm shadow-rose-100/30 focus:ring-rose-500",
     warning: "bg-amber-500 hover:bg-amber-400 text-white shadow-sm shadow-amber-100/30 focus:ring-amber-500",
-    secondary: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 focus:ring-indigo-500",
-    ghost: "bg-transparent hover:bg-slate-50 text-slate-600 focus:ring-indigo-500",
+    secondary: "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 focus:ring-brand",
+    ghost: "bg-transparent hover:bg-slate-50 text-slate-600 focus:ring-brand",
   };
 
   return (

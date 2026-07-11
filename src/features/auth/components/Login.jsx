@@ -54,7 +54,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
   return (
     <>
       <div className="flex justify-center mb-4">
-        <div className="w-12 h-12 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-center text-indigo-600">
+        <div className="w-12 h-12 bg-brand-50 border border-brand-100 rounded-2xl flex items-center justify-center text-brand-200">
           <LogIn size={20} className="stroke-[2.5]" />
         </div>
       </div>
@@ -91,7 +91,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-brand-200 focus:ring-1 focus:ring-brand-200 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
               required
             />
           </div>
@@ -110,7 +110,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full pl-12 pr-12 py-3 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+              className="w-full pl-12 pr-12 py-3 bg-white border border-slate-200 rounded-xl focus:border-brand-200 focus:ring-1 focus:ring-brand-200 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
               required
             />
             <button
@@ -127,7 +127,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
           <button
             type="button"
             onClick={onSwitchToForgot}
-            className="text-xs font-extrabold text-indigo-650 hover:text-indigo-700 transition-colors cursor-pointer"
+            className="text-xs font-extrabold text-brand-200 hover:text-brand-300 transition-colors cursor-pointer"
           >
             Forgot password?
           </button>
@@ -136,7 +136,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3.5 bg-indigo-650 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer mt-3 flex items-center justify-center"
+          className="w-full py-3.5 bg-brand-200 hover:bg-brand-300 text-[#111111] font-black rounded-xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer mt-3 flex items-center justify-center"
         >
           {isLoading ? (
             <>
@@ -170,7 +170,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
         Don't have an account?{" "}
         <button
           onClick={onSwitchToRegister}
-          className="text-indigo-650 hover:text-indigo-700 font-bold hover:underline transition-colors cursor-pointer"
+          className="text-brand-200 hover:text-brand-300 font-bold hover:underline transition-colors cursor-pointer"
         >
           Register here
         </button>

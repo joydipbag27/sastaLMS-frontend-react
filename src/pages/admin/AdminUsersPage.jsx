@@ -195,7 +195,7 @@ const AdminUsersPage = () => {
           <p className="text-sm text-slate-500">Failed to load users.</p>
           <button
             onClick={() => refetch()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-200 text-[#111111] hover:bg-brand-300 text-xs font-semibold transition-colors"
           >
             Retry
           </button>
@@ -216,10 +216,10 @@ const AdminUsersPage = () => {
       {/* Metrics Section */}
       {summary ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-          <MetricCard label="Total Users" value={summary.totalUsers ?? 0} icon={Users} iconColor="bg-indigo-50 text-indigo-650" />
+          <MetricCard label="Total Users" value={summary.totalUsers ?? 0} icon={Users} iconColor="bg-brand-50 text-brand-200" />
           <MetricCard label="Enrolled Users" value={summary.enrolledUsers ?? 0} icon={UserCheck} iconColor="bg-emerald-50 text-emerald-600" />
-          <MetricCard label="Enrollments" value={summary.totalEnrollments ?? 0} icon={BookOpen} iconColor="bg-indigo-50 text-indigo-650" />
-          <MetricCard label="Total Courses" value={summary.totalCourses ?? 0} icon={FileText} iconColor="bg-indigo-50 text-indigo-650" />
+          <MetricCard label="Enrollments" value={summary.totalEnrollments ?? 0} icon={BookOpen} iconColor="bg-brand-50 text-brand-200" />
+          <MetricCard label="Total Courses" value={summary.totalCourses ?? 0} icon={FileText} iconColor="bg-brand-50 text-brand-200" />
           <MetricCard label="Published" value={summary.publishedCourses ?? 0} icon={Eye} iconColor="bg-emerald-50 text-emerald-600" />
           <MetricCard label="Draft" value={summary.draftCourses ?? 0} icon={FileEdit} iconColor="bg-amber-50 text-amber-600" />
           <MetricCard label="Blocked" value={summary.blockedUsers ?? 0} icon={Ban} iconColor="bg-rose-50 text-rose-600" />
@@ -253,11 +253,11 @@ const AdminUsersPage = () => {
             {users.map((user) => (
               <div
                 key={user._id}
-                className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-white border border-slate-200 shadow-sm rounded-2xl p-5 items-center hover:border-indigo-150 hover:shadow-md transition-all duration-200"
+                className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-white border border-slate-200 shadow-sm rounded-2xl p-5 items-center hover:border-brand-100 hover:shadow-md transition-all duration-200"
               >
                 {/* User Details */}
                 <div className="col-span-4 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-650 flex items-center justify-center font-bold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-brand-50 border-brand-100 text-brand-200 flex items-center justify-center font-bold text-sm shrink-0">
                     {user.username?.charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0">
@@ -300,7 +300,7 @@ const AdminUsersPage = () => {
                   <div className="relative group">
                     <button
                       onClick={() => setLogoutModalUser(user)}
-                      className="p-2 rounded-xl text-slate-450 hover:text-indigo-650 hover:bg-indigo-50 hover:border-indigo-150 transition-all border border-transparent shadow-sm bg-slate-50/50 cursor-pointer"
+                      className="p-2 rounded-xl text-slate-450 hover:text-brand-200 hover:bg-brand-50 hover:border-brand-100 transition-all border border-transparent shadow-sm bg-slate-50/50 cursor-pointer"
                       aria-label="Force Logout"
                     >
                       <LogOut size={13} />
@@ -330,7 +330,7 @@ const AdminUsersPage = () => {
                   <div className="relative group">
                     <button
                       onClick={() => setPromoteModalUser(user)}
-                      className="p-2 rounded-xl text-slate-450 hover:text-indigo-650 hover:bg-indigo-50 hover:border-indigo-150 transition-all border border-transparent shadow-sm bg-slate-50/50 cursor-pointer"
+                      className="p-2 rounded-xl text-slate-450 hover:text-brand-200 hover:bg-brand-50 hover:border-brand-100 transition-all border border-transparent shadow-sm bg-slate-50/50 cursor-pointer"
                       aria-label="Promote to Creator"
                     >
                       <ShieldCheck size={13} />
@@ -386,7 +386,7 @@ const AdminUsersPage = () => {
         <Modal title="Session Status" onClose={() => setSessionModalUser(null)}>
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-650 flex items-center justify-center font-bold text-xs">
+              <div className="w-8 h-8 rounded-full bg-brand-50 border-brand-100 text-brand-200 flex items-center justify-center font-bold text-xs">
                 {sessionModalUser.user.username?.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -503,7 +503,7 @@ const AdminUsersPage = () => {
         <Modal title="Promote to Creator" onClose={() => setPromoteModalUser(null)}>
           <div className="space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-650 flex items-center justify-center font-bold text-xs">
+              <div className="w-8 h-8 rounded-full bg-brand-50 border-brand-100 text-brand-200 flex items-center justify-center font-bold text-xs">
                 {promoteModalUser.username?.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -520,7 +520,7 @@ const AdminUsersPage = () => {
               <button
                 onClick={handlePromoteUser}
                 disabled={promoteUser.isPending}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-brand-200 text-[#111111] hover:bg-brand-300 text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {promoteUser.isPending && <Loader2 size={12} className="animate-spin" />}
                 Promote User

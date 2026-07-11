@@ -12,8 +12,15 @@ export default {
         mono: ["JetBrains Mono", "monospace"],
       },
       colors: {
-        indigo: {
-          650: '#493fdf',
+        brand: {
+          50: '#FFFBDB',
+          100: '#FFF6B0',
+          200: '#FFE700',
+          300: '#E6CF00',
+          400: '#CCB800',
+          500: '#B3A100',
+          600: '#998A00',
+          DEFAULT: '#FFE700',
         },
         slate: {
           250: '#d7dee8',
@@ -58,4 +65,3 @@ export default {
   },
   plugins: [],
 }
-

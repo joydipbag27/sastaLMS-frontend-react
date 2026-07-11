@@ -110,7 +110,7 @@ const MyLearning = () => {
               label="Total Revenue"
               value={formatCurrency(paySummary?.totalRevenue)}
               icon={TrendingUp}
-              iconColor="bg-indigo-50 text-indigo-650"
+              iconColor="bg-brand-50 text-brand-200"
             />
             <SummaryCard
               label="Monthly Revenue"
@@ -122,7 +122,7 @@ const MyLearning = () => {
               label="Successful Purchases"
               value={paySummary?.totalSuccessfulPayments ?? 0}
               icon={ShieldCheck}
-              iconColor="bg-indigo-50 text-indigo-650"
+              iconColor="bg-brand-50 text-brand-200"
             />
             <SummaryCard
               label="Purchase Attempts"
@@ -141,7 +141,7 @@ const MyLearning = () => {
 
           {txLoading ? (
             <div className="p-8 flex items-center justify-center gap-2 text-xs text-slate-400">
-              <Loader2 size={16} className="animate-spin text-indigo-650" />
+              <Loader2 size={16} className="animate-spin text-brand-200" />
               <span>Loading transaction history...</span>
             </div>
           ) : !payTx || !payTx.payments || payTx.payments.length === 0 ? (
@@ -181,7 +181,7 @@ const MyLearning = () => {
                         <button
                           onClick={() => handleDownloadInvoice(p._id)}
                           disabled={downloadingId === p._id}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-650 text-[10px] font-bold transition-all border border-indigo-100 shadow-sm cursor-pointer disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-50 hover:bg-brand-100 text-brand-200 text-[10px] font-bold transition-all border border-brand-100 shadow-sm cursor-pointer disabled:opacity-50"
                         >
                           {downloadingId === p._id ? (
                             <Loader2 size={11} className="animate-spin" />
@@ -206,7 +206,7 @@ const MyLearning = () => {
   if (enrollLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-        <Loader2 className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4 text-indigo-650" />
+        <Loader2 className="w-8 h-8 border-2 border-brand-200 border-t-transparent rounded-full animate-spin mb-4 text-brand-200" />
         <p className="text-xs font-semibold text-slate-550">Loading enrolled courses...</p>
       </div>
     );
@@ -271,7 +271,7 @@ const MyLearning = () => {
                     className="w-full h-44 object-cover border-b border-slate-100 bg-slate-50"
                   />
                 ) : (
-                  <div className="w-full h-44 bg-gradient-to-br from-indigo-50 to-sky-50 flex flex-col items-center justify-center text-indigo-400 border-b border-slate-100 gap-1.5">
+                  <div className="w-full h-44 bg-gradient-to-br from-brand-50 to-sky-50 flex flex-col items-center justify-center text-brand-200 border-b border-slate-100 gap-1.5">
                     <GraduationCap size={36} className="stroke-[1.5]" />
                     <span className="text-[10px] font-bold tracking-wider font-outfit uppercase">veoLMS Class</span>
                   </div>
@@ -279,7 +279,7 @@ const MyLearning = () => {
                 <div className="p-4 space-y-3">
                   <div className="flex justify-between items-center">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${
-                      isCompleted ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-indigo-50 text-indigo-600 border-indigo-200"
+                      isCompleted ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-brand-50 text-brand-200 border-brand-100"
                     }`}>
                       {enr.status}
                     </span>

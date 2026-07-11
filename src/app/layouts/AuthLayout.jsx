@@ -4,7 +4,7 @@ import { BookOpen, Shield, BarChart3, Zap } from "lucide-react";
 const AuthLayout = ({ children }) => {
   return (
     <div className="min-h-screen lg:h-screen lg:max-h-screen bg-[#F8F9FD] flex items-center justify-center p-4 md:p-8 select-none relative overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-200/20 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-brand-100/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-200/10 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="w-full max-w-6xl lg:h-[90vh] lg:max-h-[700px] bg-white border border-slate-200 rounded-[40px] shadow-xl p-4 md:p-6 lg:p-8 lg:grid lg:grid-cols-12 lg:gap-8 items-stretch relative z-10">
@@ -13,12 +13,12 @@ const AuthLayout = ({ children }) => {
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-3xl font-black text-slate-800 tracking-tight font-outfit">
-                  veo<span className="text-indigo-650">LMS</span>
+                  veo<span className="text-brand-200">LMS</span>
                 </span>
               </div>
 
               <div className="space-y-1 mt-3">
-                <h2 className="text-xl font-black text-indigo-600 tracking-wide">
+                <h2 className="text-xl font-black text-brand-200 tracking-wide">
                   Learn. Grow. Succeed.
                 </h2>
                 <p className="text-sm text-slate-500 font-semibold leading-relaxed max-w-sm">
@@ -29,7 +29,7 @@ const AuthLayout = ({ children }) => {
 
             <div className="flex-1 min-h-[140px] my-3 w-full rounded-[28px] bg-slate-50 border border-slate-200 border-dashed flex items-center justify-center relative overflow-hidden">
               <div
-                className="absolute inset-0 bg-gradient-to-tr from-slate-100/20 to-indigo-50/10 animate-pulse"
+                className="absolute inset-0 bg-gradient-to-tr from-slate-100/20 to-brand-50/10 animate-pulse"
                 style={{ animationDuration: "4s" }}
               ></div>
               <div className="relative z-10 flex flex-col items-center text-slate-400 font-bold text-xs tracking-wide space-y-1">
@@ -46,7 +46,7 @@ const AuthLayout = ({ children }) => {
 
           <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm grid grid-cols-3 gap-2 mt-2">
             <div className="text-center space-y-0.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-1">
+              <div className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center text-brand-200 mx-auto mb-1">
                 <Shield size={16} />
               </div>
               <h4 className="font-extrabold text-slate-800 text-xs">
@@ -58,7 +58,7 @@ const AuthLayout = ({ children }) => {
             </div>
 
             <div className="text-center space-y-0.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-1">
+              <div className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center text-brand-200 mx-auto mb-1">
                 <BarChart3 size={16} />
               </div>
               <h4 className="font-extrabold text-slate-800 text-xs">
@@ -70,7 +70,7 @@ const AuthLayout = ({ children }) => {
             </div>
 
             <div className="text-center space-y-0.5">
-              <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mx-auto mb-1">
+              <div className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center text-brand-200 mx-auto mb-1">
                 <Zap size={16} />
               </div>
               <h4 className="font-extrabold text-slate-800 text-xs">

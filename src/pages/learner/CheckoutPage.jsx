@@ -138,7 +138,7 @@ const CheckoutPage = ({ currentProfile }) => {
           email: currentProfile?.email || "",
         },
         theme: {
-          color: "#4f46e5", // Indigo-600
+          color: "#FFE700", // Brand Yellow
         },
         modal: {
           ondismiss: function () {
@@ -161,8 +161,8 @@ const CheckoutPage = ({ currentProfile }) => {
   if (courseLoading || enrollmentLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-500">
-        <Loader2 className="w-10 h-10 border-t-indigo-500 animate-spin text-indigo-650 mb-4" />
-        <p className="font-mono text-[10px] uppercase font-bold tracking-widest text-indigo-650">Securing checkout session...</p>
+        <Loader2 className="w-10 h-10 border-t-brand-200 animate-spin text-brand-200 mb-4" />
+        <p className="font-mono text-[10px] uppercase font-bold tracking-widest text-brand-200">Securing checkout session...</p>
       </div>
     );
   }
@@ -195,7 +195,7 @@ const CheckoutPage = ({ currentProfile }) => {
     return (
       <div className="max-w-md mx-auto py-12 px-4">
         <div className="bg-white border border-slate-200 rounded-xl p-8 text-center shadow-sm relative overflow-hidden">
-          <div className="mx-auto w-16 h-16 bg-indigo-50 border border-indigo-200 rounded-full flex items-center justify-center mb-6 text-indigo-600">
+          <div className="mx-auto w-16 h-16 bg-brand-50 border-brand-100 rounded-full flex items-center justify-center mb-6 text-brand-200">
             <Loader2 size={36} className="animate-spin" />
           </div>
           
@@ -259,7 +259,7 @@ const CheckoutPage = ({ currentProfile }) => {
                   className="w-20 h-16 object-cover rounded-lg border border-slate-200 bg-slate-50 shrink-0"
                 />
               ) : (
-                <div className="w-20 h-16 bg-gradient-to-br from-indigo-500 to-indigo-650 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm">
+                <div className="w-20 h-16 bg-gradient-to-br from-brand-200 to-brand-300 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm">
                   <GraduationCap size={20} />
                 </div>
               )}

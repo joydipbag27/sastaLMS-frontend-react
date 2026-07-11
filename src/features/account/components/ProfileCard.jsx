@@ -38,7 +38,7 @@ const ProfileCard = ({ profile, onLogoutSuccess }) => {
             className={`w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-lg shrink-0 ${
               isCreator
                 ? "bg-amber-50 border-2 border-amber-200 text-amber-600"
-                : "bg-indigo-50 border-2 border-indigo-200 text-indigo-650"
+                : "bg-brand-50 border-2 border-brand-100 text-brand-200"
             }`}
           >
             {profile.username?.charAt(0).toUpperCase()}
@@ -50,7 +50,7 @@ const ProfileCard = ({ profile, onLogoutSuccess }) => {
               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
                 isCreator
                   ? "bg-amber-50 text-amber-600 border border-amber-100"
-                  : "bg-indigo-50 text-indigo-600 border border-indigo-100"
+                  : "bg-brand-50 text-brand-200 border border-brand-100"
               }`}>
                 <Shield size={10} />
                 {profile.role}

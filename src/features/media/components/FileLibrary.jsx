@@ -30,7 +30,7 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
   const getFileTypeInfo = (mimeType) => {
     if (!mimeType) return { icon: File, label: "File", color: "text-slate-500", bg: "bg-slate-100" };
     if (mimeType.startsWith("image/")) return { icon: Image, label: "Image", color: "text-violet-600", bg: "bg-violet-50" };
-    if (mimeType.startsWith("video/")) return { icon: Film, label: "Video", color: "text-indigo-600", bg: "bg-indigo-50" };
+    if (mimeType.startsWith("video/")) return { icon: Film, label: "Video", color: "text-brand-200", bg: "bg-brand-50" };
     if (mimeType.startsWith("audio/")) return { icon: Music, label: "Audio", color: "text-amber-600", bg: "bg-amber-50" };
     if (mimeType.includes("pdf")) return { icon: FileText, label: "PDF", color: "text-rose-600", bg: "bg-rose-50" };
     if (mimeType.includes("zip") || mimeType.includes("rar") || mimeType.includes("tar"))
@@ -134,13 +134,13 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
         <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
           <button
             onClick={() => setView("grid")}
-            className={`p-2 rounded-md transition-all ${view === "grid" ? "bg-white text-indigo-650 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+            className={`p-2 rounded-md transition-all ${view === "grid" ? "bg-white text-brand-200 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
           >
             <Grid size={16} />
           </button>
           <button
             onClick={() => setView("list")}
-            className={`p-2 rounded-md transition-all ${view === "list" ? "bg-white text-indigo-650 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+            className={`p-2 rounded-md transition-all ${view === "list" ? "bg-white text-brand-200 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
           >
             <List size={16} />
           </button>
@@ -200,14 +200,14 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
                       media.status === "READY" ? "bg-emerald-50 text-emerald-600" :
                       media.status === "PROCESSING" ? "bg-amber-50 text-amber-600" :
                       media.status === "COPY_PENDING" ? "bg-orange-50 text-orange-600" :
-                      media.status === "UPLOADING" ? "bg-indigo-50 text-indigo-600" :
+                      media.status === "UPLOADING" ? "bg-brand-50 text-brand-200" :
                       "bg-rose-50 text-rose-600"
                     }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${
                         media.status === "READY" ? "bg-emerald-500" :
                         media.status === "PROCESSING" ? "bg-amber-500 animate-pulse" :
                         media.status === "COPY_PENDING" ? "bg-orange-500 animate-pulse" :
-                        media.status === "UPLOADING" ? "bg-indigo-500 animate-pulse" :
+                        media.status === "UPLOADING" ? "bg-brand-200 animate-pulse" :
                         "bg-rose-500"
                       }`} />
                       {media.status}
@@ -228,7 +228,7 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
                       <button
                         onClick={() => handlePreview(media)}
                         disabled={loadingId === `${media._id}-preview`}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-indigo-600 text-xs font-medium transition-colors disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-brand-200 text-xs font-medium transition-colors disabled:opacity-50"
                         title="Preview"
                       >
                         {isThisPreview ? <EyeOff size={13} /> : <Eye size={13} />}
@@ -318,14 +318,14 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
                           media.status === "READY" ? "bg-emerald-50 text-emerald-600" :
                           media.status === "PROCESSING" ? "bg-amber-50 text-amber-600" :
                           media.status === "COPY_PENDING" ? "bg-orange-50 text-orange-600" :
-                          media.status === "UPLOADING" ? "bg-indigo-50 text-indigo-600" :
+                          media.status === "UPLOADING" ? "bg-brand-50 text-brand-200" :
                           "bg-rose-50 text-rose-600"
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${
                             media.status === "READY" ? "bg-emerald-500" :
                             media.status === "PROCESSING" ? "bg-amber-500 animate-pulse" :
                             media.status === "COPY_PENDING" ? "bg-orange-500 animate-pulse" :
-                            media.status === "UPLOADING" ? "bg-indigo-500 animate-pulse" :
+                            media.status === "UPLOADING" ? "bg-brand-200 animate-pulse" :
                             "bg-rose-500"
                           }`} />
                           {media.status}
@@ -337,7 +337,7 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
                           <button
                             onClick={() => handleDownload(media)}
                             disabled={loadingId === `${media._id}-download`}
-                            className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-colors disabled:opacity-50"
+                            className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-brand-200 transition-colors disabled:opacity-50"
                             title="Download"
                           >
                             <Download size={14} />
@@ -346,7 +346,7 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
                             <button
                               onClick={() => handlePreview(media)}
                               disabled={loadingId === `${media._id}-preview`}
-                              className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-colors disabled:opacity-50"
+                              className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-brand-200 transition-colors disabled:opacity-50"
                               title="Preview"
                             >
                               {isThisPreview ? <EyeOff size={14} /> : <Eye size={14} />}

@@ -175,7 +175,7 @@ const RbacTab = ({ currentProfile }) => {
               max={50}
               value={usersLimit}
               onChange={(e) => setUsersLimit(parseInt(e.target.value) || 10)}
-              className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-slate-800 text-xs w-16 text-center focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+              className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-slate-800 text-xs w-16 text-center focus:outline-none focus:border-brand-200 focus:ring-2 focus:ring-brand/10"
             />
             <Button onClick={() => handleListUsers()} variant="primary" isLoading={loading} className="py-1.5 px-3 text-xs">
               Load Users
@@ -206,7 +206,7 @@ const RbacTab = ({ currentProfile }) => {
                     <tr
                       key={user._id}
                       className={`border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer ${
-                        isSelected ? "bg-indigo-50/50" : ""
+                        isSelected ? "bg-brand-50/50" : ""
                       }`}
                       onClick={() => {
                         setRbacSelectedUser(user);
@@ -218,7 +218,7 @@ const RbacTab = ({ currentProfile }) => {
                       <td className="p-3 border-r border-slate-200">
                         <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
                           user.role === "ADMIN" ? "bg-rose-50 text-rose-600 border border-rose-200" :
-                          user.role === "CREATOR" ? "bg-indigo-50 text-indigo-600 border border-indigo-200" :
+                          user.role === "CREATOR" ? "bg-brand-50 text-brand-200 border-brand-100" :
                           "bg-slate-100 text-slate-600 border border-slate-200"
                         }`}>
                           {user.role}
@@ -322,7 +322,7 @@ const RbacTab = ({ currentProfile }) => {
                 id="new-role-select"
                 value={rbacChangeRoleTo}
                 onChange={(e) => setRbacChangeRoleTo(e.target.value)}
-                className="bg-white border border-slate-200 text-slate-800 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                className="bg-white border border-slate-200 text-slate-800 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-brand-200 focus:ring-2 focus:ring-brand/10"
               >
                 <option value="STUDENT">STUDENT</option>
                 <option value="CREATOR">CREATOR</option>

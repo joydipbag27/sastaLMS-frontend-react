@@ -139,9 +139,9 @@ const ProfilePanel = ({ isOpen, onClose, triggerRef }) => {
           <div className="flex items-start gap-3.5">
             <div
               className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${
-                isCreator
-                  ? "bg-amber-50 border-2 border-amber-200 text-amber-600"
-                  : "bg-indigo-50 border-2 border-indigo-200 text-indigo-650"
+                  isCreator
+                    ? "bg-amber-50 border-2 border-amber-200 text-amber-600"
+                    : "bg-brand-50 border-2 border-brand-100 text-brand-200"
               }`}
             >
               {profile.username?.charAt(0).toUpperCase()}
@@ -157,7 +157,7 @@ const ProfilePanel = ({ isOpen, onClose, triggerRef }) => {
                 className={`inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                   isCreator
                     ? "bg-amber-50 text-amber-600 border border-amber-100"
-                    : "bg-indigo-50 text-indigo-600 border border-indigo-100"
+                    : "bg-brand-50 text-brand-200 border border-brand-100"
                 }`}
               >
                 {profile.role}
@@ -192,16 +192,16 @@ const ProfilePanel = ({ isOpen, onClose, triggerRef }) => {
                 onClick={onClose}
                 onKeyDown={(e) => handleNavKeyDown(e, index)}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${
                   active
-                    ? "bg-indigo-50 text-indigo-650"
+                    ? "bg-brand-50 text-brand-200"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-800"
                 }`}
                 role="menuitem"
               >
                 <Icon
                   size={18}
-                  className={active ? "text-indigo-650" : "text-slate-400"}
+                  className={active ? "text-brand-200" : "text-slate-400"}
                 />
                 <span className="flex-1">{item.name}</span>
                 <ChevronRight size={14} className="text-slate-300" />

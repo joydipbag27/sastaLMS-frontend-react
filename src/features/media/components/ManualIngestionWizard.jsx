@@ -98,7 +98,7 @@ const ManualIngestionWizard = ({ useMediaHook, initialLessonId = "", onSuccess }
               value={lessonId}
               onChange={(e) => !initialLessonId && setLessonId(e.target.value)}
               disabled={!!initialLessonId}
-              className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:border-brand-200 focus:ring-2 focus:ring-brand/10 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
               required
             />
           </div>
@@ -106,7 +106,7 @@ const ManualIngestionWizard = ({ useMediaHook, initialLessonId = "", onSuccess }
           <button
             type="submit"
             disabled={isCreatingManual}
-            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-650 hover:bg-indigo-600 text-white rounded-lg font-semibold text-sm transition-all duration-150 shadow-sm disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2.5 bg-brand-200 hover:bg-brand-300 text-[#111111] rounded-lg font-semibold text-sm transition-all duration-150 shadow-sm disabled:opacity-50"
           >
             {isCreatingManual ? (
               <>
@@ -132,7 +132,7 @@ const ManualIngestionWizard = ({ useMediaHook, initialLessonId = "", onSuccess }
                 Process your video using local system resources, then upload the bundle directly.
               </p>
             </div>
-            <span className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-650 font-mono px-2 py-1 rounded">
+            <span className="text-xs bg-brand-50 border border-brand-100 text-brand-200 font-mono px-2 py-1 rounded">
               Media ID generated
             </span>
           </div>
@@ -140,7 +140,7 @@ const ManualIngestionWizard = ({ useMediaHook, initialLessonId = "", onSuccess }
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 flex items-center justify-between">
             <div>
               <p className="text-[10px] uppercase font-bold text-slate-500">Your New Media Folder ID</p>
-              <p className="text-sm font-mono font-bold text-indigo-650 mt-1 select-all">{mediaId}</p>
+              <p className="text-sm font-mono font-bold text-brand-200 mt-1 select-all">{mediaId}</p>
             </div>
             <button
               onClick={() => handleCopy(mediaId, "mediaId")}
@@ -154,12 +154,12 @@ const ManualIngestionWizard = ({ useMediaHook, initialLessonId = "", onSuccess }
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
             <div className="flex justify-between items-center">
               <div>
-                <span className="text-xs font-bold text-indigo-650 uppercase tracking-wider block font-outfit">Recommended Workflow</span>
+                <span className="text-xs font-bold text-brand-200 uppercase tracking-wider block font-outfit">Recommended Workflow</span>
                 <span className="text-xs font-semibold text-slate-700">Run PowerShell Processing Script</span>
               </div>
               <button
                 onClick={() => handleCopy(psScriptCommand, "psScript")}
-                className="text-[11px] text-indigo-650 hover:text-indigo-700 flex items-center gap-1 font-semibold"
+                className="text-[11px] text-brand-200 hover:text-brand-300 flex items-center gap-1 font-semibold"
               >
                 {copiedTextType === "psScript" ? "Copied!" : "Copy Command"}
               </button>
@@ -189,7 +189,7 @@ const ManualIngestionWizard = ({ useMediaHook, initialLessonId = "", onSuccess }
                   <span className="text-xs font-semibold text-slate-600">1. Transcode via Local FFmpeg (HLS 360p + 720p)</span>
                   <button
                     onClick={() => handleCopy(ffmpegCommand, "ffmpeg")}
-                    className="text-[11px] text-indigo-650 hover:text-indigo-700 flex items-center gap-1 font-semibold"
+                    className="text-[11px] text-brand-200 hover:text-brand-300 flex items-center gap-1 font-semibold"
                   >
                     {copiedTextType === "ffmpeg" ? "Copied!" : "Copy Command"}
                   </button>
@@ -204,7 +204,7 @@ const ManualIngestionWizard = ({ useMediaHook, initialLessonId = "", onSuccess }
                   <span className="text-xs font-semibold text-slate-600">2. Upload Playlists (*.m3u8) to B2</span>
                   <button
                     onClick={() => handleCopy(rclonePlaylistsCommand, "rclonePlaylists")}
-                    className="text-[11px] text-indigo-650 hover:text-indigo-700 flex items-center gap-1 font-semibold"
+                    className="text-[11px] text-brand-200 hover:text-brand-300 flex items-center gap-1 font-semibold"
                   >
                     {copiedTextType === "rclonePlaylists" ? "Copied!" : "Copy Command"}
                   </button>
@@ -219,7 +219,7 @@ const ManualIngestionWizard = ({ useMediaHook, initialLessonId = "", onSuccess }
                   <span className="text-xs font-semibold text-slate-600">3. Upload Segments (*.ts) to B2</span>
                   <button
                     onClick={() => handleCopy(rcloneSegmentsCommand, "rcloneSegments")}
-                    className="text-[11px] text-indigo-650 hover:text-indigo-700 flex items-center gap-1 font-semibold"
+                    className="text-[11px] text-brand-200 hover:text-brand-300 flex items-center gap-1 font-semibold"
                   >
                     {copiedTextType === "rcloneSegments" ? "Copied!" : "Copy Command"}
                   </button>
@@ -307,7 +307,7 @@ const ManualIngestionWizard = ({ useMediaHook, initialLessonId = "", onSuccess }
           <div className="pt-4 flex justify-center gap-3">
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 px-5 py-2.5 bg-indigo-650 hover:bg-indigo-600 text-white rounded-lg font-semibold text-sm transition-all duration-150 shadow-sm"
+              className="flex items-center gap-2 px-5 py-2.5 bg-brand-200 hover:bg-brand-300 text-[#111111] rounded-lg font-semibold text-sm transition-all duration-150 shadow-sm"
             >
               <RefreshCw size={15} />
               Register New Video

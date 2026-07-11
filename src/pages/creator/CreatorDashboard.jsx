@@ -86,7 +86,7 @@ const CourseImage = ({ src, alt, className = "" }) => {
 
   if (hasError || !src) {
     return (
-      <div className={`w-full h-44 bg-gradient-to-br from-indigo-50 to-sky-50 flex flex-col items-center justify-center text-indigo-300 gap-1.5 ${className}`}>
+      <div className={`w-full h-44 bg-gradient-to-br from-brand-50 to-sky-50 flex flex-col items-center justify-center text-brand-200 gap-1.5 ${className}`}>
         <GraduationCap size={32} className="stroke-[1.5]" />
         <span className="text-[9px] font-bold tracking-wider font-outfit uppercase">veoLMS</span>
       </div>
@@ -447,7 +447,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                   id="course-level"
                   value={courseLevel}
                   onChange={(e) => setCourseLevel(e.target.value)}
-                  className="bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all"
+                  className="bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:border-brand-200 focus:ring-2 focus:ring-brand/10 transition-all"
                 >
                   <option value="Beginner">Beginner</option>
                   <option value="Intermediate">Intermediate</option>
@@ -461,7 +461,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                   id="course-status"
                   value={courseStatus}
                   onChange={(e) => setCourseStatus(e.target.value)}
-                  className="bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all"
+                  className="bg-white border border-slate-200 text-slate-800 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:border-brand-200 focus:ring-2 focus:ring-brand/10 transition-all"
                 >
                   <option value="Draft">Draft</option>
                   <option value="Published">Published</option>
@@ -501,7 +501,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                 ) : (
                   <>
                     <p className="text-[10px] text-slate-400">PNG, JPEG, or WEBP. Max 2MB.</p>
-                    <label className="flex items-center justify-center gap-2 border border-dashed border-slate-300 hover:border-indigo-400 bg-white rounded-lg p-3 cursor-pointer transition-colors text-xs text-slate-500 font-medium">
+                    <label className="flex items-center justify-center gap-2 border border-dashed border-slate-300 hover:border-brand-200 bg-white rounded-lg p-3 cursor-pointer transition-colors text-xs text-slate-500 font-medium">
                       <Upload size={14} />
                       <span>Select image</span>
                       <input
@@ -525,12 +525,12 @@ const CreatorDashboard = ({ currentProfile }) => {
 
                 {isThumbnailUploading && (
                   <div className="space-y-1.5 border border-slate-200 p-2.5 rounded-lg bg-white">
-                    <div className="flex justify-between items-center text-[10px] text-indigo-650 font-bold font-mono">
+                    <div className="flex justify-between items-center text-[10px] text-brand-200 font-bold font-mono">
                       <span>{thumbnailStatusText}</span>
                       <span>{thumbnailPercent}%</span>
                     </div>
                     <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                      <div className="bg-indigo-500 h-full transition-all duration-200 rounded-full" style={{ width: `${thumbnailPercent}%` }} />
+                      <div className="bg-brand-200 h-full transition-all duration-200 rounded-full" style={{ width: `${thumbnailPercent}%` }} />
                     </div>
                   </div>
                 )}
@@ -565,7 +565,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                 ) : (
                   <>
                     <p className="text-[10px] text-slate-400">MP4, WebM, or MOV. Max 100MB.</p>
-                    <label className="flex items-center justify-center gap-2 border border-dashed border-slate-300 hover:border-indigo-400 bg-white rounded-lg p-3 cursor-pointer transition-colors text-xs text-slate-500 font-medium">
+                    <label className="flex items-center justify-center gap-2 border border-dashed border-slate-300 hover:border-brand-200 bg-white rounded-lg p-3 cursor-pointer transition-colors text-xs text-slate-500 font-medium">
                       <Upload size={14} />
                       <span>Select video</span>
                       <input
@@ -589,12 +589,12 @@ const CreatorDashboard = ({ currentProfile }) => {
 
                 {isTrailerUploading && (
                   <div className="space-y-1.5 border border-slate-200 p-2.5 rounded-lg bg-white">
-                    <div className="flex justify-between items-center text-[10px] text-indigo-650 font-bold font-mono">
+                    <div className="flex justify-between items-center text-[10px] text-brand-200 font-bold font-mono">
                       <span>{trailerStatusText}</span>
                       <span>{trailerPercent}%</span>
                     </div>
                     <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                      <div className="bg-indigo-500 h-full transition-all duration-200 rounded-full" style={{ width: `${trailerPercent}%` }} />
+                      <div className="bg-brand-200 h-full transition-all duration-200 rounded-full" style={{ width: `${trailerPercent}%` }} />
                     </div>
                   </div>
                 )}
@@ -621,7 +621,7 @@ const CreatorDashboard = ({ currentProfile }) => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-white border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                className="bg-white border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-medium focus:outline-none focus:border-brand-200 focus:ring-2 focus:ring-brand/10"
               >
                 <option value="All">All</option>
                 <option value="Published">Published</option>
@@ -649,7 +649,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                   <div
                     key={crs._id}
                     onClick={() => navigate(`/creator/courses/${crs._id}`)}
-                    className="border border-slate-200 rounded-xl bg-white overflow-hidden hover:shadow-md hover:border-indigo-200 transition-all duration-200 cursor-pointer group"
+                    className="border border-slate-200 rounded-xl bg-white overflow-hidden hover:shadow-md hover:border-brand-100 transition-all duration-200 cursor-pointer group"
                   >
                     {/* Image */}
                     <div className="relative overflow-hidden">
@@ -678,7 +678,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                         )}
                       </div>
 
-                      <h4 className="text-sm font-bold text-slate-800 tracking-tight leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-indigo-650 transition-colors" title={crs.title}>
+                      <h4 className="text-sm font-bold text-slate-800 tracking-tight leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-brand-200 transition-colors" title={crs.title}>
                         {crs.title}
                       </h4>
 
@@ -706,7 +706,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                           e.stopPropagation();
                           navigate(`/creator/courses/${crs._id}`);
                         }}
-                        className="flex-1 py-2 bg-indigo-650 hover:bg-indigo-700 text-white text-xs font-bold font-outfit rounded-lg transition-colors"
+                        className="flex-1 py-2 bg-brand-200 text-[#111111] hover:bg-brand-300 text-xs font-bold font-outfit rounded-lg transition-colors"
                       >
                         Curriculum
                       </button>

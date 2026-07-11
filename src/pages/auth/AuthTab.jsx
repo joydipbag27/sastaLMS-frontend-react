@@ -13,7 +13,7 @@ const AuthTab = ({ onLoginSuccess }) => {
           onClick={() => setSubTab("login")}
           className={`flex-1 py-2 rounded-lg font-extrabold text-xs transition-all duration-200 ${
             subTab === "login"
-              ? "bg-white text-indigo-650 shadow-sm border border-slate-200/80"
+              ? "bg-white text-brand-200 shadow-sm border border-slate-200/80"
               : "text-slate-450 hover:text-slate-650"
           }`}
         >
@@ -23,7 +23,7 @@ const AuthTab = ({ onLoginSuccess }) => {
           onClick={() => setSubTab("signup")}
           className={`flex-1 py-2 rounded-lg font-extrabold text-xs transition-all duration-200 ${
             subTab === "signup"
-              ? "bg-white text-indigo-650 shadow-sm border border-slate-200/80"
+              ? "bg-white text-brand-200 shadow-sm border border-slate-200/80"
               : "text-slate-450 hover:text-slate-650"
           }`}
         >
@@ -33,7 +33,7 @@ const AuthTab = ({ onLoginSuccess }) => {
           onClick={() => setSubTab("forgot")}
           className={`flex-1 py-2 rounded-lg font-extrabold text-xs transition-all duration-200 ${
             subTab === "forgot"
-              ? "bg-white text-indigo-650 shadow-sm border border-slate-200/80"
+              ? "bg-white text-brand-200 shadow-sm border border-slate-200/80"
               : "text-slate-450 hover:text-slate-650"
           }`}
         >

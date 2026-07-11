@@ -40,7 +40,7 @@ const FileTab = ({ currentProfile }) => {
           onClick={() => setActiveTab("manual")}
           className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-sm font-semibold transition-all ${
             activeTab === "manual"
-              ? "border-indigo-650 text-indigo-650"
+              ? "border-brand-200 text-brand-200"
               : "border-transparent text-slate-500 hover:text-slate-700"
           }`}
         >
@@ -51,7 +51,7 @@ const FileTab = ({ currentProfile }) => {
           onClick={() => setActiveTab("library")}
           className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-sm font-semibold transition-all ${
             activeTab === "library"
-              ? "border-indigo-650 text-indigo-650"
+              ? "border-brand-200 text-brand-200"
               : "border-transparent text-slate-500 hover:text-slate-700"
           }`}
         >
@@ -62,10 +62,10 @@ const FileTab = ({ currentProfile }) => {
 
       {activeTab === "manual" ? (
         <div className="space-y-6">
-          <div className="flex gap-4 p-4 bg-indigo-50 border border-indigo-100 rounded-xl text-sm">
-            <Info size={20} className="text-indigo-600 shrink-0 mt-0.5" />
+          <div className="flex gap-4 p-4 bg-brand-50 border-brand-100 rounded-xl text-sm">
+            <Info size={20} className="text-brand-200 shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold text-indigo-700 mb-1">Standard video uploads are lesson-scoped</p>
+              <p className="font-bold text-brand-300 mb-1">Standard video uploads are lesson-scoped</p>
               <p className="text-slate-600 text-xs leading-relaxed">
                 If you prefer automated transcoding, open a course from the{" "}
                 <strong className="text-slate-700">Courses</strong> tab, expand a section, and use the{" "}
@@ -74,7 +74,7 @@ const FileTab = ({ currentProfile }) => {
               </p>
               <Link
                 to="/courses"
-                className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-indigo-650 hover:text-indigo-700 transition-colors"
+                className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-brand-200 hover:text-brand-300 transition-colors"
               >
                 <LinkIcon size={13} />
                 Go to Courses

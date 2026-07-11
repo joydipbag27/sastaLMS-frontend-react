@@ -38,8 +38,8 @@ const App = () => {
     return (
       <div className="min-h-screen bg-[#F8F9FD] flex items-center justify-center">
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-indigo-650 font-bold tracking-widest uppercase text-xs font-outfit">Loading veoLMS</p>
+          <div className="w-10 h-10 border-3 border-brand-200 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-brand-200 font-bold tracking-widest uppercase text-xs font-outfit">Loading veoLMS</p>
         </div>
       </div>
     );

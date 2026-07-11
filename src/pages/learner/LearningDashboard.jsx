@@ -101,7 +101,7 @@ const SidebarSectionItem = ({
         className="w-full flex items-center justify-between p-4 bg-white hover:bg-slate-50 transition-all duration-150 text-left group"
       >
         <div className="min-w-0 flex-1">
-          <h4 className="font-bold text-slate-800 text-sm leading-snug font-outfit group-hover:text-indigo-650 transition-colors">
+          <h4 className="font-bold text-slate-800 text-sm leading-snug font-outfit group-hover:text-brand-200 transition-colors">
             {sect.title}
           </h4>
           <span className="text-[11px] text-slate-500 font-medium font-sans mt-0.5 block">
@@ -137,14 +137,14 @@ const SidebarSectionItem = ({
                   onClick={() => onSelectLesson(les._id)}
                   className={`flex items-center justify-between px-5 py-3 cursor-pointer transition-all duration-150 border-l-4 ${
                     isSelected
-                      ? "bg-indigo-50/70 border-indigo-650"
+                      ? "bg-brand-50/70 border-brand-200"
                       : "hover:bg-slate-50 border-transparent"
                   }`}
                 >
                   <div className="flex gap-3 flex-1 min-w-0 pr-2">
                     <div className="min-w-0">
                       <p className={`text-xs font-semibold leading-tight ${
-                        isSelected ? "text-indigo-650" : "text-slate-700"
+                        isSelected ? "text-brand-200" : "text-slate-700"
                       }`}>
                         <span className="text-slate-400 font-mono mr-1.5">{displayOrder}</span>
                         {les.title}
@@ -598,7 +598,7 @@ const LearningDashboard = () => {
             </span>
           </div>
 
-          <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center font-bold text-xs text-indigo-650">
+          <div className="w-8 h-8 rounded-full bg-brand-50 border-brand-100 flex items-center justify-center font-bold text-xs text-brand-200">
             {profile?.username?.charAt(0).toUpperCase()}
           </div>
         </div>
@@ -614,8 +614,8 @@ const LearningDashboard = () => {
             <div className="w-full aspect-video relative flex items-center justify-center bg-slate-950 rounded-xl overflow-hidden shadow-lg border border-slate-100/10">
               {lessonLoading || videoUrlLoading || playbackStatus === "loading" || progressLoading ? (
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-10 h-10 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-[10px] uppercase font-bold tracking-widest font-mono text-indigo-400">Loading Media...</span>
+                  <div className="w-10 h-10 border-[3px] border-brand-200 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-[10px] uppercase font-bold tracking-widest font-mono text-brand-200">Loading Media...</span>
                 </div>
               ) : activeLesson ? (
                 playbackStatus === "ready" && videoUrl ? (
@@ -685,7 +685,7 @@ const LearningDashboard = () => {
                 )
               ) : (
                 <div className="flex flex-col items-center justify-center text-slate-400 p-6 text-center max-w-sm gap-3">
-                  <div className="w-14 h-14 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-indigo-400">
+                  <div className="w-14 h-14 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-brand-200">
                     <Compass size={24} />
                   </div>
                   <h3 className="text-slate-300 font-bold text-sm font-outfit uppercase tracking-wider">Ready to Learn?</h3>
@@ -724,7 +724,7 @@ const LearningDashboard = () => {
                     onClick={() => setActiveTab(key)}
                     className={`relative pb-3 text-sm font-bold font-outfit tracking-wide transition-colors cursor-pointer ${
                       activeTab === key
-                        ? "text-indigo-650 border-b-2 border-indigo-650"
+                        ? "text-brand-200 border-b-2 border-brand-200"
                         : "text-slate-500 hover:text-slate-800"
                     }`}
                   >
@@ -761,7 +761,7 @@ const LearningDashboard = () => {
                       placeholder="Ask a question about this lesson..."
                       value={newQuestion}
                       onChange={e => setNewQuestion(e.target.value)}
-                      className="flex-1 bg-white border border-slate-200 text-slate-800 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 placeholder-slate-400"
+                      className="flex-1 bg-white border border-slate-200 text-slate-800 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-brand-200 focus:ring-2 focus:ring-brand/10 placeholder-slate-400"
                     />
                     <Button type="submit" variant="primary" className="py-2 px-4 shrink-0 text-xs font-bold font-outfit">
                       Post
@@ -781,7 +781,7 @@ const LearningDashboard = () => {
                         <div key={item.id} className="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
                           <div className="flex justify-between items-center mb-1.5">
                             <div className="flex items-center gap-2">
-                              <div className="w-5 h-5 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center text-[9px] font-bold text-indigo-650">
+                              <div className="w-5 h-5 rounded-full bg-brand-50 border-brand-100 flex items-center justify-center text-[9px] font-bold text-brand-200">
                                 {item.user.charAt(0).toUpperCase()}
                               </div>
                               <span className="font-bold text-slate-800 text-xs font-outfit">{item.user}</span>

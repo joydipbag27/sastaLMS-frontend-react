@@ -132,7 +132,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
   return (
     <>
       <div className="flex justify-center mb-2">
-        <div className="w-10 h-10 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-center text-indigo-600">
+        <div className="w-10 h-10 bg-brand-50 border border-brand-100 rounded-xl flex items-center justify-center text-brand-200">
           <UserPlus size={18} className="stroke-[2.5]" />
         </div>
       </div>
@@ -169,7 +169,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Choose a username"
-              className="w-full pl-12 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm disabled:bg-slate-50 disabled:text-slate-400"
+              className="w-full pl-12 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:border-brand-200 focus:ring-1 focus:ring-brand-200 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm disabled:bg-slate-50 disabled:text-slate-400"
               required
               disabled={isEmailVerified}
             />
@@ -189,7 +189,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full pl-12 pr-[80px] py-2 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm disabled:bg-slate-50 disabled:text-slate-400"
+              className="w-full pl-12 pr-[80px] py-2 bg-white border border-slate-200 rounded-xl focus:border-brand-200 focus:ring-1 focus:ring-brand-200 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm disabled:bg-slate-50 disabled:text-slate-400"
               required
               disabled={otpSent || isEmailVerified}
             />
@@ -198,7 +198,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
                 type="button"
                 onClick={handleSendOtp}
                 disabled={otpLoading}
-                className="absolute inset-y-1.5 right-2 px-3 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 text-indigo-650 font-extrabold text-[10px] rounded-lg transition-all cursor-pointer flex items-center justify-center"
+                className="absolute inset-y-1.5 right-2 px-3 bg-brand-50 border border-brand-100 hover:bg-brand-100 text-brand-200 font-extrabold text-[10px] rounded-lg transition-all cursor-pointer flex items-center justify-center"
               >
                 {otpLoading ? <Loader2 size={12} className="animate-spin" /> : "Verify"}
               </button>
@@ -213,9 +213,9 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
         </div>
 
         {!isEmailVerified && otpSent && (
-          <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-xl space-y-2.5 animate-fade-in">
+          <div className="p-3 bg-brand-50 border border-brand-100 rounded-xl space-y-2.5 animate-fade-in">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-black text-indigo-650 tracking-wide uppercase">
+              <span className="text-[10px] font-black text-brand-200 tracking-wide uppercase">
                 Email Verification
               </span>
               <button
@@ -241,7 +241,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value)}
                   placeholder="Enter 6-digit code"
-                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 tracking-wider placeholder-slate-400 outline-none text-xs transition-all shadow-sm"
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:border-brand-200 focus:ring-1 focus:ring-brand-200 font-medium text-slate-800 tracking-wider placeholder-slate-400 outline-none text-xs transition-all shadow-sm"
                   required
                 />
               </div>
@@ -256,7 +256,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
                 type="button"
                 onClick={handleVerifyOtp}
                 disabled={otpLoading}
-                className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl shadow-sm text-xs transition-all cursor-pointer flex items-center justify-center"
+                className="flex-1 py-2 bg-brand-200 hover:bg-brand-300 text-[#111111] font-extrabold rounded-xl shadow-sm text-xs transition-all cursor-pointer flex items-center justify-center"
               >
                 {otpLoading ? <Loader2 size={12} className="animate-spin mr-1" /> : "Confirm Code"}
               </button>
@@ -288,7 +288,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Create a password"
-                  className="w-full pl-12 pr-12 py-2 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+                  className="w-full pl-12 pr-12 py-2 bg-white border border-slate-200 rounded-xl focus:border-brand-200 focus:ring-1 focus:ring-brand-200 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
                   required
                   minLength="6"
                 />
@@ -315,7 +315,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm password"
-                  className="w-full pl-12 pr-12 py-2 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
+                  className="w-full pl-12 pr-12 py-2 bg-white border border-slate-200 rounded-xl focus:border-brand-200 focus:ring-1 focus:ring-brand-200 font-medium text-slate-800 placeholder-slate-400 outline-none text-sm transition-all shadow-sm"
                   required
                 />
                 <button
@@ -331,7 +331,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 bg-indigo-650 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer mt-3 flex items-center justify-center"
+              className="w-full py-3.5 bg-brand-200 hover:bg-brand-300 text-[#111111] font-black rounded-xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer mt-3 flex items-center justify-center"
             >
               {isLoading ? (
                 <>
@@ -367,7 +367,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
         Already have an account?{" "}
         <button
           onClick={onSwitchToLogin}
-          className="text-indigo-650 hover:text-indigo-700 font-bold hover:underline transition-colors cursor-pointer"
+          className="text-brand-200 hover:text-brand-300 font-bold hover:underline transition-colors cursor-pointer"
         >
           Login here
         </button>
