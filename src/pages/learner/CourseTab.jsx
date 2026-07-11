@@ -49,7 +49,7 @@ const CourseCardSkeleton = () => (
 const CourseCard = ({ crs, isCreatorOrAdmin, navigate }) => {
   const handleCardClick = () => {
     if (isCreatorOrAdmin) {
-      navigate(`/admin/courses/${crs._id}`);
+      navigate(`/creator/courses/${crs._id}`);
     } else {
       navigate(`/dashboard/courses/${crs._id}`);
     }
@@ -100,7 +100,7 @@ const CourseCard = ({ crs, isCreatorOrAdmin, navigate }) => {
 
       <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
         <span className="text-sm font-bold text-slate-800">
-          {crs.price === 0 ? "Free" : `$${crs.price}`}
+          {crs.price === 0 ? "Free" : `₹${crs.price}`}
         </span>
         <span className="text-xs font-semibold text-indigo-650 bg-indigo-50 px-2.5 py-1 rounded-lg group-hover:bg-indigo-100 transition-colors">
           {isCreatorOrAdmin ? "Manage" : "Explore"}
@@ -130,7 +130,7 @@ const CourseTab = ({ currentProfile }) => {
     status: "Published",
   }, limit);
 
-  const isCreatorOrAdmin = currentProfile && ["CREATOR", "ADMIN"].includes(currentProfile.role);
+  const isCreatorOrAdmin = currentProfile && currentProfile.role === "CREATOR";
 
   if (selectedCourse) {
     return (

@@ -1,12 +1,9 @@
-import React from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../features/auth/hooks/useAuth";
 
 const isSafeRedirectPath = (path) => {
   if (!path || typeof path !== "string") return false;
-  // Must start with exactly one '/' and not contain a second '/' immediately (prevents '//')
   if (!path.startsWith("/") || path.startsWith("//")) return false;
-  // Reject backslashes, control characters, or HTML-like bracket syntax
   if (/[\\{}()<>\[\]]/.test(path)) return false;
   return true;
 };
@@ -23,8 +20,8 @@ export const GuestOnlyRoute = ({ children, fallbackPath }) => {
     if (fallbackPath) {
       return <Navigate to={fallbackPath} replace />;
     }
-    const isCreatorOrAdmin = profile.role === "CREATOR" || profile.role === "ADMIN";
-    return <Navigate to={isCreatorOrAdmin ? "/admin/courses" : "/dashboard/courses"} replace />;
+    if (profile.role === "CREATOR") return <Navigate to="/creator/users" replace />;
+    return <Navigate to="/dashboard/courses" replace />;
   }
 
   return children;
@@ -51,7 +48,8 @@ export const RoleRoute = ({ children, allowedRoles, redirectPath }) => {
     if (redirectPath) {
       return <Navigate to={redirectPath} replace />;
     }
-    return <Navigate to={profile.role === "STUDENT" ? "/dashboard/courses" : "/admin/courses"} replace />;
+    if (profile.role === "STUDENT") return <Navigate to="/dashboard/courses" replace />;
+    if (profile.role === "CREATOR") return <Navigate to="/creator/users" replace />;
   }
 
   return children;

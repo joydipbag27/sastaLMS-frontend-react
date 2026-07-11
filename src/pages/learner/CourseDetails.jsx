@@ -391,11 +391,11 @@ const SectionItem = ({
             <span className="font-bold text-slate-800 text-sm block truncate leading-snug">{sect.title}</span>
             <div className="flex items-center gap-2 mt-0.5">
               {sect.description && (
-                <p className="text-[11px] text-slate-405 truncate max-w-[200px] sm:max-w-xs">{sect.description}</p>
+                <p className="text-[11px] text-slate-450 truncate max-w-[200px] sm:max-w-xs">{sect.description}</p>
               )}
               {sect.description && displayLessonCount > 0 && <span className="text-[11px] text-slate-350">•</span>}
               {displayLessonCount > 0 && (
-                <span className="text-[11px] text-slate-405 font-medium">{displayLessonCount} {displayLessonCount === 1 ? "lesson" : "lessons"}</span>
+                <span className="text-[11px] text-slate-450 font-medium">{displayLessonCount} {displayLessonCount === 1 ? "lesson" : "lessons"}</span>
               )}
             </div>
           </div>
@@ -620,7 +620,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
 
   const course = initialCourse || fetchedCourse;
 
-  const canEdit = currentProfile && ["CREATOR", "ADMIN"].includes(currentProfile.role);
+  const canEdit = currentProfile && currentProfile.role === "CREATOR";
   const isCreatorOrAdmin = canEdit;
 
   // React Query hook for sections and enrollment
@@ -912,9 +912,9 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
               </span>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-black text-slate-800 font-outfit tracking-tight">
-                  {isEnrolled ? "UNLOCKED" : course.price === 0 ? "FREE" : `$${course.price}`}
+                  {isEnrolled ? "UNLOCKED" : course.price === 0 ? "FREE" : `₹${course.price}`}
                 </span>
-                {!isEnrolled && course.price > 0 && <span className="text-xs text-slate-500 font-bold font-outfit">USD</span>}
+                {!isEnrolled && course.price > 0 && <span className="text-xs text-slate-500 font-bold font-outfit">INR</span>}
               </div>
               {isCreatorOrAdmin && (
                 <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-650 mt-3 border border-indigo-200 font-outfit uppercase tracking-wider">

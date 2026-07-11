@@ -104,7 +104,7 @@ const SidebarSectionItem = ({
           <h4 className="font-bold text-slate-800 text-sm leading-snug font-outfit group-hover:text-indigo-650 transition-colors">
             {sect.title}
           </h4>
-          <span className="text-[11px] text-slate-550 font-medium font-sans mt-0.5 block">
+          <span className="text-[11px] text-slate-500 font-medium font-sans mt-0.5 block">
             {completedCount} of {lessons.length}
           </span>
         </div>
@@ -213,7 +213,7 @@ const LearningDashboard = () => {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
 
-  const isCreatorOrAdmin = ["CREATOR", "ADMIN"].includes(profile?.role);
+  const isCreatorOrAdmin = profile?.role === "CREATOR";
 
   // Curriculum (sections list) and server-authoritative course progress
   const { sections, sectionsLoading } = useCurriculum(courseId, isCreatorOrAdmin);
@@ -508,7 +508,7 @@ const LearningDashboard = () => {
   const overallProgress = courseProgress?.progressPercentage ?? 0;
 
   const handleBack = () => {
-    navigate(isCreatorOrAdmin ? `/admin/courses` : `/dashboard/courses`);
+    navigate(isCreatorOrAdmin ? `/creator/courses` : `/dashboard/courses`);
   };
 
   const handlePrevLesson = async () => {
@@ -661,7 +661,7 @@ const LearningDashboard = () => {
                           Enroll Now
                         </Button>
                         <Button
-                          onClick={() => navigate(isCreatorOrAdmin ? `/admin/courses` : `/dashboard/courses`)}
+                          onClick={() => navigate(isCreatorOrAdmin ? `/creator/courses` : `/dashboard/courses`)}
                           variant="secondary"
                           className="flex-1 py-2 text-xs font-bold font-outfit"
                         >
@@ -735,7 +735,7 @@ const LearningDashboard = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="text-xs sm:text-sm leading-relaxed text-slate-655 font-sans">
+            <div className="text-xs sm:text-sm leading-relaxed text-slate-650 font-sans">
               {activeTab === "description" && (
                 <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                   <p className="text-slate-600 leading-relaxed font-outfit">

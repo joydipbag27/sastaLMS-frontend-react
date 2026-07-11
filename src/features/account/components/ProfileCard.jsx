@@ -41,7 +41,6 @@ const ProfileCard = ({ profile, onLogoutSuccess }) => {
           <div>
             <span className="text-slate-500 text-xs block mb-1">Role Assignment</span>
             <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
-              profile.role === "ADMIN" ? "bg-rose-50 text-rose-600 border-rose-200" :
               profile.role === "CREATOR" ? "bg-indigo-50 text-indigo-600 border-indigo-200" :
               "bg-slate-100 text-slate-600 border-slate-200"
             }`}>

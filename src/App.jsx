@@ -9,13 +9,15 @@ import PublicLayout from "./app/layouts/PublicLayout";
 // Tabs/Pages
 import AuthTab from "./pages/auth/AuthTab";
 import SettingsTab from "./pages/learner/SettingsTab";
-import RbacTab from "./pages/creator/RbacTab";
 import CreatorDashboard from "./pages/creator/CreatorDashboard";
 import CourseTab from "./pages/learner/CourseTab";
 import CourseDetails from "./pages/learner/CourseDetails";
 import CheckoutPage from "./pages/learner/CheckoutPage";
 import LearningDashboard from "./pages/learner/LearningDashboard";
 import MyLearning from "./pages/learner/MyLearning";
+
+// Admin Pages
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
 
 import { useAuth } from "./features/auth/hooks/useAuth";
 import { GuestOnlyRoute, AuthenticatedRoute, RoleRoute } from "./app/router/Guards";
@@ -43,13 +45,13 @@ const App = () => {
     );
   }
 
-  const isCreatorOrAdmin = currentProfile?.role === "CREATOR" || currentProfile?.role === "ADMIN";
+  const isCreator = currentProfile?.role === "CREATOR";
 
   const renderPublicRoute = (component) => {
     if (!currentProfile) {
       return <PublicLayout>{component}</PublicLayout>;
     }
-    if (isCreatorOrAdmin) {
+    if (isCreator) {
       return <AdminLayout profile={currentProfile} onLogout={handleLogout}>{component}</AdminLayout>;
     }
     return <StudentLayout profile={currentProfile} onLogout={handleLogout}>{component}</StudentLayout>;
@@ -64,20 +66,20 @@ const App = () => {
         <Route path="/my-learning" element={<AuthenticatedRoute>{renderPublicRoute(<MyLearning />)}</AuthenticatedRoute>} />
 
         {/* Public Auth Route */}
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
             <GuestOnlyRoute fallbackPath="/courses">
               <AuthLayout>
                 <AuthTab onLoginSuccess={fetchProfile} />
               </AuthLayout>
             </GuestOnlyRoute>
-          } 
+          }
         />
 
         {/* Student Routes */}
-        <Route 
-          path="/dashboard/*" 
+        <Route
+          path="/dashboard/*"
           element={
             <RoleRoute allowedRoles={["STUDENT"]} redirectPath="/courses">
               <StudentLayout profile={currentProfile} onLogout={handleLogout}>
@@ -90,25 +92,25 @@ const App = () => {
                 </Routes>
               </StudentLayout>
             </RoleRoute>
-          } 
+          }
         />
 
-        {/* Admin/Creator Routes */}
-        <Route 
-          path="/admin/*" 
+        {/* Creator / Platform Management Routes - CREATOR only */}
+        <Route
+          path="/creator/*"
           element={
-            <RoleRoute allowedRoles={["CREATOR", "ADMIN"]} redirectPath="/courses">
+            <RoleRoute allowedRoles={["CREATOR"]} redirectPath="/courses">
               <AdminLayout profile={currentProfile} onLogout={handleLogout}>
                 <Routes>
                   <Route path="courses" element={<CreatorDashboard currentProfile={currentProfile} />} />
                   <Route path="courses/:courseId" element={<NavigateToCourse />} />
-                  <Route path="users" element={<RbacTab currentProfile={currentProfile} />} />
+                  <Route path="users" element={<AdminUsersPage />} />
                   <Route path="settings" element={<SettingsTab profile={currentProfile} onLogoutSuccess={handleLogout} />} />
-                  <Route path="*" element={<Navigate to="/courses" replace />} />
+                  <Route path="*" element={<Navigate to="/creator/users" replace />} />
                 </Routes>
               </AdminLayout>
             </RoleRoute>
-          } 
+          }
         />
 
         {/* Immersive Learning Classroom Route */}

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, BookOpen, Users, Settings, LogOut, User } from "lucide-react";
+import { LayoutDashboard, BookOpen, Users, Settings, LogOut, User, CreditCard } from "lucide-react";
 import { makeRequest } from "../../services/api/apiClient";
 
 const AdminLayout = ({ profile, onLogout, children }) => {
@@ -23,21 +23,27 @@ const AdminLayout = ({ profile, onLogout, children }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const isCreator = profile?.role === "CREATOR" || profile?.role === "ADMIN";
-  const isAdmin = profile?.role === "ADMIN";
+  const isCreator = profile?.role === "CREATOR";
+  const isCreatorPath = location.pathname.startsWith("/creator");
 
-  const navLinks = [
-    { name: "Explore Catalog", path: "/courses", icon: LayoutDashboard },
-    { name: "My Learning", path: "/my-learning", icon: BookOpen },
-    isCreator && { name: "Course Creator", path: "/admin/courses", icon: BookOpen },
-    isAdmin && { name: "RBAC Control", path: "/admin/users", icon: Users },
-    { name: "Settings", path: "/admin/settings", icon: Settings },
-  ].filter(Boolean);
+  const navLinks = isCreatorPath
+    ? [
+        { name: "Users & Stats", path: "/creator/users", icon: Users },
+        { name: "Course Manager", path: "/creator/courses", icon: BookOpen },
+        { name: "Settings", path: "/creator/settings", icon: Settings },
+      ]
+    : [
+        { name: "Explore Catalog", path: "/courses", icon: LayoutDashboard },
+        isCreator
+          ? { name: "Payments", path: "/my-learning", icon: CreditCard }
+          : { name: "My Learning", path: "/my-learning", icon: BookOpen },
+        isCreator && { name: "Creator Studio", path: "/creator/users", icon: BookOpen },
+      ].filter(Boolean);
 
   const isActive = (path) => {
-    if (path === "/courses") return location.pathname === "/courses";
-    if (path === "/my-learning") return location.pathname === "/my-learning";
-    return location.pathname.startsWith(path);
+    if (path === "/courses") return location.pathname.startsWith("/courses");
+    if (path === "/my-learning") return location.pathname.startsWith("/my-learning");
+    return location.pathname === path || (path !== "/courses" && path !== "/my-learning" && location.pathname.startsWith(path + "/"));
   };
 
   return (
@@ -98,7 +104,7 @@ const AdminLayout = ({ profile, onLogout, children }) => {
                 <div className="text-[10px] text-slate-400 truncate">{profile?.email}</div>
               </div>
               <Link
-                to="/admin/settings"
+                to="/creator/settings"
                 onClick={() => setDropdownOpen(false)}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                 role="menuitem"

@@ -648,7 +648,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                 {courses.map((crs) => (
                   <div
                     key={crs._id}
-                    onClick={() => navigate(`/admin/courses/${crs._id}`)}
+                    onClick={() => navigate(`/creator/courses/${crs._id}`)}
                     className="border border-slate-200 rounded-xl bg-white overflow-hidden hover:shadow-md hover:border-indigo-200 transition-all duration-200 cursor-pointer group"
                   >
                     {/* Image */}
@@ -704,7 +704,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/admin/courses/${crs._id}`);
+                          navigate(`/creator/courses/${crs._id}`);
                         }}
                         className="flex-1 py-2 bg-indigo-650 hover:bg-indigo-700 text-white text-xs font-bold font-outfit rounded-lg transition-colors"
                       >

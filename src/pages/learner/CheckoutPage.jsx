@@ -289,21 +289,16 @@ const CheckoutPage = ({ currentProfile }) => {
               <div className="space-y-2.5 text-xs">
                 <div className="flex justify-between text-slate-500">
                   <span>Subtotal</span>
-                  <span className="font-bold">${course?.price?.toFixed(2)}</span>
+                  <span className="font-bold">₹{course?.price?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-slate-500">
                   <span>Taxes & Fees</span>
-                  <span className="font-bold">$0.00</span>
+                  <span className="font-bold">₹0.00</span>
                 </div>
                 <div className="border-t border-slate-200 my-2 pt-2 flex justify-between items-baseline">
-                  <span className="text-slate-700 font-bold">Total (USD)</span>
-                  <span className="text-xl font-black text-slate-800 font-outfit">${course?.price?.toFixed(2)}</span>
+                  <span className="text-slate-700 font-bold">Total</span>
+                  <span className="text-xl font-black text-slate-800 font-outfit">₹{course?.price?.toFixed(2)}</span>
                 </div>
-                {course?.price && (
-                  <div className="text-[10px] text-slate-400 text-right font-medium">
-                    (Processed in INR at checkout)
-                  </div>
-                )}
               </div>
             </div>
 
