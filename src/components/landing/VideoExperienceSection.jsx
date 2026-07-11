@@ -1,0 +1,119 @@
+import React from "react";
+import VideoPlayerPlaceholder from "./VideoPlayerPlaceholder";
+import { Sliders, RotateCcw, TrendingUp } from "lucide-react";
+
+const VideoExperienceSection = () => {
+  return (
+    <section className="relative bg-[#FAF9F6] py-14 lg:py-20 overflow-hidden select-none border-t border-slate-200/40">
+      
+      {/* Decorative background elements */}
+      <div className="absolute top-[20%] right-[-10%] w-[35%] h-[35%] bg-[#FFE700]/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+      <div className="absolute bottom-[10%] left-[-10%] w-[35%] h-[35%] bg-[#FFE700]/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+
+      <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Section Header Content */}
+        <div className="text-center max-w-2xl mx-auto mb-10 md:mb-14 flex flex-col items-center space-y-4">
+          <span className="inline-block bg-[#FFE700]/10 border border-[#FFE700]/20 px-3 py-1 rounded-full text-[10px] font-black tracking-widest text-[#998A00] uppercase font-outfit">
+            BUILT FOR LEARNING
+          </span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#111111] leading-tight font-outfit tracking-tight">
+            WATCH. LEARN. <br />
+            <span className="text-[#998A00]">KEEP MOVING.</span>
+          </h2>
+          <p className="text-sm md:text-base text-slate-500 font-semibold leading-relaxed">
+            A focused learning experience built around adaptive video lessons, structured course content, resume playback, and progress tracking.
+          </p>
+        </div>
+
+        {/* Main Visual Composition Area */}
+        <div className="relative max-w-4xl mx-auto mb-12 md:mb-16">
+          
+          {/* Main Visual: Video Player Placeholder */}
+          <div className="relative z-10 w-full">
+            <VideoPlayerPlaceholder />
+          </div>
+
+          {/* Illustration Container - Desktop & Tablet (Absolute / Overlapping) */}
+          <div className="hidden md:block absolute -bottom-16 -right-16 lg:-right-24 w-56 lg:w-72 z-20 pointer-events-none transition-all duration-300 hover:scale-105">
+            {/* Pale yellow abstract background shape to ground the illustration */}
+            <div className="absolute inset-0 bg-[#FFE700]/10 rounded-full blur-2xl transform scale-75 -z-10"></div>
+            
+            <img
+              src="/pixles market illustrations/Video Tutorial.png"
+              alt="Video Tutorial Learning Illustration"
+              className="w-full h-auto object-contain drop-shadow-xl"
+              draggable="false"
+            />
+          </div>
+
+          {/* Illustration Container - Mobile (Inline layout below player, hidden on md+) */}
+          <div className="block md:hidden w-48 mx-auto mt-6 relative">
+            <div className="absolute inset-0 bg-[#FFE700]/10 rounded-full blur-xl transform scale-75 -z-10"></div>
+            <img
+              src="/pixles market illustrations/Video Tutorial.png"
+              alt="Video Tutorial Learning Illustration"
+              className="w-full h-auto object-contain drop-shadow-lg"
+              draggable="false"
+            />
+          </div>
+
+        </div>
+
+        {/* Feature Row Section */}
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 lg:gap-12 pt-6">
+          
+          {/* Feature 1: Adaptive Playback */}
+          <div className="flex flex-col items-start text-left space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FFE700]/15 flex items-center justify-center text-[#998A00] shadow-sm">
+              <Sliders size={16} className="stroke-[2.5]" />
+            </div>
+            <div>
+              <h3 className="font-black text-[#111111] text-sm md:text-base font-outfit tracking-wide mb-1.5">
+                Adaptive Playback
+              </h3>
+              <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
+                Smooth video delivery designed for different viewing conditions.
+              </p>
+            </div>
+          </div>
+
+          {/* Feature 2: Resume Learning */}
+          <div className="flex flex-col items-start text-left space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FFE700]/15 flex items-center justify-center text-[#998A00] shadow-sm">
+              <RotateCcw size={16} className="stroke-[2.5]" />
+            </div>
+            <div>
+              <h3 className="font-black text-[#111111] text-sm md:text-base font-outfit tracking-wide mb-1.5">
+                Resume Learning
+              </h3>
+              <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
+                Continue lessons from your previous playback position.
+              </p>
+            </div>
+          </div>
+
+          {/* Feature 3: Progress Tracking */}
+          <div className="flex flex-col items-start text-left space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FFE700]/15 flex items-center justify-center text-[#998A00] shadow-sm">
+              <TrendingUp size={16} className="stroke-[2.5]" />
+            </div>
+            <div>
+              <h3 className="font-black text-[#111111] text-sm md:text-base font-outfit tracking-wide mb-1.5">
+                Progress Tracking
+              </h3>
+              <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
+                Track lesson progress and completion throughout the course.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  );
+};
+
+export default VideoExperienceSection;

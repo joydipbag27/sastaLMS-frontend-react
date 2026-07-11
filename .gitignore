@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .env
+public/pixles market illustrations
 
 # Editor directories and files
 .vscode/*
