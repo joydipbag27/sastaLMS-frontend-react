@@ -15,6 +15,7 @@ import CourseDetails from "./pages/learner/CourseDetails";
 import CheckoutPage from "./pages/learner/CheckoutPage";
 import LearningDashboard from "./pages/learner/LearningDashboard";
 import MyLearning from "./pages/learner/MyLearning";
+import LandingPage from "./pages/LandingPage";
 
 // Admin Pages
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
@@ -60,6 +61,9 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        {/* Landing Page */}
+        <Route path="/" element={<LandingPage />} />
+
         {/* Public Course Explorer */}
         <Route path="/courses" element={renderPublicRoute(<CourseTab currentProfile={currentProfile} />)} />
         <Route path="/courses/:courseId" element={renderPublicRoute(<CourseDetails currentProfile={currentProfile} />)} />
