@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { makeRequest } from "../../../services/api/apiClient";
 import Card from "../../../components/ui/Card";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 import StepFlow from "../../../components/shared/StepFlow";
+import { ShieldCheck, KeyRound, Lock } from "lucide-react";
 
 const ChangePassword = ({ email, onSuccess }) => {
   const [step, setStep] = useState(1);
@@ -68,91 +69,116 @@ const ChangePassword = ({ email, onSuccess }) => {
   };
 
   return (
-    <Card title="Change Password" subtitle="Update account password (requires old password)">
-      <StepFlow currentStep={step} />
-
-      {error && <div className="text-xs text-rose-600 font-medium bg-rose-50 p-2.5 rounded-lg border border-rose-200 mb-3">{error}</div>}
-      {message && <div className="text-xs text-emerald-600 font-medium bg-emerald-50 p-2.5 rounded-lg border border-emerald-200 mb-3">{message}</div>}
-
-      {step === 1 && (
-        <div className="space-y-3">
-          <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-            For security, we will send an OTP verification email to your registered address: <span className="text-indigo-650 font-bold">{email}</span>
+    <Card>
+      <div className="space-y-4">
+        {/* Card Header */}
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+            <KeyRound size={16} />
           </div>
-          <Button onClick={handleSendOtp} variant="primary" isLoading={loading} className="w-full">
-            Send Change Password OTP
-          </Button>
+          <div>
+            <h3 className="text-sm font-bold font-outfit text-slate-800">Change Password</h3>
+            <p className="text-[11px] text-slate-400">Update your account password</p>
+          </div>
         </div>
-      )}
 
-      {step === 2 && (
-        <form onSubmit={handleVerifyOtp} className="space-y-4">
-          <Input
-            label="Verification OTP"
-            id="change-otp"
-            type="text"
-            required
-            maxLength={6}
-            placeholder="Enter the 6-digit OTP code"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            disabled={loading}
-          />
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setStep(1)}
-              disabled={loading}
-              className="flex-1"
-            >
-              Back
-            </Button>
-            <Button type="submit" variant="success" isLoading={loading} className="flex-1">
-              Verify OTP
+        <StepFlow currentStep={step} />
+
+        {error && (
+          <div className="flex items-center gap-2 text-xs text-rose-600 font-medium bg-rose-50 p-3 rounded-xl border border-rose-200">
+            <ShieldCheck size={14} className="shrink-0" />
+            {error}
+          </div>
+        )}
+        {message && (
+          <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+            <ShieldCheck size={14} className="shrink-0" />
+            {message}
+          </div>
+        )}
+
+        {step === 1 && (
+          <div className="space-y-3">
+            <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
+              For security, we will send a verification code to{" "}
+              <span className="text-indigo-650 font-bold">{email}</span>
+            </div>
+            <Button onClick={handleSendOtp} variant="primary" isLoading={loading} className="w-full">
+              Send Verification Code
             </Button>
           </div>
-        </form>
-      )}
+        )}
 
-      {step === 3 && (
-        <form onSubmit={handleChangePass} className="space-y-4">
-          <Input
-            label="Old Password"
-            id="change-old-password"
-            type="password"
-            required
-            placeholder="Enter current password"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            disabled={loading}
-          />
-          <Input
-            label="New Password"
-            id="change-new-password"
-            type="password"
-            required
-            placeholder="Enter new password (min 8 chars)"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            disabled={loading}
-          />
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setStep(2)}
+        {step === 2 && (
+          <form onSubmit={handleVerifyOtp} className="space-y-4">
+            <Input
+              label="Verification Code"
+              id="change-otp"
+              type="text"
+              required
+              maxLength={6}
+              placeholder="Enter the 6-digit code"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
               disabled={loading}
-              className="flex-1"
-            >
-              Back
-            </Button>
-            <Button type="submit" variant="success" isLoading={loading} className="flex-1">
-              Update Password
-            </Button>
-          </div>
-        </form>
-      )}
+            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setStep(1)}
+                disabled={loading}
+                className="flex-1"
+              >
+                Back
+              </Button>
+              <Button type="submit" variant="success" isLoading={loading} className="flex-1">
+                Verify Code
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {step === 3 && (
+          <form onSubmit={handleChangePass} className="space-y-4">
+            <Input
+              label="Current Password"
+              id="change-old-password"
+              type="password"
+              required
+              placeholder="Enter your current password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              disabled={loading}
+            />
+            <Input
+              label="New Password"
+              id="change-new-password"
+              type="password"
+              required
+              placeholder="Enter new password (min 8 chars)"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              disabled={loading}
+            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setStep(2)}
+                disabled={loading}
+                className="flex-1"
+              >
+                Back
+              </Button>
+              <Button type="submit" variant="success" isLoading={loading} className="flex-1">
+                <Lock size={14} />
+                Update Password
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
     </Card>
   );
 };
