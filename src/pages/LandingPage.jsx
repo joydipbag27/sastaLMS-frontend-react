@@ -2,6 +2,8 @@ import React from "react";
 import LandingNavbar from "../components/landing/LandingNavbar";
 import LandingHero from "../components/landing/LandingHero";
 import VideoExperienceSection from "../components/landing/VideoExperienceSection";
+import HowItWorksSection from "../components/landing/HowItWorksSection";
+import ArchitectureSection from "../components/landing/ArchitectureSection";
 
 const LandingPage = () => {
   return (
@@ -10,6 +12,8 @@ const LandingPage = () => {
       <main>
         <LandingHero />
         <VideoExperienceSection />
+        <HowItWorksSection />
+        <ArchitectureSection />
       </main>
     </div>
   );
