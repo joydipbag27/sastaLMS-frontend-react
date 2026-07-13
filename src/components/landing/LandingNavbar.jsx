@@ -4,6 +4,7 @@ import { useAuth } from "../../features/auth/hooks/useAuth";
 import Button from "../ui/Button";
 import ProfilePanel from "../shared/ProfilePanel";
 import { Menu, X, BookOpen, LayoutDashboard, LogIn, ExternalLink } from "lucide-react";
+import { motion } from "framer-motion";
 
 const LandingNavbar = () => {
   const { profile } = useAuth();
@@ -72,32 +73,38 @@ const LandingNavbar = () => {
         {/* Right Actions - Desktop Only */}
         <div className="hidden md:flex items-center gap-4">
           <Link to="/courses">
-            <Button
-              variant="secondary"
-              className="py-2 px-4 text-xs font-bold border-slate-300 hover:bg-slate-100/60"
-            >
-              Explore Courses
-            </Button>
+            <motion.div whileHover={{ y: -1.5, scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">
+              <Button
+                variant="secondary"
+                className="py-2 px-4 text-xs font-bold border-slate-300 hover:bg-slate-100/60"
+              >
+                Explore Courses
+              </Button>
+            </motion.div>
           </Link>
 
           {(!profile || isCreator) && (
-            <Button
-              variant="primary"
-              onClick={handleOpenStudio}
-              className="py-2 px-4 text-xs font-bold bg-[#FFE700] hover:bg-[#FFE700]/85 text-[#111111]"
-            >
-              Open Studio
-            </Button>
+            <motion.div whileHover={{ y: -1.5, scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">
+              <Button
+                variant="primary"
+                onClick={handleOpenStudio}
+                className="py-2 px-4 text-xs font-bold bg-[#FFE700] hover:bg-[#FFE700]/85 text-[#111111]"
+              >
+                Open Studio
+              </Button>
+            </motion.div>
           )}
 
           {profile && isStudent && (
             <Link to="/my-learning">
-              <Button
-                variant="primary"
-                className="py-2 px-4 text-xs font-bold bg-[#FFE700] hover:bg-[#FFE700]/85 text-[#111111]"
-              >
-                My Learning
-              </Button>
+              <motion.div whileHover={{ y: -1.5, scale: 1.02 }} whileTap={{ scale: 0.98 }} className="inline-block">
+                <Button
+                  variant="primary"
+                  className="py-2 px-4 text-xs font-bold bg-[#FFE700] hover:bg-[#FFE700]/85 text-[#111111]"
+                >
+                  My Learning
+                </Button>
+              </motion.div>
             </Link>
           )}
 

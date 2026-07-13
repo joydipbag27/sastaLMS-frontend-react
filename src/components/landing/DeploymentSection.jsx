@@ -1,7 +1,34 @@
 import React from "react";
 import { Code, BookOpen, Rocket, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 const DeploymentSection = () => {
+  const prefersReduced = typeof window !== 'undefined' && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const revealVariants = prefersReduced
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1 } }
+    : { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
+
+  const rocketVariants = prefersReduced
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, x: 40, y: 20, rotate: 4 },
+        visible: { opacity: 1, x: 0, y: 0, rotate: 0, transition: { duration: 0.8, ease: "easeOut" } }
+      };
+
+  const staggerContainer = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: prefersReduced ? 0 : 0.08,
+      }
+    }
+  };
+
+  const staggerItem = prefersReduced
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1 } }
+    : { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
   return (
     <section className="relative bg-[#111111] text-[#FAF9F6] py-16 lg:py-24 overflow-hidden select-none border-t border-white/10">
       
@@ -19,7 +46,13 @@ const DeploymentSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start relative mb-12 md:mb-16">
           
           {/* Top Left: Text Introduction & Desktop CTAs */}
-          <div className="md:col-span-7 flex flex-col items-start text-left space-y-6">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            variants={revealVariants}
+            className="md:col-span-7 flex flex-col items-start text-left space-y-6"
+          >
             
             {/* Eyebrow */}
             <span className="inline-block text-[#FFE700] text-[10px] font-black tracking-widest uppercase font-outfit">
@@ -42,26 +75,39 @@ const DeploymentSection = () => {
 
             {/* CTAs (Desktop / Tablet Only) */}
             <div className="hidden md:flex flex-wrap items-center gap-4 pt-2">
-              <a
-                href="#"
+              <motion.a
+                href="https://github.com/joydipbag27/veoLMS-frontend-react"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className="group inline-flex items-center gap-2 bg-[#FFE700] hover:bg-[#FFE700]/90 active:scale-[0.98] text-[#111111] px-6 py-3 rounded-xl font-bold font-outfit text-sm transition-all duration-150 shadow-md shadow-[#FFE700]/10"
               >
                 VIEW SOURCE CODE
                 <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
-              </a>
-              <a
+              </motion.a>
+              
+              <motion.a
                 href="#"
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className="group inline-flex items-center gap-2 border border-white/20 hover:bg-white/5 active:scale-[0.98] text-[#FAF9F6] px-6 py-3 rounded-xl font-bold font-outfit text-sm transition-all duration-150"
               >
                 READ DOCUMENTATION
                 <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
-              </a>
+              </motion.a>
             </div>
 
-          </div>
+          </motion.div>
 
           {/* Top Right: Large Illustration (Desktop/Tablet) */}
-          <div className="hidden md:flex md:col-span-5 flex-col items-center justify-center relative">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            variants={rocketVariants}
+            className="hidden md:flex md:col-span-5 flex-col items-center justify-center relative"
+          >
             {/* Multi-layered light glow to make the dark illustration stand out */}
             <div className="absolute w-[85%] h-[85%] bg-[#FFE700]/15 rounded-full blur-[70px] -z-10" />
             <div className="absolute w-[60%] h-[60%] bg-white/5 rounded-full blur-[40px] -z-10" />
@@ -72,10 +118,16 @@ const DeploymentSection = () => {
               draggable="false"
               loading="lazy"
             />
-          </div>
+          </motion.div>
 
           {/* Mobile Only: Large Illustration (rendered between copy and actions) */}
-          <div className="flex md:hidden w-full max-w-[200px] mx-auto py-4 relative items-center justify-center">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            variants={rocketVariants}
+            className="flex md:hidden w-full max-w-[200px] mx-auto py-4 relative items-center justify-center"
+          >
             <div className="absolute w-[80%] h-[80%] bg-[#FFE700]/12 rounded-full blur-[50px] -z-10" />
             <div className="absolute w-[50%] h-[50%] bg-white/5 rounded-full blur-[30px] -z-10" />
             <img
@@ -84,15 +136,21 @@ const DeploymentSection = () => {
               className="w-full h-auto object-contain drop-shadow-xl relative z-10"
               draggable="false"
             />
-          </div>
+          </motion.div>
 
         </div>
 
         {/* ── Middle/Lower Area (Three Actions Row) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12 pt-6 border-t border-white/10 relative z-10">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12 pt-6 border-t border-white/10 relative z-10"
+        >
           
           {/* Action 01 */}
-          <div className="flex flex-col items-start text-left space-y-4 border-b border-white/5 pb-6 md:border-b-0 md:pb-0">
+          <motion.div variants={staggerItem} className="flex flex-col items-start text-left space-y-4 border-b border-white/5 pb-6 md:border-b-0 md:pb-0">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black text-slate-500 font-outfit tracking-wider">01</span>
               <div className="shrink-0 w-8 h-8 rounded-lg bg-[#FFE700]/10 border border-[#FFE700]/20 flex items-center justify-center text-[#FFE700]">
@@ -107,10 +165,10 @@ const DeploymentSection = () => {
                 Inspect the frontend, backend services, media pipeline, and application implementation.
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Action 02 */}
-          <div className="flex flex-col items-start text-left space-y-4 border-b border-white/5 pb-6 md:border-b-0 md:pb-0">
+          <motion.div variants={staggerItem} className="flex flex-col items-start text-left space-y-4 border-b border-white/5 pb-6 md:border-b-0 md:pb-0">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black text-slate-500 font-outfit tracking-wider">02</span>
               <div className="shrink-0 w-8 h-8 rounded-lg bg-[#FFE700]/10 border border-[#FFE700]/20 flex items-center justify-center text-[#FFE700]">
@@ -125,10 +183,10 @@ const DeploymentSection = () => {
                 Understand the system architecture, required services, configuration, deployment process, and operational requirements.
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Action 03 */}
-          <div className="flex flex-col items-start text-left space-y-4">
+          <motion.div variants={staggerItem} className="flex flex-col items-start text-left space-y-4">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black text-slate-500 font-outfit tracking-wider">03</span>
               <div className="shrink-0 w-8 h-8 rounded-lg bg-[#FFE700]/10 border border-[#FFE700]/20 flex items-center justify-center text-[#FFE700]">
@@ -143,26 +201,33 @@ const DeploymentSection = () => {
                 Configure the required infrastructure, deploy the application, and operate your own SastaLMS instance.
               </p>
             </div>
-          </div>
+          </motion.div>
 
-        </div>
+        </motion.div>
 
         {/* Mobile Only: CTAs (placed at the bottom after actions) */}
         <div className="flex md:hidden flex-col gap-3 pt-10 relative z-10 w-full">
-          <a
-            href="#"
+          <motion.a
+            href="https://github.com/joydipbag27/veoLMS-frontend-react"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ y: -2, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="group inline-flex items-center justify-center gap-2 bg-[#FFE700] hover:bg-[#FFE700]/90 active:scale-[0.98] text-[#111111] py-3.5 rounded-xl font-bold font-outfit text-sm transition-all duration-150 shadow-md shadow-[#FFE700]/10"
           >
             VIEW SOURCE CODE
             <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
-          </a>
-          <a
+          </motion.a>
+          
+          <motion.a
             href="#"
+            whileHover={{ y: -2, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="group inline-flex items-center justify-center gap-2 border border-white/20 hover:bg-white/5 active:scale-[0.98] text-[#FAF9F6] py-3.5 rounded-xl font-bold font-outfit text-sm transition-all duration-150"
           >
             READ DOCUMENTATION
             <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
-          </a>
+          </motion.a>
         </div>
 
       </div>

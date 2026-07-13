@@ -1,7 +1,27 @@
 import React from "react";
 import { Database, Globe, Cpu } from "lucide-react";
+import { motion } from "framer-motion";
 
 const CostModelSection = () => {
+  const prefersReduced = typeof window !== 'undefined' && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const revealVariants = prefersReduced
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1 } }
+    : { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
+
+  const cardsContainerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: prefersReduced ? 0 : 0.08,
+      }
+    }
+  };
+
+  const cardItemVariants = prefersReduced
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1 } }
+    : { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
   return (
     <section
       id="cost-model"
@@ -21,7 +41,13 @@ const CostModelSection = () => {
       <div className="max-w-5xl mx-auto px-6 relative z-10 flex flex-col items-center">
         
         {/* ── Section Header ── */}
-        <div className="text-center max-w-2xl mx-auto mb-10 md:mb-14 flex flex-col items-center space-y-4">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={revealVariants}
+          className="text-center max-w-2xl mx-auto mb-10 md:mb-14 flex flex-col items-center space-y-4"
+        >
           <span className="inline-block bg-[#FFE700]/10 border border-[#FFE700]/25 px-3 py-1 rounded-full text-[10px] font-black tracking-widest text-[#998A00] uppercase font-outfit">
             COSTS WITHOUT THE MYSTERY
           </span>
@@ -35,7 +61,7 @@ const CostModelSection = () => {
           <p className="text-sm md:text-base text-slate-500 font-semibold leading-relaxed max-w-xl mt-2">
             SastaLMS does not pretend every deployment costs the same. Your operating cost depends on how much media you store and deliver, how you process video, and the infrastructure your deployment consumes.
           </p>
-        </div>
+        </motion.div>
 
         {/* ── Mobile Only: Large Illustration (rendered between copy and columns) ── */}
         <div className="flex md:hidden w-full max-w-[220px] mx-auto pb-8 relative items-center justify-center">
@@ -49,10 +75,16 @@ const CostModelSection = () => {
         </div>
 
         {/* ── Three Cost Areas Columns ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12 w-full pt-6 md:pt-8 relative z-10">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={cardsContainerVariants}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12 w-full pt-6 md:pt-8 relative z-10"
+        >
           
           {/* Cost Area 01 — STORE */}
-          <div className="flex flex-col items-start text-left space-y-4 border-b border-slate-200/40 pb-6 md:border-b-0 md:pb-0">
+          <motion.div variants={cardItemVariants} className="flex flex-col items-start text-left space-y-4 border-b border-slate-200/40 pb-6 md:border-b-0 md:pb-0">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black text-slate-450 font-outfit tracking-wider">01</span>
               <div className="shrink-0 w-9 h-9 rounded-xl bg-white border-2 border-[#111111] flex items-center justify-center text-[#111111] shadow-[2.5px_2.5px_0px_0px_rgba(255,231,0,1)]">
@@ -67,10 +99,10 @@ const CostModelSection = () => {
                 Keep course media in object storage while temporary processing files exist only as long as the pipeline needs them.
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Cost Area 02 — DELIVER */}
-          <div className="flex flex-col items-start text-left space-y-4 border-b border-slate-200/40 pb-6 md:border-b-0 md:pb-0">
+          <motion.div variants={cardItemVariants} className="flex flex-col items-start text-left space-y-4 border-b border-slate-200/40 pb-6 md:border-b-0 md:pb-0">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black text-slate-450 font-outfit tracking-wider">02</span>
               <div className="shrink-0 w-9 h-9 rounded-xl bg-white border-2 border-[#111111] flex items-center justify-center text-[#111111] shadow-[2.5px_2.5px_0px_0px_rgba(255,231,0,1)]">
@@ -85,10 +117,10 @@ const CostModelSection = () => {
                 Delivery cost depends on viewing traffic, origin egress, available allowances, and how effectively the CDN serves cached media.
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Cost Area 03 — PROCESS & RUN */}
-          <div className="flex flex-col items-start text-left space-y-4">
+          <motion.div variants={cardItemVariants} className="flex flex-col items-start text-left space-y-4">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-black text-slate-450 font-outfit tracking-wider">03</span>
               <div className="shrink-0 w-9 h-9 rounded-xl bg-white border-2 border-[#111111] flex items-center justify-center text-[#111111] shadow-[2.5px_2.5px_0px_0px_rgba(255,231,0,1)]">
@@ -103,15 +135,19 @@ const CostModelSection = () => {
                 Use managed processing and pay-per-use compute, or run the included self-hosted transcoding path on infrastructure you operate.
               </p>
             </div>
-          </div>
-
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* ── Desktop Only: Large Illustration (rendered beneath columns) ── */}
-        <div className="hidden md:flex w-full justify-center relative mt-8 mb-1 z-0">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={prefersReduced ? {} : { hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.6 } } }}
+          className="hidden md:flex w-full justify-center relative mt-8 mb-1 z-0"
+        >
           <div className="absolute w-64 h-64 bg-[#FFE700]/6 rounded-full blur-3xl pointer-events-none transform scale-90" />
           
-
           <img
             src="/pixles market illustrations/Finance Analysis.png"
             alt="Infrastructure planning illustration"
@@ -119,10 +155,16 @@ const CostModelSection = () => {
             draggable="false"
             loading="lazy"
           />
-        </div>
+        </motion.div>
 
         {/* ── Cost Equation Area (Visually Memorable Conclusion) ── */}
-        <div className="w-full border-y border-slate-200/80 py-6 my-6 md:my-8 relative flex flex-col items-center justify-center text-center z-10">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={revealVariants}
+          className="w-full border-y border-slate-200/80 py-6 my-6 md:my-8 relative flex flex-col items-center justify-center text-center z-10"
+        >
           <div className="text-[9px] font-black tracking-widest text-[#998A00] uppercase font-outfit mb-3">
             YOUR CONFIGURATION
           </div>
@@ -139,14 +181,20 @@ const CostModelSection = () => {
             <span className="text-slate-450 font-extrabold">+</span>
             <span>COMPUTE</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* ── Disclaimer / Credibility Note ── */}
-        <div className="text-center w-full max-w-2xl px-4 z-10">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-40px" }}
+          variants={revealVariants}
+          className="text-center w-full max-w-2xl px-4 z-10"
+        >
           <p className="text-[10px] md:text-[11px] text-slate-500 font-semibold leading-relaxed">
             Provider pricing, free allowances, cache behavior, deployment region, and usage patterns can change the final cost. SastaLMS exposes the major cost drivers instead of pretending every deployment costs the same.
           </p>
-        </div>
+        </motion.div>
 
       </div>
     </section>

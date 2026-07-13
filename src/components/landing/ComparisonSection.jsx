@@ -1,8 +1,90 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const ComparisonSection = () => {
+  const containerRef = useRef(null);
+  const spineRef = useRef(null);
+
+  useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReduced) {
+      gsap.set(".central-spine-line", { scaleY: 1 });
+      gsap.set(".row-marker, .row-label, .row-hosted, .row-sasta, .comparison-annotation", { opacity: 1, scale: 1, x: 0, y: 0, rotation: 3 });
+      gsap.set(".row-accent", { scaleX: 1, opacity: 1 });
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      // 1. Scrub central vertical spine
+      gsap.to(spineRef.current, {
+        scaleY: 1,
+        scrollTrigger: {
+          trigger: spineRef.current,
+          start: "top 35%",
+          end: "bottom 75%",
+          scrub: 0.5,
+        }
+      });
+
+      // 2. Coordinated rows reveals
+      const rows = gsap.utils.toArray(".comparison-row");
+      rows.forEach((row) => {
+        const marker = row.querySelector(".row-marker");
+        const label = row.querySelector(".row-label");
+        const hosted = row.querySelector(".row-hosted");
+        const sasta = row.querySelector(".row-sasta");
+        const accent = row.querySelector(".row-accent");
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: row,
+            start: "top 78%",
+            toggleActions: "play none none none",
+          }
+        });
+
+        tl.fromTo(marker, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.5)" })
+          .fromTo(label, { opacity: 0, y: 5 }, { opacity: 1, y: 0, duration: 0.3 }, "-=0.15")
+          .fromTo(hosted, { opacity: 0, x: -18 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, "-=0.25")
+          .fromTo(sasta, { opacity: 0, x: 18 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, "-=0.45");
+
+        if (accent) {
+          tl.fromTo(accent, { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.3, ease: "power1.out" }, "-=0.15");
+        }
+      });
+
+      // 3. Center Annotation rotation settle
+      const annotation = containerRef.current.querySelector(".comparison-annotation");
+      if (annotation) {
+        gsap.fromTo(annotation,
+          { opacity: 0, rotation: 8, scale: 0.95 },
+          { 
+            opacity: 1, 
+            rotation: 3, 
+            scale: 1, 
+            duration: 0.55, 
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: annotation,
+              start: "top 75%",
+              toggleActions: "play none none none",
+            }
+          }
+        );
+      }
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
+      ref={containerRef}
       id="comparison"
       className="relative bg-[#FCFAF2] py-12 lg:py-16 overflow-hidden select-none border-t border-slate-200/40"
     >
@@ -57,7 +139,7 @@ const ComparisonSection = () => {
                 provider managed
               </div>
 
-              {/* Metaphorical Illustration: Meditation 1 (relaxing / assisted convenience) */}
+              {/* Metaphorical Illustration */}
               <div className="w-full max-w-[180px] lg:max-w-[220px] aspect-square flex items-center justify-center relative z-10">
                 <div className="absolute inset-0 bg-[#FFE700]/4 rounded-full blur-2xl transform scale-75 -z-10" />
                 <img
@@ -93,7 +175,7 @@ const ComparisonSection = () => {
                 self operated
               </div>
 
-              {/* Metaphorical Illustration: Build (operating machinery / taking control) */}
+              {/* Metaphorical Illustration */}
               <div className="w-full max-w-[180px] lg:max-w-[220px] aspect-square flex items-center justify-center relative z-10">
                 <div className="absolute inset-0 bg-[#FFE700]/4 rounded-full blur-2xl transform scale-75 -z-10" />
                 <img
@@ -121,13 +203,13 @@ const ComparisonSection = () => {
         <div className="w-full max-w-4xl mx-auto mt-16 md:mt-24 relative z-10">
           
           {/* Central spine vertical line (Desktop) */}
-          <div className="hidden md:block absolute top-6 bottom-6 w-[2px] bg-[#FFE700]/70 left-1/2 -translate-x-1/2 z-0" />
+          <div ref={spineRef} className="hidden md:block absolute top-6 bottom-6 w-[2px] bg-[#FFE700]/70 left-1/2 -translate-x-1/2 z-0 origin-top transform scale-y-0 central-spine-line" />
           
           {/* Central spine vertical line (Mobile) */}
           <div className="block md:hidden absolute top-6 bottom-6 w-[2px] bg-[#FFE700]/40 left-1/2 -translate-x-1/2 z-0" />
 
           {/* Tiny annotation near the spine */}
-          <div className="hidden md:block absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-[#998A00] font-sans uppercase tracking-wider rotate-[3deg] border border-[#FFE700]/45 bg-[#FCFAF2] px-2.5 py-0.5 rounded pointer-events-none select-none z-20 whitespace-nowrap">
+          <div className="hidden md:block absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-[#998A00] font-sans uppercase tracking-wider rotate-[3deg] border border-[#FFE700]/45 bg-[#FCFAF2] px-2.5 py-0.5 rounded pointer-events-none select-none z-20 whitespace-nowrap comparison-annotation opacity-0" style={{ transformOrigin: "center" }}>
             same goal. different responsibility.
           </div>
 
@@ -136,28 +218,28 @@ const ComparisonSection = () => {
             {/* Dimension 01 — GETTING STARTED */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-7">
+              <div className="hidden md:grid grid-cols-12 items-center py-7 comparison-row">
                 {/* Left value (Hosted) */}
-                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
+                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center row-hosted opacity-0">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
                     Provider-managed setup.
                   </p>
                 </div>
                 {/* Spine category */}
                 <div className="col-span-2 flex flex-col items-center justify-center relative">
-                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
+                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10 row-marker opacity-0">
                     01
                   </div>
-                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap">
+                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap row-label opacity-0">
                     GETTING STARTED
                   </span>
                 </div>
                 {/* Right value (SastaLMS) */}
-                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center">
-                  <p className="text-sm font-bold text-[#111111] max-w-xs leading-relaxed">
+                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center row-sasta opacity-0">
+                  <p className="text-sm font-bold text-[#111111] max-w-xs leading-relaxed relative">
                     You{" "}
                     <span className="relative inline-block px-1">
-                      <span className="absolute bottom-0.5 left-0 right-0 h-[4px] bg-[#FFE700]/70 -z-10 rounded-sm"></span>
+                      <span className="absolute bottom-0.5 left-0 right-0 h-[4px] bg-[#FFE700]/70 -z-10 rounded-sm row-accent origin-left scale-x-0"></span>
                       deploy the system.
                     </span>
                   </p>
@@ -190,27 +272,28 @@ const ComparisonSection = () => {
             {/* Dimension 02 — HOW YOU PAY */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-7">
+              <div className="hidden md:grid grid-cols-12 items-center py-7 comparison-row">
                 {/* Left value (Hosted) */}
-                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
+                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center row-hosted opacity-0">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
                     Pay the provider's pricing model.
                   </p>
                 </div>
                 {/* Spine category */}
                 <div className="col-span-2 flex flex-col items-center justify-center relative">
-                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
+                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10 row-marker opacity-0">
                     02
                   </div>
-                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap">
+                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap row-label opacity-0">
                     HOW YOU PAY
                   </span>
                 </div>
                 {/* Right value (SastaLMS) */}
-                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center">
+                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center row-sasta opacity-0">
                   <p className="text-sm font-bold text-[#111111] max-w-xs leading-relaxed">
                     Pay for the{" "}
-                    <span className="border-b-2 border-dashed border-[#FFE700] pb-0.5">
+                    <span className="border-b-2 border-dashed border-[#FFE700] pb-0.5 relative inline-block">
+                      <span className="row-accent absolute inset-x-0 bottom-0.5 h-[2px] bg-[#FFE700] origin-left scale-x-0"></span>
                       infrastructure
                     </span>{" "}
                     and services you use.
@@ -244,27 +327,28 @@ const ComparisonSection = () => {
             {/* Dimension 03 — SOURCE ACCESS */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-7">
+              <div className="hidden md:grid grid-cols-12 items-center py-7 comparison-row">
                 {/* Left value (Hosted) */}
-                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
+                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center row-hosted opacity-0">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
                     Platform implementation is provider-owned.
                   </p>
                 </div>
                 {/* Spine category */}
                 <div className="col-span-2 flex flex-col items-center justify-center relative">
-                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
+                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10 row-marker opacity-0">
                     03
                   </div>
-                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap">
+                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap row-label opacity-0">
                     SOURCE ACCESS
                   </span>
                 </div>
                 {/* Right value (SastaLMS) */}
-                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center">
+                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center row-sasta opacity-0">
                   <p className="text-sm font-bold text-[#111111] max-w-xs leading-relaxed">
                     Inspect the{" "}
-                    <span className="bg-[#FFE700] px-1.5 py-0.5 rounded text-[#111111] font-black text-xs md:text-sm shadow-sm">
+                    <span className="bg-[#FFE700] px-1.5 py-0.5 rounded text-[#111111] font-black text-xs md:text-sm shadow-sm relative inline-block">
+                      <span className="row-accent absolute inset-0 bg-[#FFE700] rounded -z-10 origin-left scale-x-0"></span>
                       project source.
                     </span>
                   </p>
@@ -297,27 +381,27 @@ const ComparisonSection = () => {
             {/* Dimension 04 — OPERATIONS */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-7">
+              <div className="hidden md:grid grid-cols-12 items-center py-7 comparison-row">
                 {/* Left value (Hosted) */}
-                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
+                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center row-hosted opacity-0">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
                     The provider operates the platform.
                   </p>
                 </div>
                 {/* Spine category */}
                 <div className="col-span-2 flex flex-col items-center justify-center relative">
-                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
+                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10 row-marker opacity-0">
                     04
                   </div>
-                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap">
+                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap row-label opacity-0">
                     OPERATIONS
                   </span>
                 </div>
                 {/* Right value (SastaLMS) */}
-                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center">
+                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center row-sasta opacity-0">
                   <p className="text-sm font-bold text-[#111111] max-w-xs leading-relaxed relative">
                     You operate your deployment.
-                    <span className="absolute -top-1.5 -right-3 text-[#FFE700] font-black text-xs">*</span>
+                    <span className="absolute -top-1.5 -right-3 text-[#FFE700] font-black text-xs row-accent opacity-0 scale-50">*</span>
                   </p>
                 </div>
               </div>
@@ -348,28 +432,28 @@ const ComparisonSection = () => {
             {/* Dimension 05 — PLATFORM DEPENDENCE */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-7">
+              <div className="hidden md:grid grid-cols-12 items-center py-7 comparison-row">
                 {/* Left value (Hosted) */}
-                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
+                <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center row-hosted opacity-0">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
                     Operate within the provider's platform.
                   </p>
                 </div>
                 {/* Spine category */}
                 <div className="col-span-2 flex flex-col items-center justify-center relative">
-                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
+                  <div className="w-9 h-9 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10 row-marker opacity-0">
                     05
                   </div>
-                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap">
+                  <span className="text-[10px] font-black text-[#998A00] uppercase tracking-wider font-outfit mt-2 bg-[#FCFAF2] px-2 text-center relative z-10 whitespace-nowrap row-label opacity-0">
                     PLATFORM DEPENDENCE
                   </span>
                 </div>
                 {/* Right value (SastaLMS) */}
-                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center">
+                <div className="col-span-5 text-left pl-8 flex flex-col items-start justify-center row-sasta opacity-0">
                   <p className="text-sm font-bold text-[#111111] max-w-xs leading-relaxed">
                     Operate your{" "}
                     <span className="relative inline-block px-1">
-                      <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#FFE700]/60 -z-10 rounded-sm"></span>
+                      <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#FFE700]/60 -z-10 rounded-sm row-accent origin-left scale-x-0"></span>
                       own deployed instance.
                     </span>
                   </p>

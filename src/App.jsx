@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 
 // Layouts
 import AuthLayout from "./app/layouts/AuthLayout";
@@ -37,10 +38,60 @@ const App = () => {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FD] flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-3 border-brand-200 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-brand-200 font-bold tracking-widest uppercase text-xs font-outfit">Loading veoLMS</p>
+      <div className="min-h-screen bg-[#F6F4EB] flex items-center justify-center font-outfit select-none">
+        <div className="flex flex-col items-center space-y-6">
+          {/* Logo Animation */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-3xl font-black text-[#111111] tracking-tight flex items-center"
+          >
+            veo
+            <motion.span 
+              animate={{ 
+                scale: [1, 1.04, 1]
+              }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: 1.5, 
+                ease: "easeInOut" 
+              }}
+              className="bg-[#FFE700] text-[#111111] px-2 py-0.5 rounded-lg ml-1 shadow-sm font-black border border-[#E6CF00]/30"
+            >
+              LMS
+            </motion.span>
+          </motion.div>
+
+          {/* Pulse Dot Loader */}
+          <div className="flex items-center gap-1.5 py-1">
+            {[0, 1, 2].map((index) => (
+              <motion.div
+                key={index}
+                animate={{
+                  y: [0, -6, 0]
+                }}
+                transition={{
+                  duration: 0.6,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  delay: index * 0.12,
+                  ease: "easeInOut"
+                }}
+                className="w-2.5 h-2.5 rounded-full bg-[#111111]"
+              />
+            ))}
+          </div>
+
+          {/* Loading Text */}
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="text-[#111111]/70 font-bold tracking-widest uppercase text-[10px]"
+          >
+            initializing sastalms...
+          </motion.p>
         </div>
       </div>
     );

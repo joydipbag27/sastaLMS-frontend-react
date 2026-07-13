@@ -1,4 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const steps = [
   {
@@ -39,26 +43,90 @@ const steps = [
   },
 ];
 
-/* Restrained dashed vertical connector rendered between steps */
+/* Reconfigured connector line designed to grow as the visitor scrolls */
 const StepConnector = () => (
   <div className="flex justify-center my-1.5 md:my-2.5 pointer-events-none" aria-hidden="true">
-    <div className="flex flex-col items-center gap-1">
-      {/* Three small yellow dashes stacked vertically */}
-      {[0, 1, 2].map((i) => (
-        <div
-          key={i}
-          className="w-px h-4 bg-[#FFE700]/50"
-          style={{ opacity: 1 - i * 0.25 }}
-        />
-      ))}
-      <div className="w-1.5 h-1.5 rounded-full bg-[#FFE700]/60" />
+    <div className="flex flex-col items-center">
+      <div className="w-[2px] h-12 bg-[#FFE700]/70 origin-top transform scale-y-0 step-connector-line" />
+      <div className="w-2.5 h-2.5 rounded-full bg-[#FFE700] border-2 border-[#111111] z-10 -mt-1 shadow-sm step-connector-dot opacity-0 scale-50" />
     </div>
   </div>
 );
 
 const HowItWorksSection = () => {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    
+    // In case the visitor prefers reduced motion, leave everything in its fully visible static state
+    if (prefersReduced) {
+      gsap.set(".step-text-col, .step-img, .step-connector-dot", { opacity: 1, scale: 1 });
+      gsap.set(".step-connector-line", { scaleY: 1 });
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      // Step reveals
+      const stepItems = gsap.utils.toArray(".workflow-step");
+      stepItems.forEach((step) => {
+        const textCol = step.querySelector(".step-text-col");
+        const img = step.querySelector(".step-img");
+        const isFlipped = step.dataset.flip === "true";
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: step,
+            start: "top 82%",
+            toggleActions: "play none none none",
+          }
+        });
+
+        tl.fromTo(textCol, 
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+        ).fromTo(img,
+          { opacity: 0, x: isFlipped ? 30 : -30, scale: 0.96 },
+          { opacity: 1, x: 0, scale: 1, duration: 0.6, ease: "power2.out" },
+          "-=0.3"
+        );
+      });
+
+      // Connector scrub lines
+      const lines = gsap.utils.toArray(".step-connector-line");
+      lines.forEach((line) => {
+        const dot = line.nextSibling;
+
+        gsap.to(line, {
+          scaleY: 1,
+          scrollTrigger: {
+            trigger: line,
+            start: "top 75%",
+            end: "bottom 60%",
+            scrub: 0.5,
+          }
+        });
+
+        if (dot) {
+          gsap.to(dot, {
+            opacity: 1,
+            scale: 1,
+            scrollTrigger: {
+              trigger: line,
+              start: "bottom 60%",
+              toggleActions: "play none none none",
+            }
+          });
+        }
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
+      ref={containerRef}
       className="relative bg-[#F6F4EB] py-8 lg:py-10 overflow-hidden select-none border-t border-slate-200/40"
       id="product"
     >
@@ -94,13 +162,14 @@ const HowItWorksSection = () => {
             <div key={step.number}>
               {/* Individual Step */}
               <div
-                className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center py-4 lg:py-6 ${
+                className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center py-4 lg:py-6 workflow-step ${
                   step.flip ? "lg:[direction:rtl]" : ""
                 }`}
+                data-flip={step.flip}
               >
                 {/* Text column — always ltr text direction */}
                 <div
-                  className={`flex flex-col items-start text-left space-y-5 ${
+                  className={`flex flex-col items-start text-left space-y-5 step-text-col opacity-0 ${
                     step.flip ? "lg:[direction:ltr]" : ""
                   }`}
                 >
@@ -140,7 +209,7 @@ const HowItWorksSection = () => {
                   <img
                     src={step.illustration}
                     alt={step.illustrationAlt}
-                    className="relative z-10 w-full max-w-[180px] md:max-w-[220px] lg:max-w-[260px] h-auto object-contain drop-shadow-lg animate-fade-in"
+                    className="relative z-10 w-full max-w-[180px] md:max-w-[220px] lg:max-w-[260px] h-auto object-contain drop-shadow-lg step-img opacity-0"
                     draggable="false"
                     loading="lazy"
                   />
@@ -158,3 +227,4 @@ const HowItWorksSection = () => {
 };
 
 export default HowItWorksSection;
+

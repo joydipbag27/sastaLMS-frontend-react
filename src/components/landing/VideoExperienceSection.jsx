@@ -1,8 +1,32 @@
 import React from "react";
 import VideoPlayerPlaceholder from "./VideoPlayerPlaceholder";
 import { Sliders, RotateCcw, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
 
 const VideoExperienceSection = () => {
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const headerVariants = prefersReduced
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1 } }
+    : { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
+
+  const playerVariants = prefersReduced
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1 } }
+    : { hidden: { opacity: 0, scale: 0.98, y: 20 }, visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.6 } } };
+
+  const featuresContainerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: prefersReduced ? 0 : 0.08,
+      }
+    }
+  };
+
+  const featureItemVariants = prefersReduced
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1 } }
+    : { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
   return (
     <section className="relative bg-[#F6F4EB] py-12 lg:py-16 overflow-hidden select-none border-t border-slate-200/40">
       
@@ -13,7 +37,13 @@ const VideoExperienceSection = () => {
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header Content */}
-        <div className="text-center max-w-2xl mx-auto mb-10 md:mb-14 flex flex-col items-center space-y-4">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={headerVariants}
+          className="text-center max-w-2xl mx-auto mb-10 md:mb-14 flex flex-col items-center space-y-4"
+        >
           <span className="inline-block bg-[#FFE700]/10 border border-[#FFE700]/20 px-3 py-1 rounded-full text-[10px] font-black tracking-widest text-[#998A00] uppercase font-outfit">
             BUILT FOR LEARNING
           </span>
@@ -24,10 +54,16 @@ const VideoExperienceSection = () => {
           <p className="text-sm md:text-base text-slate-500 font-semibold leading-relaxed">
             A focused learning experience built around adaptive video lessons, structured course content, resume playback, and progress tracking.
           </p>
-        </div>
+        </motion.div>
 
         {/* Main Visual Composition Area */}
-        <div className="relative max-w-4xl mx-auto mb-10 md:mb-12">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={playerVariants}
+          className="relative max-w-4xl mx-auto mb-10 md:mb-12"
+        >
           
           {/* Main Visual: Video Player Placeholder */}
           <div className="relative z-10 w-full">
@@ -58,62 +94,69 @@ const VideoExperienceSection = () => {
             />
           </div>
 
-        </div>
+        </motion.div>
 
         {/* Feature Row Section */}
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 lg:gap-12 pt-6">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            variants={featuresContainerVariants}
+            className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 lg:gap-12 pt-6"
+          >
           
-          {/* Feature 1: Adaptive Playback */}
-          <div className="flex flex-col items-start text-left space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-[#FFE700]/15 flex items-center justify-center text-[#998A00] shadow-sm">
-              <Sliders size={16} className="stroke-[2.5]" />
-            </div>
-            <div>
-              <h3 className="font-black text-[#111111] text-sm md:text-base font-outfit tracking-wide mb-1.5">
-                Adaptive Playback
-              </h3>
-              <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
-                Smooth video delivery designed for different viewing conditions.
-              </p>
-            </div>
-          </div>
+            {/* Feature 1: Adaptive Playback */}
+            <motion.div variants={featureItemVariants} className="flex flex-col items-start text-left space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-[#FFE700]/15 flex items-center justify-center text-[#998A00] shadow-sm">
+                <Sliders size={16} className="stroke-[2.5]" />
+              </div>
+              <div>
+                <h3 className="font-black text-[#111111] text-sm md:text-base font-outfit tracking-wide mb-1.5">
+                  Adaptive Playback
+                </h3>
+                <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
+                  Smooth video delivery designed for different viewing conditions.
+                </p>
+              </div>
+            </motion.div>
 
-          {/* Feature 2: Resume Learning */}
-          <div className="flex flex-col items-start text-left space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-[#FFE700]/15 flex items-center justify-center text-[#998A00] shadow-sm">
-              <RotateCcw size={16} className="stroke-[2.5]" />
-            </div>
-            <div>
-              <h3 className="font-black text-[#111111] text-sm md:text-base font-outfit tracking-wide mb-1.5">
-                Resume Learning
-              </h3>
-              <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
-                Continue lessons from your previous playback position.
-              </p>
-            </div>
-          </div>
+            {/* Feature 2: Resume Learning */}
+            <motion.div variants={featureItemVariants} className="flex flex-col items-start text-left space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-[#FFE700]/15 flex items-center justify-center text-[#998A00] shadow-sm">
+                <RotateCcw size={16} className="stroke-[2.5]" />
+              </div>
+              <div>
+                <h3 className="font-black text-[#111111] text-sm md:text-base font-outfit tracking-wide mb-1.5">
+                  Resume Learning
+                </h3>
+                <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
+                  Continue lessons from your previous playback position.
+                </p>
+              </div>
+            </motion.div>
 
-          {/* Feature 3: Progress Tracking */}
-          <div className="flex flex-col items-start text-left space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-[#FFE700]/15 flex items-center justify-center text-[#998A00] shadow-sm">
-              <TrendingUp size={16} className="stroke-[2.5]" />
-            </div>
-            <div>
-              <h3 className="font-black text-[#111111] text-sm md:text-base font-outfit tracking-wide mb-1.5">
-                Progress Tracking
-              </h3>
-              <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
-                Track lesson progress and completion throughout the course.
-              </p>
-            </div>
-          </div>
+            {/* Feature 3: Progress Tracking */}
+            <motion.div variants={featureItemVariants} className="flex flex-col items-start text-left space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-[#FFE700]/15 flex items-center justify-center text-[#998A00] shadow-sm">
+                <TrendingUp size={16} className="stroke-[2.5]" />
+              </div>
+              <div>
+                <h3 className="font-black text-[#111111] text-sm md:text-base font-outfit tracking-wide mb-1.5">
+                  Progress Tracking
+                </h3>
+                <p className="text-xs md:text-sm text-slate-500 font-semibold leading-relaxed">
+                  Track lesson progress and completion throughout the course.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
-      </div>
 
-    </div>
-  </section>
+      </div>
+    </section>
   );
 };
 
 export default VideoExperienceSection;
+
