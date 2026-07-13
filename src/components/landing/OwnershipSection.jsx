@@ -5,7 +5,7 @@ const OwnershipSection = () => {
   return (
     <section
       id="architecture"
-      className="relative bg-[#FCFAF2] py-14 lg:py-20 overflow-hidden select-none border-t border-[#FFE700]/30"
+      className="relative bg-[#FCFAF2] py-12 lg:py-16 overflow-hidden select-none border-t border-[#FFE700]/30"
     >
       {/* Subtle top edge dot line accent */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-px bg-gradient-to-r from-transparent via-[#FFE700]/50 to-transparent" />
@@ -73,7 +73,7 @@ const OwnershipSection = () => {
 
 
               <img
-                src="/pixles market illustrations/Data Cloud 3.png"
+                src="/pixles market illustrations/Bug 1.png"
                 alt="veoLMS Cloud Infrastructure and Storage Ownership"
                 className="w-full h-auto object-contain drop-shadow-lg"
                 draggable="false"

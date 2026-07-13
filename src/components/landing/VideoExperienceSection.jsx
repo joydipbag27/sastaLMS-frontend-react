@@ -4,7 +4,7 @@ import { Sliders, RotateCcw, TrendingUp } from "lucide-react";
 
 const VideoExperienceSection = () => {
   return (
-    <section className="relative bg-[#FAF9F6] py-14 lg:py-20 overflow-hidden select-none border-t border-slate-200/40">
+    <section className="relative bg-[#F6F4EB] py-12 lg:py-16 overflow-hidden select-none border-t border-slate-200/40">
       
       {/* Decorative background elements */}
       <div className="absolute top-[20%] right-[-10%] w-[35%] h-[35%] bg-[#FFE700]/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
@@ -27,7 +27,7 @@ const VideoExperienceSection = () => {
         </div>
 
         {/* Main Visual Composition Area */}
-        <div className="relative max-w-4xl mx-auto mb-12 md:mb-16">
+        <div className="relative max-w-4xl mx-auto mb-10 md:mb-12">
           
           {/* Main Visual: Video Player Placeholder */}
           <div className="relative z-10 w-full">

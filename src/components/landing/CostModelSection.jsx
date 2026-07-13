@@ -5,7 +5,7 @@ const CostModelSection = () => {
   return (
     <section
       id="cost-model"
-      className="relative bg-[#FAF9F6] py-14 lg:py-20 overflow-hidden select-none border-t border-slate-200/40"
+      className="relative bg-[#F6F4EB] py-12 lg:py-16 overflow-hidden select-none border-t border-slate-200/40"
     >
       {/* Subtle top edge dot line accent */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
@@ -108,15 +108,9 @@ const CostModelSection = () => {
         </div>
 
         {/* ── Desktop Only: Large Illustration (rendered beneath columns) ── */}
-        <div className="hidden md:flex w-full justify-center relative mt-10 mb-2 z-0">
+        <div className="hidden md:flex w-full justify-center relative mt-8 mb-1 z-0">
           <div className="absolute w-64 h-64 bg-[#FFE700]/6 rounded-full blur-3xl pointer-events-none transform scale-90" />
           
-          {/* Subtle handwritten annotation detail */}
-          <div className="absolute top-8 left-[60%] border border-[#FFE700]/30 bg-[#FCFAF2] px-2.5 py-1 rounded-md rotate-6 shadow-sm pointer-events-none select-none z-20">
-            <span className="text-[9px] font-black text-[#998A00] font-sans uppercase tracking-wider">
-              depends on how you run it
-            </span>
-          </div>
 
           <img
             src="/pixles market illustrations/Finance Analysis.png"
@@ -128,7 +122,7 @@ const CostModelSection = () => {
         </div>
 
         {/* ── Cost Equation Area (Visually Memorable Conclusion) ── */}
-        <div className="w-full border-y border-slate-200/80 py-8 my-8 md:my-10 relative flex flex-col items-center justify-center text-center z-10">
+        <div className="w-full border-y border-slate-200/80 py-6 my-6 md:my-8 relative flex flex-col items-center justify-center text-center z-10">
           <div className="text-[9px] font-black tracking-widest text-[#998A00] uppercase font-outfit mb-3">
             YOUR CONFIGURATION
           </div>

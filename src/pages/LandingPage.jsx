@@ -12,9 +12,9 @@ import LandingFooter from "../components/landing/LandingFooter";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#111111] font-sans antialiased overflow-x-hidden selection:bg-brand/30">
+    <div className="min-h-screen bg-[#F6F4EB] text-[#111111] font-sans antialiased selection:bg-brand/30">
       <LandingNavbar />
-      <main>
+      <main className="overflow-x-hidden">
         <LandingHero />
         <VideoExperienceSection />
         <HowItWorksSection />

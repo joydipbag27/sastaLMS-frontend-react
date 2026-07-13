@@ -4,7 +4,7 @@ const ComparisonSection = () => {
   return (
     <section
       id="comparison"
-      className="relative bg-[#FCFAF2] py-16 lg:py-24 overflow-hidden select-none border-t border-slate-200/40"
+      className="relative bg-[#FCFAF2] py-12 lg:py-16 overflow-hidden select-none border-t border-slate-200/40"
     >
       {/* Subtle top edge dot line accent */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-px bg-gradient-to-r from-transparent via-[#FFE700]/30 to-transparent" />
@@ -136,7 +136,7 @@ const ComparisonSection = () => {
             {/* Dimension 01 — GETTING STARTED */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-10">
+              <div className="hidden md:grid grid-cols-12 items-center py-7">
                 {/* Left value (Hosted) */}
                 <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
@@ -165,7 +165,7 @@ const ComparisonSection = () => {
               </div>
 
               {/* Mobile view */}
-              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-8 relative z-10 w-full">
+              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-6 relative z-10 w-full">
                 <div className="w-8 h-8 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
                   01
                 </div>
@@ -190,7 +190,7 @@ const ComparisonSection = () => {
             {/* Dimension 02 — HOW YOU PAY */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-10">
+              <div className="hidden md:grid grid-cols-12 items-center py-7">
                 {/* Left value (Hosted) */}
                 <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
@@ -219,7 +219,7 @@ const ComparisonSection = () => {
               </div>
 
               {/* Mobile view */}
-              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-8 relative z-10 w-full">
+              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-6 relative z-10 w-full">
                 <div className="w-8 h-8 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
                   02
                 </div>
@@ -244,7 +244,7 @@ const ComparisonSection = () => {
             {/* Dimension 03 — SOURCE ACCESS */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-10">
+              <div className="hidden md:grid grid-cols-12 items-center py-7">
                 {/* Left value (Hosted) */}
                 <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
@@ -272,7 +272,7 @@ const ComparisonSection = () => {
               </div>
 
               {/* Mobile view */}
-              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-8 relative z-10 w-full">
+              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-6 relative z-10 w-full">
                 <div className="w-8 h-8 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
                   03
                 </div>
@@ -297,7 +297,7 @@ const ComparisonSection = () => {
             {/* Dimension 04 — OPERATIONS */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-10">
+              <div className="hidden md:grid grid-cols-12 items-center py-7">
                 {/* Left value (Hosted) */}
                 <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
@@ -323,7 +323,7 @@ const ComparisonSection = () => {
               </div>
 
               {/* Mobile view */}
-              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-8 relative z-10 w-full">
+              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-6 relative z-10 w-full">
                 <div className="w-8 h-8 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
                   04
                 </div>
@@ -348,7 +348,7 @@ const ComparisonSection = () => {
             {/* Dimension 05 — PLATFORM DEPENDENCE */}
             <div className="relative z-10">
               {/* Desktop view */}
-              <div className="hidden md:grid grid-cols-12 items-center py-10">
+              <div className="hidden md:grid grid-cols-12 items-center py-7">
                 {/* Left value (Hosted) */}
                 <div className="col-span-5 text-right pr-8 flex flex-col items-end justify-center">
                   <p className="text-sm font-semibold text-slate-500 max-w-xs leading-relaxed">
@@ -377,7 +377,7 @@ const ComparisonSection = () => {
               </div>
 
               {/* Mobile view */}
-              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-8 relative z-10 w-full">
+              <div className="flex md:hidden flex-col items-center text-center space-y-4 py-6 relative z-10 w-full">
                 <div className="w-8 h-8 rounded-full bg-[#FFE700] border-2 border-[#111111] flex items-center justify-center text-xs font-black font-outfit text-[#111111] shadow-sm z-10">
                   05
                 </div>

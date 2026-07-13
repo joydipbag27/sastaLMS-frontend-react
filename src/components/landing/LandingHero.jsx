@@ -19,7 +19,7 @@ const LandingHero = () => {
   };
 
   return (
-    <section className="relative overflow-hidden bg-[#FAF9F6] py-16 lg:py-24 xl:py-32 select-none">
+    <section className="relative overflow-hidden bg-[#F6F4EB] py-16 lg:py-24 xl:py-32 select-none">
       {/* Background Accent Gradients */}
       <div className="absolute top-[-10%] left-[-15%] w-[40%] h-[40%] bg-[#FFE700]/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
       <div className="absolute bottom-[10%] right-[-10%] w-[45%] h-[45%] bg-[#FFE700]/5 rounded-full blur-[140px] pointer-events-none -z-10"></div>
@@ -94,11 +94,11 @@ const LandingHero = () => {
           <div className="absolute w-[80%] h-[80%] border-2 border-dashed border-[#FFE700]/30 rounded-full -z-10 animate-spin" style={{ animationDuration: "25s" }}></div>
 
           {/* Core Illustration Wrapper */}
-          <div className="relative w-full max-w-[500px] bg-transparent p-4 flex items-center justify-center">
+          <div className="relative w-full max-w-[480px] bg-transparent p-4 flex items-center justify-center">
 
             {/* The Selected Illustration */}
             <img
-              src="/pixles market illustrations/Online Learning.png"
+              src="/pixles market illustrations/Knowledge.png"
               alt="Knowledge and Online Learning Illustration"
               className="w-full h-auto object-contain select-none drop-shadow-lg"
               draggable="false"

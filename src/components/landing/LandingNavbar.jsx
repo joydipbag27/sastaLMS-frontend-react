@@ -28,7 +28,7 @@ const LandingNavbar = () => {
   };
 
   return (
-    <header className="sticky top-0 w-full bg-[#FAF9F6]/90 backdrop-blur-md border-b border-slate-200/50 z-40 select-none">
+    <header className="sticky top-0 w-full bg-[#F6F4EB]/90 backdrop-blur-md border-b border-slate-200/50 z-40 select-none">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         
         {/* Left: Branding */}
@@ -37,7 +37,7 @@ const LandingNavbar = () => {
             to="/"
             className="text-2xl font-black text-[#111111] tracking-tight font-outfit flex items-center"
           >
-            veo<span className="bg-[#FFE700] text-[#111111] px-1.5 py-0.5 rounded-lg ml-1 shadow-sm font-black">LMS</span>
+            sasta<span className="bg-[#FFE700] text-[#111111] px-1.5 py-0.5 rounded-lg ml-1 shadow-sm font-black">LMS</span>
           </Link>
         </div>
 
@@ -154,7 +154,7 @@ const LandingNavbar = () => {
 
       {/* Mobile Drawer Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200/50 bg-[#FAF9F6] px-6 py-6 space-y-6 shadow-lg animate-slide-in-from-top-4">
+        <div className="md:hidden border-t border-slate-200/50 bg-[#F6F4EB] px-6 py-6 space-y-6 shadow-lg animate-slide-in-from-top-4">
           <nav className="flex flex-col gap-4">
             <a
               href="#product"

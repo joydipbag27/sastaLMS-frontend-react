@@ -41,7 +41,7 @@ const steps = [
 
 /* Restrained dashed vertical connector rendered between steps */
 const StepConnector = () => (
-  <div className="flex justify-center my-2 md:my-4 pointer-events-none" aria-hidden="true">
+  <div className="flex justify-center my-1.5 md:my-2.5 pointer-events-none" aria-hidden="true">
     <div className="flex flex-col items-center gap-1">
       {/* Three small yellow dashes stacked vertically */}
       {[0, 1, 2].map((i) => (
@@ -59,7 +59,7 @@ const StepConnector = () => (
 const HowItWorksSection = () => {
   return (
     <section
-      className="relative bg-[#FAF9F6] py-10 lg:py-14 overflow-hidden select-none border-t border-slate-200/40"
+      className="relative bg-[#F6F4EB] py-8 lg:py-10 overflow-hidden select-none border-t border-slate-200/40"
       id="product"
     >
       {/* Decorative radial gradients */}
@@ -94,7 +94,7 @@ const HowItWorksSection = () => {
             <div key={step.number}>
               {/* Individual Step */}
               <div
-                className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center py-6 lg:py-8 ${
+                className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center py-4 lg:py-6 ${
                   step.flip ? "lg:[direction:rtl]" : ""
                 }`}
               >
