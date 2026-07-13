@@ -3,7 +3,8 @@ import LandingNavbar from "../components/landing/LandingNavbar";
 import LandingHero from "../components/landing/LandingHero";
 import VideoExperienceSection from "../components/landing/VideoExperienceSection";
 import HowItWorksSection from "../components/landing/HowItWorksSection";
-import ArchitectureSection from "../components/landing/ArchitectureSection";
+import OwnershipSection from "../components/landing/OwnershipSection";
+
 
 const LandingPage = () => {
   return (
@@ -13,10 +14,11 @@ const LandingPage = () => {
         <LandingHero />
         <VideoExperienceSection />
         <HowItWorksSection />
-        <ArchitectureSection />
+        <OwnershipSection />
       </main>
     </div>
   );
 };
 
 export default LandingPage;
+
