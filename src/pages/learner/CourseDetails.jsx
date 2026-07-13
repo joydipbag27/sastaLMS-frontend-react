@@ -135,11 +135,12 @@ const LessonRow = ({
   onUploadVideo,
   onManualIngestion,
   isUploading,
-  handleLessonClick
+  handleLessonClick,
+  className = ""
 }) => {
   return (
     <div 
-      className="group/lesson flex items-center justify-between p-3.5 hover:bg-slate-50/50 transition-all duration-200 cursor-pointer"
+      className={`group/lesson flex items-center justify-between p-3.5 hover:bg-slate-50/50 transition-all duration-200 cursor-pointer ${className}`}
       onClick={() => handleLessonClick(les)}
     >
       <div className="flex items-center gap-3 min-w-0">
@@ -377,11 +378,11 @@ const SectionItem = ({
   const displayLessonCount = sect.lessons?.length || (isExpanded && lessons ? lessons.length : 0);
 
   return (
-    <div className="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm hover:border-brand-100 transition-all duration-200">
+    <div className="border border-slate-200 rounded-xl bg-white shadow-sm hover:border-brand-100 transition-all duration-200">
       {/* Section Header */}
       <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex justify-between items-center p-4 cursor-pointer bg-slate-50 hover:bg-slate-100/50 transition-all select-none border-b border-transparent"
+        className={`flex justify-between items-center p-4 cursor-pointer bg-slate-50 hover:bg-slate-100/50 transition-all select-none border-b border-transparent rounded-t-xl ${!isExpanded ? "rounded-b-xl" : ""}`}
       >
         <div className="flex items-center gap-3.5 min-w-0">
           <span className="text-brand-200 font-mono font-bold text-[10px] bg-brand-50 border-brand-100 px-2 py-0.5 rounded-lg shrink-0">
@@ -446,7 +447,7 @@ const SectionItem = ({
 
       {/* Section Lessons Body */}
       {isExpanded && (
-        <div className="p-4 border-t border-slate-200 bg-slate-50/50 space-y-3">
+        <div className="p-4 border-t border-slate-200 bg-slate-50/50 space-y-3 rounded-b-xl">
           {lessonsLoading ? (
             <div className="text-center py-4 italic text-slate-400 text-[11px] font-mono">Retrieving lessons...</div>
           ) : lessons.length === 0 ? (
@@ -454,8 +455,8 @@ const SectionItem = ({
               No lessons inside this section yet.
             </div>
           ) : (
-            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-              {lessons.map((les) => (
+            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white shadow-sm">
+              {lessons.map((les, index) => (
                 <div key={les._id} className="relative">
                   <LessonRow
                     les={les}
@@ -467,11 +468,12 @@ const SectionItem = ({
                     onManualIngestion={handleManualIngestionToggle}
                     isUploading={uploadingLessonId === les._id}
                     handleLessonClick={handleLessonClick}
+                    className={`${index === 0 ? "rounded-t-xl" : ""} ${index === lessons.length - 1 && uploadingLessonId !== les._id ? "rounded-b-xl" : ""}`}
                   />
 
                   {canEdit && uploadingLessonId === les._id && (
                     <div 
-                      className="p-4 border-t border-slate-200 bg-slate-50 space-y-4"
+                      className={`p-4 border-t border-slate-200 bg-slate-50 space-y-4 ${index === lessons.length - 1 ? "rounded-b-xl" : ""}`}
                       onClick={(e) => e.stopPropagation()}
                     >
                       {/* Mode Toggle */}

@@ -1,11 +1,10 @@
 // Custom API client for veoLMS Backend testing
 
-let apiBaseUrl = localStorage.getItem("veo_api_base_url") || "http://localhost:3000";
+let apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 let logCallback = null;
 
 export const setApiBaseUrl = (url) => {
   apiBaseUrl = url;
-  localStorage.setItem("veo_api_base_url", url);
 };
 
 export const getApiBaseUrl = () => apiBaseUrl;

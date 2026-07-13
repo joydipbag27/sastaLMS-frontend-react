@@ -649,10 +649,10 @@ const CreatorDashboard = ({ currentProfile }) => {
                   <div
                     key={crs._id}
                     onClick={() => navigate(`/creator/courses/${crs._id}`)}
-                    className="border border-slate-200 rounded-xl bg-white overflow-hidden hover:shadow-md hover:border-brand-100 transition-all duration-200 cursor-pointer group"
+                    className="border border-slate-200 rounded-xl bg-white hover:shadow-md hover:border-brand-100 transition-all duration-200 cursor-pointer group"
                   >
                     {/* Image */}
-                    <div className="relative overflow-hidden">
+                    <div className="relative overflow-hidden rounded-t-xl">
                       <CourseImage src={crs.thumbnailUrl} alt={crs.title} className="group-hover:scale-[1.02] transition-transform duration-300" />
                       <div className="absolute top-2 right-2">
                         <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider font-outfit backdrop-blur-sm ${
