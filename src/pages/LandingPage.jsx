@@ -4,6 +4,8 @@ import LandingHero from "../components/landing/LandingHero";
 import VideoExperienceSection from "../components/landing/VideoExperienceSection";
 import HowItWorksSection from "../components/landing/HowItWorksSection";
 import OwnershipSection from "../components/landing/OwnershipSection";
+import DeploymentSection from "../components/landing/DeploymentSection";
+import CostModelSection from "../components/landing/CostModelSection";
 
 
 const LandingPage = () => {
@@ -15,10 +17,14 @@ const LandingPage = () => {
         <VideoExperienceSection />
         <HowItWorksSection />
         <OwnershipSection />
+        <DeploymentSection />
+        <CostModelSection />
       </main>
     </div>
   );
 };
 
 export default LandingPage;
+
+
 
