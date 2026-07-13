@@ -4,8 +4,10 @@ import LandingHero from "../components/landing/LandingHero";
 import VideoExperienceSection from "../components/landing/VideoExperienceSection";
 import HowItWorksSection from "../components/landing/HowItWorksSection";
 import OwnershipSection from "../components/landing/OwnershipSection";
-import DeploymentSection from "../components/landing/DeploymentSection";
 import CostModelSection from "../components/landing/CostModelSection";
+import ComparisonSection from "../components/landing/ComparisonSection";
+import DeploymentSection from "../components/landing/DeploymentSection";
+import LandingFooter from "../components/landing/LandingFooter";
 
 
 const LandingPage = () => {
@@ -17,14 +19,18 @@ const LandingPage = () => {
         <VideoExperienceSection />
         <HowItWorksSection />
         <OwnershipSection />
-        <DeploymentSection />
         <CostModelSection />
+        <ComparisonSection />
+        <DeploymentSection />
+        <LandingFooter />
       </main>
     </div>
   );
 };
 
 export default LandingPage;
+
+
 
 
 
