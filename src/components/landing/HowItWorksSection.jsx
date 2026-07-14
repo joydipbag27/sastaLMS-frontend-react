@@ -151,7 +151,7 @@ const HowItWorksSection = () => {
             </span>
           </h2>
           <p className="text-sm md:text-base text-slate-500 font-semibold leading-relaxed max-w-xl">
-            veoLMS brings course creation, video delivery, student access, and
+            SastaLMS brings course creation, video delivery, student access, and
             learning progress into one connected workflow.
           </p>
         </div>

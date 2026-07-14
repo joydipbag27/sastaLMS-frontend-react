@@ -474,8 +474,8 @@ const AdminUsersPage = () => {
             <div className="bg-rose-50 border border-rose-200 rounded-lg px-3 py-2.5">
               <p className="text-xs text-rose-700 font-medium">
                 {blockModalUser.isBlocked
-                  ? "Are you sure you want to unblock this user? They will be able to log back into veoLMS."
-                  : "Are you sure you want to block this user? They will be force-logged out and locked out of veoLMS."}
+                  ? "Are you sure you want to unblock this user? They will be able to log back into SastaLMS."
+                  : "Are you sure you want to block this user? They will be force-logged out and locked out of SastaLMS."}
               </p>
             </div>
             <div className="flex gap-2 pt-1">

@@ -54,7 +54,7 @@ const AppNavbar = () => {
           to="/courses"
           className="text-xl font-black text-brand-200 tracking-tight flex items-center gap-2"
         >
-          veoLMS
+          SastaLMS
         </Link>
         {isCreator && (
           <span className="bg-amber-50 text-amber-600 border border-amber-100 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-outfit hidden sm:inline">

@@ -64,7 +64,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister, onSwitchToForgot }) => {
           Welcome Back!
         </h1>
         <p className="text-xs font-semibold text-slate-450">
-          Login to continue to veoLMS
+          Login to continue to SastaLMS
         </p>
       </div>
 

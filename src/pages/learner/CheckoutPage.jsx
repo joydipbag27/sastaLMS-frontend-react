@@ -126,7 +126,7 @@ const CheckoutPage = ({ currentProfile }) => {
         key,
         amount,
         currency,
-        name: "veoLMS",
+        name: "SastaLMS",
         description: `Purchase: ${course.title}`,
         image: "/logo.png",
         order_id: orderId,
@@ -274,7 +274,7 @@ const CheckoutPage = ({ currentProfile }) => {
               <ShieldCheck className="text-emerald-600 shrink-0 mt-0.5" size={16} />
               <div>
                 <p className="font-bold text-slate-700">Secure Course Purchase</p>
-                <p className="text-[10px] mt-0.5">VeoLMS does not store your card details. Payment processing is handled end-to-end via Razorpay's bank-grade secure layers.</p>
+                <p className="text-[10px] mt-0.5">SastaLMS does not store your card details. Payment processing is handled end-to-end via Razorpay's bank-grade secure layers.</p>
               </div>
             </div>
           </Card>

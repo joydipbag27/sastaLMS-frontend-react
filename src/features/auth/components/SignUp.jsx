@@ -142,7 +142,7 @@ const SignUp = ({ onSignUpSuccess, onSwitchToLogin }) => {
           Create Account
         </h1>
         <p className="text-xs font-semibold text-slate-450">
-          Register to get started on veoLMS
+          Register to get started on SastaLMS
         </p>
       </div>
 

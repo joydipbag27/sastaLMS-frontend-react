@@ -38,7 +38,7 @@ const OwnershipSection = () => {
 
             <img
               src="/pixles market illustrations/Bug 1.png"
-              alt="veoLMS Cloud Infrastructure and Storage Ownership"
+              alt="SastaLMS Cloud Infrastructure and Storage Ownership"
               className="w-full h-auto max-w-[240px] lg:max-w-[320px] object-contain drop-shadow-xl"
               draggable="false"
               loading="lazy"
@@ -74,7 +74,7 @@ const OwnershipSection = () => {
 
               <img
                 src="/pixles market illustrations/Bug 1.png"
-                alt="veoLMS Cloud Infrastructure and Storage Ownership"
+                alt="SastaLMS Cloud Infrastructure and Storage Ownership"
                 className="w-full h-auto object-contain drop-shadow-lg"
                 draggable="false"
               />

@@ -273,7 +273,7 @@ const MyLearning = () => {
                 ) : (
                   <div className="w-full h-44 bg-gradient-to-br from-brand-50 to-sky-50 flex flex-col items-center justify-center text-brand-200 border-b border-slate-100 gap-1.5">
                     <GraduationCap size={36} className="stroke-[1.5]" />
-                    <span className="text-[10px] font-bold tracking-wider font-outfit uppercase">veoLMS Class</span>
+                    <span className="text-[10px] font-bold tracking-wider font-outfit uppercase">SastaLMS Class</span>
                   </div>
                 )}
                 <div className="p-4 space-y-3">

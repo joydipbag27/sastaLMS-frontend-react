@@ -47,7 +47,7 @@ const App = () => {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="text-3xl font-black text-[#111111] tracking-tight flex items-center"
           >
-            veo
+            Sasta
             <motion.span 
               animate={{ 
                 scale: [1, 1.04, 1]

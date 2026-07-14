@@ -13,7 +13,7 @@ const AuthLayout = ({ children }) => {
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-3xl font-black text-slate-800 tracking-tight font-outfit">
-                  veo<span className="text-brand-200">LMS</span>
+                  Sasta<span className="text-brand-200">LMS</span>
                 </span>
               </div>
 

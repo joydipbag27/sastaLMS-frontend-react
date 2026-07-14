@@ -89,7 +89,7 @@ const CourseImage = ({ src, alt, className = "" }) => {
     return (
       <div className={`relative group overflow-hidden w-full aspect-video bg-gradient-to-br from-brand-50 to-sky-50 flex flex-col items-center justify-center text-brand-200 gap-1.5 ${className}`}>
         <GraduationCap size={36} className="stroke-[1.5]" />
-        <span className="text-[10px] font-bold tracking-wider font-outfit uppercase">veoLMS Class</span>
+        <span className="text-[10px] font-bold tracking-wider font-outfit uppercase">SastaLMS Class</span>
         <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
           <div className="p-4 rounded-full bg-white/80 border border-slate-200 text-brand-200 transform scale-90 group-hover:scale-100 transition-all duration-200 shadow-sm">
             <Play size={28} className="fill-current ml-0.5" />

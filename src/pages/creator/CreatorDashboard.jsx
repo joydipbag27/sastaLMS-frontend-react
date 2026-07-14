@@ -88,7 +88,7 @@ const CourseImage = ({ src, alt, className = "" }) => {
     return (
       <div className={`w-full h-44 bg-gradient-to-br from-brand-50 to-sky-50 flex flex-col items-center justify-center text-brand-200 gap-1.5 ${className}`}>
         <GraduationCap size={32} className="stroke-[1.5]" />
-        <span className="text-[9px] font-bold tracking-wider font-outfit uppercase">veoLMS</span>
+        <span className="text-[9px] font-bold tracking-wider font-outfit uppercase">SastaLMS</span>
       </div>
     );
   }
