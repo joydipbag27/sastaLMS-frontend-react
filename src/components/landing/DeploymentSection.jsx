@@ -88,7 +88,7 @@ const DeploymentSection = () => {
               </motion.a>
               
               <motion.a
-                href="#"
+                href="/docs"
                 whileHover={{ y: -2, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="group inline-flex items-center gap-2 border border-white/20 hover:bg-white/5 active:scale-[0.98] text-[#FAF9F6] px-6 py-3 rounded-xl font-bold font-outfit text-sm transition-all duration-150"
@@ -220,7 +220,7 @@ const DeploymentSection = () => {
           </motion.a>
           
           <motion.a
-            href="#"
+            href="/docs"
             whileHover={{ y: -2, scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="group inline-flex items-center justify-center gap-2 border border-white/20 hover:bg-white/5 active:scale-[0.98] text-[#FAF9F6] py-3.5 rounded-xl font-bold font-outfit text-sm transition-all duration-150"

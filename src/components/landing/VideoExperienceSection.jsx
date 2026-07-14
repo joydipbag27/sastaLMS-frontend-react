@@ -29,7 +29,7 @@ const VideoExperienceSection = () => {
     : { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
   return (
-    <section className="relative bg-[#F6F4EB] py-12 lg:py-16 overflow-hidden select-none border-t border-slate-200/40">
+    <section id="experience" className="relative bg-[#F6F4EB] py-12 lg:py-16 overflow-hidden select-none border-t border-slate-200/40">
       
       {/* Decorative background elements */}
       <div className="absolute top-[20%] right-[-10%] w-[35%] h-[35%] bg-[#FFE700]/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>

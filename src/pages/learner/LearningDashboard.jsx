@@ -574,7 +574,7 @@ const LearningDashboard = () => {
   return (
     <div className="h-screen flex flex-col bg-[#F8F9FD] text-slate-800 font-sans overflow-hidden">
       {/* Classroom Header */}
-      <header className="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between shrink-0 select-none z-20">
+      <header className="sticky top-0 h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between shrink-0 select-none z-20">
         <div className="flex items-center gap-3.5 min-w-0">
           <button
             onClick={handleBack}

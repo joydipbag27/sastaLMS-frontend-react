@@ -52,7 +52,7 @@ const LandingNavbar = () => {
   };
 
   return (
-    <header className="sticky top-0 w-full bg-[#F6F4EB]/90 backdrop-blur-md border-b border-slate-200/50 z-40 select-none">
+    <header className="fixed top-0 left-0 right-0 w-full bg-[#F6F4EB]/90 backdrop-blur-md border-b border-slate-200/50 z-40 select-none">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
         {/* Left: Branding */}
@@ -68,28 +68,34 @@ const LandingNavbar = () => {
         {/* Center Links - Desktop Only */}
         <nav className="hidden md:flex items-center gap-8" aria-label="Landing page sections">
           <a
-            href="#product"
+            href="/#product"
             className="text-sm font-semibold text-slate-600 hover:text-[#111111] transition-colors duration-150"
           >
             Product
           </a>
           <a
-            href="#experience"
+            href="/#experience"
             className="text-sm font-semibold text-slate-600 hover:text-[#111111] transition-colors duration-150"
           >
             Experience
           </a>
           <a
-            href="#creators"
+            href="/#creators"
             className="text-sm font-semibold text-slate-600 hover:text-[#111111] transition-colors duration-150"
           >
             For Creators
           </a>
-          <a
-            href="#architecture"
+          <Link
+            to="/docs"
             className="text-sm font-semibold text-slate-600 hover:text-[#111111] transition-colors duration-150"
           >
-            Architecture
+            Documentation
+          </Link>
+          <a
+            href="/docs#detailed-repositories"
+            className="text-sm font-semibold text-slate-600 hover:text-[#111111] transition-colors duration-150"
+          >
+            Source Code
           </a>
         </nav>
 
@@ -200,32 +206,39 @@ const LandingNavbar = () => {
         >
           <div className="flex flex-col gap-4">
             <a
-              href="#product"
+              href="/#product"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-semibold text-slate-700 hover:text-[#111111]"
             >
               Product
             </a>
             <a
-              href="#experience"
+              href="/#experience"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-semibold text-slate-700 hover:text-[#111111]"
             >
               Experience
             </a>
             <a
-              href="#creators"
+              href="/#creators"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-semibold text-slate-700 hover:text-[#111111]"
             >
               For Creators
             </a>
-            <a
-              href="#architecture"
+            <Link
+              to="/docs"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-semibold text-slate-700 hover:text-[#111111]"
             >
-              Architecture
+              Documentation
+            </Link>
+            <a
+              href="/docs#detailed-repositories"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-base font-semibold text-slate-700 hover:text-[#111111]"
+            >
+              Source Code
             </a>
           </div>
 

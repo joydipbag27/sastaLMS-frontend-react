@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LandingNavbar from "../components/landing/LandingNavbar";
 import LandingHero from "../components/landing/LandingHero";
 import VideoExperienceSection from "../components/landing/VideoExperienceSection";
@@ -11,10 +11,14 @@ import LandingFooter from "../components/landing/LandingFooter";
 
 
 const LandingPage = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#F6F4EB] text-[#111111] font-sans antialiased selection:bg-brand/30">
       <LandingNavbar />
-      <main className="overflow-x-hidden">
+      <main className="overflow-x-hidden pt-16">
         <LandingHero />
         <VideoExperienceSection />
         <HowItWorksSection />

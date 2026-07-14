@@ -1,10 +1,11 @@
 import React from "react";
 import { Server, Database, Settings, ArrowRight, Globe, Cloud } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const OwnershipSection = () => {
   return (
     <section
-      id="architecture"
+      id="product"
       className="relative bg-[#FCFAF2] py-12 lg:py-16 overflow-hidden select-none border-t border-[#FFE700]/30"
     >
       {/* Subtle top edge dot line accent */}
@@ -138,12 +139,8 @@ const OwnershipSection = () => {
             </div>
 
             {/* CTA Button */}
-            <a
-              href="#architecture"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById("architecture")?.scrollIntoView({ behavior: "smooth" });
-              }}
+            <Link
+              to="/docs#architecture"
               className="group inline-flex items-center gap-2 bg-[#111111] hover:bg-[#111111]/85 active:scale-[0.98] text-white px-6 py-3 rounded-xl font-bold font-outfit text-sm shadow-md shadow-black/10 transition-all duration-150 mt-4"
             >
               EXPLORE THE SYSTEM
@@ -151,7 +148,7 @@ const OwnershipSection = () => {
                 size={16}
                 className="transform group-hover:translate-x-1 transition-transform"
               />
-            </a>
+            </Link>
 
           </div>
 

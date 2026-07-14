@@ -131,9 +131,9 @@ const LandingFooter = () => {
                 PROJECT
               </h5>
               <ul className="space-y-2.5">
-                <FooterLink href="https://github.com/joydipbag27/veoLMS-frontend-react" isExternal>Source Code</FooterLink>
-                <FooterLink href="#">Documentation</FooterLink>
-                <FooterLink href="#architecture">Architecture</FooterLink>
+                <FooterLink href="https://github.com/joydipbag27/sastaLMS-backend" isExternal>Source Code</FooterLink>
+                <FooterLink href="/docs">Documentation</FooterLink>
+                <FooterLink href="https://github.com/joydipbag27/sastaLMS-backend/blob/main/Media_Pipeline_Architecture.md" isExternal>Media Pipeline</FooterLink>
               </ul>
             </nav>
 
@@ -143,9 +143,9 @@ const LandingFooter = () => {
                 CONNECT
               </h5>
               <ul className="space-y-2.5">
-                <FooterLink href="#">Portfolio</FooterLink>
+                <FooterLink href="https://joydip.in">Portfolio</FooterLink>
                 <FooterLink href="https://github.com/joydipbag27" isExternal>GitHub</FooterLink>
-                <FooterLink href="#">LinkedIn</FooterLink>
+                <FooterLink href="https://www.linkedin.com/in/joydipbag27">LinkedIn</FooterLink>
               </ul>
             </nav>
 

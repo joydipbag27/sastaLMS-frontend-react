@@ -129,7 +129,7 @@ const HowItWorksSection = () => {
     <section
       ref={containerRef}
       className="relative bg-[#F6F4EB] py-8 lg:py-10 overflow-hidden select-none border-t border-slate-200/40"
-      id="product"
+      id="how-it-works"
     >
       {/* Decorative radial gradients */}
       <div className="absolute top-[5%] left-[-12%] w-[40%] h-[40%] bg-[#FFE700]/5 rounded-full blur-[130px] pointer-events-none -z-10" />
