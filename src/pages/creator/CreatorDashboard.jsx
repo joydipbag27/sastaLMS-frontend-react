@@ -433,7 +433,7 @@ const CreatorDashboard = ({ currentProfile }) => {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Input
-                label="Price ($ USD)"
+                label="Price (₹ INR)"
                 id="course-price"
                 type="number"
                 required
@@ -673,7 +673,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                         </span>
                         {crs.price > 0 && (
                           <span className="text-[10px] font-bold text-slate-500 font-outfit">
-                            ${crs.price}
+                            ₹{crs.price}
                           </span>
                         )}
                       </div>

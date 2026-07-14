@@ -100,7 +100,7 @@ const LandingFooter = () => {
             className="md:col-span-5 flex flex-col items-start space-y-4"
           >
             <h4 className="text-2xl font-black font-outfit text-white tracking-tight uppercase">
-              SASTALMS<span className="text-[#FFE700]">.</span>
+              sasta<span className="bg-[#FFE700] text-[#111111] px-1.5 py-0.5 rounded-lg ml-1 shadow-sm font-black">LMS</span>
             </h4>
             <p className="text-xs md:text-sm text-slate-400 font-semibold leading-relaxed max-w-sm">
               A complete, deployable LMS project built around video learning, self-hosting, and practical infrastructure costs.
