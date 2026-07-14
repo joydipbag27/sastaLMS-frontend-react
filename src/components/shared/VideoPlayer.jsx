@@ -75,7 +75,7 @@ export const VideoPlayer = ({
       // Event bindings
       plyrInstance.on("play", () => onPlay?.());
       plyrInstance.on("pause", () => onPause?.());
-      
+
       let lastTime = 0;
       plyrInstance.on("timeupdate", () => {
         const currentTime = plyrInstance.currentTime;

@@ -79,12 +79,12 @@ const LandingNavbar = () => {
           >
             Experience
           </a>
-          <a
-            href="/#creators"
+          <Link
+            to="/creator/courses"
             className="text-sm font-semibold text-slate-600 hover:text-[#111111] transition-colors duration-150"
           >
             For Creators
-          </a>
+          </Link>
           <Link
             to="/docs"
             className="text-sm font-semibold text-slate-600 hover:text-[#111111] transition-colors duration-150"
