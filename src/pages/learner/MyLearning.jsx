@@ -21,6 +21,8 @@ import {
   ShieldCheck
 } from "lucide-react";
 
+import LoadingScreen from "../../components/shared/LoadingScreen";
+
 // Metric card sub-component
 const SummaryCard = ({ label, value, icon: Icon, iconColor }) => (
   <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4 flex items-center gap-3">
@@ -206,12 +208,7 @@ const MyLearning = () => {
 
   // 2. RENDER STUDENT ENROLLMENT FLOW
   if (enrollLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-        <Loader2 className="w-8 h-8 border-2 border-brand-200 border-t-transparent rounded-full animate-spin mb-4 text-brand-200" />
-        <p className="text-xs font-semibold text-slate-550">Loading enrolled courses...</p>
-      </div>
-    );
+    return <LoadingScreen message="Loading enrolled courses..." />;
   }
 
   if (enrollError) {
