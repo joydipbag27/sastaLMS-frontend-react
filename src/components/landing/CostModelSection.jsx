@@ -31,7 +31,7 @@ const CostModelSection = () => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
       {/* Decorative large background word */}
-      <div className="absolute top-[12%] left-[4%] text-[7rem] md:text-[10rem] lg:text-[13rem] font-black text-[#111111]/[0.015] font-outfit leading-none select-none pointer-events-none tracking-tighter uppercase z-0">
+      <div className="absolute top-[12%] left-[4%] text-[5rem] sm:text-[7rem] md:text-[10rem] lg:text-[13rem] font-black text-[#111111]/[0.015] font-outfit leading-none select-none pointer-events-none tracking-tighter uppercase z-0">
         WHAT COSTS?
       </div>
 

@@ -15,7 +15,7 @@ const OwnershipSection = () => {
       <div className="absolute bottom-[10%] right-[-10%] w-[35%] h-[35%] bg-[#FFE700]/4 rounded-full blur-[100px] pointer-events-none -z-10" />
 
       {/* Oversized background typography decoration */}
-      <div className="absolute top-[15%] left-[5%] text-[9rem] md:text-[12rem] lg:text-[14rem] font-black text-[#111111]/[0.015] font-outfit leading-none select-none pointer-events-none tracking-tighter uppercase z-0">
+      <div className="absolute top-[15%] left-[5%] text-[6rem] sm:text-[9rem] md:text-[12rem] lg:text-[14rem] font-black text-[#111111]/[0.015] font-outfit leading-none select-none pointer-events-none tracking-tighter uppercase z-0">
         BUILT
       </div>
 

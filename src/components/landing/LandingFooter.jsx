@@ -53,7 +53,7 @@ const LandingFooter = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, delay: 0.2 }}
-        className="absolute bottom-[-2%] left-1/2 -translate-x-1/2 text-[7rem] sm:text-[12rem] md:text-[18rem] lg:text-[22rem] font-black text-white/[0.012] font-outfit leading-none select-none pointer-events-none tracking-tighter uppercase z-0 whitespace-nowrap"
+        className="absolute bottom-[-2%] left-1/2 -translate-x-1/2 text-[5rem] sm:text-[8rem] md:text-[14rem] lg:text-[22rem] font-black text-white/[0.012] font-outfit leading-none select-none pointer-events-none tracking-tighter uppercase z-0 whitespace-nowrap"
         aria-hidden="true"
       >
         SASTALMS.

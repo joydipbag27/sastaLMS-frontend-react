@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/hooks/useAuth";
 import Button from "../ui/Button";
@@ -12,6 +12,29 @@ const LandingNavbar = () => {
   const [panelOpen, setPanelOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const triggerRef = useRef(null);
+
+  // Lock body scroll when mobile menu or profile panel is open
+  useEffect(() => {
+    const isLocked = mobileMenuOpen || panelOpen;
+    if (isLocked) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen, panelOpen]);
+
+  // Close mobile menu on Escape key
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
 
   const isCreator = profile?.role === "CREATOR";
   const isStudent = profile?.role === "STUDENT";
@@ -142,16 +165,25 @@ const LandingNavbar = () => {
           {profile && (
             <button
               ref={triggerRef}
-              onClick={() => setPanelOpen(!panelOpen)}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setPanelOpen(!panelOpen);
+              }}
               className="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs border bg-[#FFE700]/20 border-[#FFE700]/30 text-slate-800"
+              aria-label="Open profile menu"
+              aria-expanded={panelOpen}
             >
               {profile.username?.charAt(0).toUpperCase()}
             </button>
           )}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => {
+              setPanelOpen(false);
+              setMobileMenuOpen(!mobileMenuOpen);
+            }}
             className="p-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-            aria-label="Toggle navigation menu"
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -160,8 +192,13 @@ const LandingNavbar = () => {
 
       {/* Mobile Drawer Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200/50 bg-[#F6F4EB] px-6 py-6 space-y-6 shadow-lg animate-slide-in-from-top-4">
-          <nav className="flex flex-col gap-4">
+        <nav
+          className="md:hidden border-t border-slate-200/50 bg-[#F6F4EB] px-6 py-6 space-y-6 shadow-lg animate-slide-in-from-top-4"
+          aria-label="Mobile navigation"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="flex flex-col gap-4">
             <a
               href="#product"
               onClick={() => setMobileMenuOpen(false)}
@@ -190,7 +227,7 @@ const LandingNavbar = () => {
             >
               Architecture
             </a>
-          </nav>
+          </div>
 
           <div className="border-t border-slate-200/80 pt-4 flex flex-col gap-3">
             <Link to="/courses" onClick={() => setMobileMenuOpen(false)}>
@@ -223,7 +260,7 @@ const LandingNavbar = () => {
               </Link>
             )}
           </div>
-        </div>
+        </nav>
       )}
 
       {/* Hidden container to mount profile panel dropdown on mobile properly */}

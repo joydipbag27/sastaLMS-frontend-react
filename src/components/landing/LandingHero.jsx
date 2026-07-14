@@ -67,7 +67,7 @@ const LandingHero = () => {
       <div className="absolute top-[-10%] left-[-15%] w-[40%] h-[40%] bg-[#FFE700]/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
       <div className="absolute bottom-[10%] right-[-10%] w-[45%] h-[45%] bg-[#FFE700]/5 rounded-full blur-[140px] pointer-events-none -z-10"></div>
  
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 items-center">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
  
         {/* Left Column: Copy & Actions */}
         <motion.div
@@ -165,10 +165,10 @@ const LandingHero = () => {
           </div>
  
           {/* Background Decorative Yellow Circle Outline */}
-          <div className="absolute w-[80%] h-[80%] border-2 border-dashed border-[#FFE700]/30 rounded-full -z-10 animate-spin" style={{ animationDuration: "25s" }}></div>
+          <div className="absolute w-[60%] h-[60%] sm:w-[70%] sm:h-[70%] lg:w-[80%] lg:h-[80%] border-2 border-dashed border-[#FFE700]/30 rounded-full -z-10 animate-spin" style={{ animationDuration: "25s" }}></div>
  
           {/* Core Illustration Wrapper */}
-          <div className="relative w-full max-w-[480px] bg-transparent p-4 flex items-center justify-center">
+          <div className="relative w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[480px] bg-transparent p-4 flex items-center justify-center">
  
             {/* The Selected Illustration */}
             <img

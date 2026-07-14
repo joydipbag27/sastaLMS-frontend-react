@@ -71,7 +71,7 @@ const VideoExperienceSection = () => {
           </div>
 
           {/* Illustration Container - Desktop & Tablet (Absolute / Overlapping) */}
-          <div className="hidden md:block absolute -bottom-16 -right-16 lg:-right-24 w-56 lg:w-72 z-20 pointer-events-none transition-all duration-300 hover:scale-105">
+          <div className="hidden lg:block absolute -bottom-16 -right-16 lg:-right-24 w-56 lg:w-72 z-20 pointer-events-none transition-all duration-300 hover:scale-105">
             {/* Pale yellow abstract background shape to ground the illustration */}
             <div className="absolute inset-0 bg-[#FFE700]/10 rounded-full blur-2xl transform scale-75 -z-10"></div>
             
@@ -83,8 +83,8 @@ const VideoExperienceSection = () => {
             />
           </div>
 
-          {/* Illustration Container - Mobile (Inline layout below player, hidden on md+) */}
-          <div className="block md:hidden w-48 mx-auto mt-6 relative">
+          {/* Illustration Container - Mobile & Tablet (Inline layout below player, hidden on lg+) */}
+          <div className="block lg:hidden w-48 mx-auto mt-6 relative">
             <div className="absolute inset-0 bg-[#FFE700]/10 rounded-full blur-xl transform scale-75 -z-10"></div>
             <img
               src="/pixles market illustrations/Video Tutorial.png"

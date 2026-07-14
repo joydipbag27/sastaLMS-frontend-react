@@ -33,7 +33,7 @@ const DeploymentSection = () => {
     <section className="relative bg-[#111111] text-[#FAF9F6] py-16 lg:py-24 overflow-hidden select-none border-t border-white/10">
       
       {/* Decorative large background word */}
-      <div className="absolute bottom-[8%] left-[5%] text-[10rem] md:text-[15rem] font-black text-white/[0.01] font-outfit leading-none select-none pointer-events-none tracking-tighter uppercase z-0">
+      <div className="absolute bottom-[8%] left-[5%] text-[6rem] sm:text-[10rem] md:text-[15rem] font-black text-white/[0.01] font-outfit leading-none select-none pointer-events-none tracking-tighter uppercase z-0">
         RUN IT
       </div>
 

@@ -205,8 +205,8 @@ const ComparisonSection = () => {
           {/* Central spine vertical line (Desktop) */}
           <div ref={spineRef} className="hidden md:block absolute top-6 bottom-6 w-[2px] bg-[#FFE700]/70 left-1/2 -translate-x-1/2 z-0 origin-top transform scale-y-0 central-spine-line" />
           
-          {/* Central spine vertical line (Mobile) */}
-          <div className="block md:hidden absolute top-6 bottom-6 w-[2px] bg-[#FFE700]/40 left-1/2 -translate-x-1/2 z-0" />
+          {/* Central spine vertical line (Mobile) - hidden on mobile, the VS badges serve as separators */}
+          <div className="hidden absolute top-6 bottom-6 w-[2px] bg-[#FFE700]/40 left-1/2 -translate-x-1/2 z-0" />
 
           {/* Tiny annotation near the spine */}
           <div className="hidden md:block absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-[#998A00] font-sans uppercase tracking-wider rotate-[3deg] border border-[#FFE700]/45 bg-[#FCFAF2] px-2.5 py-0.5 rounded pointer-events-none select-none z-20 whitespace-nowrap comparison-annotation opacity-0" style={{ transformOrigin: "center" }}>

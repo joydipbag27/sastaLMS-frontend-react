@@ -69,6 +69,7 @@ const HowItWorksSection = () => {
     const ctx = gsap.context(() => {
       // Step reveals
       const stepItems = gsap.utils.toArray(".workflow-step");
+      const isMobile = window.innerWidth < 768;
       stepItems.forEach((step) => {
         const textCol = step.querySelector(".step-text-col");
         const img = step.querySelector(".step-img");
@@ -86,7 +87,7 @@ const HowItWorksSection = () => {
           { opacity: 0, y: 20 },
           { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
         ).fromTo(img,
-          { opacity: 0, x: isFlipped ? 30 : -30, scale: 0.96 },
+          { opacity: 0, x: isMobile ? 0 : (isFlipped ? 30 : -30), scale: 0.96 },
           { opacity: 1, x: 0, scale: 1, duration: 0.6, ease: "power2.out" },
           "-=0.3"
         );
@@ -177,7 +178,7 @@ const HowItWorksSection = () => {
                   <div className="relative">
                     {/* Faded large background number */}
                     <span
-                      className="absolute -top-8 -left-4 text-[7rem] md:text-[9rem] font-black text-[#111111]/[0.04] font-outfit leading-none select-none pointer-events-none"
+                      className="absolute -top-8 -left-4 text-[5rem] sm:text-[7rem] md:text-[9rem] font-black text-[#111111]/[0.04] font-outfit leading-none select-none pointer-events-none"
                       aria-hidden="true"
                     >
                       {step.number}
