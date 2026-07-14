@@ -99,7 +99,7 @@ const ProfilePanel = ({ isOpen, onClose, triggerRef }) => {
     ? [
         { name: "Profile & Settings", path: settingsPath, icon: Settings },
         { name: "Users & Stats", path: "/creator/users", icon: Users },
-        { name: "Payments", path: "/my-learning", icon: CreditCard },
+        { name: "Payments", path: "/creator/payments", icon: CreditCard },
         { name: "Course Manager", path: "/creator/courses", icon: BookOpen },
       ]
     : [
@@ -124,7 +124,7 @@ const ProfilePanel = ({ isOpen, onClose, triggerRef }) => {
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/10"
+        className="absolute inset-0 bg-transparent"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -141,7 +141,7 @@ const ProfilePanel = ({ isOpen, onClose, triggerRef }) => {
               className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${
                   isCreator
                     ? "bg-amber-50 border-2 border-amber-200 text-amber-600"
-                    : "bg-brand-50 border-2 border-brand-100 text-brand-200"
+                    : "bg-brand-50 border-2 border-brand-100 text-brand-600"
               }`}
             >
               {profile.username?.charAt(0).toUpperCase()}
@@ -157,7 +157,7 @@ const ProfilePanel = ({ isOpen, onClose, triggerRef }) => {
                 className={`inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                   isCreator
                     ? "bg-amber-50 text-amber-600 border border-amber-100"
-                    : "bg-brand-50 text-brand-200 border border-brand-100"
+                    : "bg-brand-50 text-brand-600 border border-brand-100"
                 }`}
               >
                 {profile.role}
@@ -194,14 +194,14 @@ const ProfilePanel = ({ isOpen, onClose, triggerRef }) => {
                 aria-current={active ? "page" : undefined}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${
                   active
-                    ? "bg-brand-50 text-brand-200"
+                    ? "bg-brand-50 text-brand-600"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-800"
                 }`}
                 role="menuitem"
               >
                 <Icon
                   size={18}
-                  className={active ? "text-brand-200" : "text-slate-400"}
+                  className={active ? "text-brand-600" : "text-slate-400"}
                 />
                 <span className="flex-1">{item.name}</span>
                 <ChevronRight size={14} className="text-slate-300" />

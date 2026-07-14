@@ -244,7 +244,7 @@ const CourseOverview = ({ description }) => {
       {isLong && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-xs font-bold font-outfit text-brand-200 hover:text-brand-300 transition-colors flex items-center gap-1 focus:outline-none"
+          className="text-xs font-bold font-outfit text-brand-600 hover:text-brand-700 transition-colors flex items-center gap-1 focus:outline-none"
         >
           {isExpanded ? "Show less" : "Show more"}
         </button>
@@ -385,7 +385,7 @@ const SectionItem = ({
         className={`flex justify-between items-center p-4 cursor-pointer bg-slate-50 hover:bg-slate-100/50 transition-all select-none border-b border-transparent rounded-t-xl ${!isExpanded ? "rounded-b-xl" : ""}`}
       >
         <div className="flex items-center gap-3.5 min-w-0">
-          <span className="text-brand-200 font-mono font-bold text-[10px] bg-brand-50 border-brand-100 px-2 py-0.5 rounded-lg shrink-0">
+          <span className="text-brand-600 font-mono font-bold text-[10px] bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-lg shrink-0">
             S{sect.order}
           </span>
           <div className="min-w-0">
@@ -764,7 +764,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
       {/* Hero Header Section */}
       <div className="relative z-10 border-b border-slate-200 pb-5 space-y-3">
         <div className="flex flex-wrap gap-2">
-          <span className="bg-brand-50 text-brand-200 border-brand-100 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-outfit">
+          <span className="bg-brand-50 text-brand-600 border border-brand-100 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-outfit">
             {course.level}
           </span>
         </div>
@@ -776,7 +776,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
         <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
           <div className="flex items-center gap-1">
             <span className="text-slate-400">Instructor:</span>
-            <span className="font-semibold text-brand-200">{course.displayName || course.creator?.username || course.creator || "LMS Tutor"}</span>
+            <span className="font-semibold text-brand-600">{course.displayName || course.creator?.username || course.creator || "LMS Tutor"}</span>
           </div>
           <span className="text-slate-350">•</span>
           <div className="flex items-center gap-1.5">
@@ -919,7 +919,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
                 {!isEnrolled && course.price > 0 && <span className="text-xs text-slate-500 font-bold font-outfit">INR</span>}
               </div>
               {isCreatorOrAdmin && (
-                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-200 mt-3 border-brand-100 font-outfit uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-600 mt-3 border border-brand-100 font-outfit uppercase tracking-wider">
                   <Shield size={10} /> Creator Access
                 </div>
               )}

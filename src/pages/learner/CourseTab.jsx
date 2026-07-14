@@ -102,7 +102,7 @@ const CourseCard = ({ crs, isCreatorOrAdmin, navigate }) => {
         <span className="text-sm font-bold text-slate-800">
           {crs.price === 0 ? "Free" : `₹${crs.price}`}
         </span>
-        <span className="text-xs font-semibold text-brand-200 bg-brand-50 px-2.5 py-1 rounded-lg group-hover:bg-brand-100 transition-colors">
+        <span className="text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-100/50 px-2.5 py-1 rounded-lg group-hover:bg-brand-100 transition-colors">
           {isCreatorOrAdmin ? "Manage" : "Explore"}
         </span>
       </div>

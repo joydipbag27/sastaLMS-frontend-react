@@ -24,7 +24,7 @@ const SettingsTab = ({ profile, onLogoutSuccess }) => {
     <div className="space-y-6 pb-16">
       {/* Page Header */}
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-brand-50 border-brand-100 flex items-center justify-center text-brand-200 shrink-0 mt-0.5">
+        <div className="w-10 h-10 rounded-xl bg-brand-50 border-brand-100 flex items-center justify-center text-brand-600 shrink-0 mt-0.5">
           <Settings size={18} />
         </div>
         <div>
@@ -45,7 +45,7 @@ const SettingsTab = ({ profile, onLogoutSuccess }) => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-t-lg transition-colors border-b-2 -mb-px ${
                   active
-                    ? "border-brand-200 text-brand-200 bg-brand-50/50"
+                    ? "border-brand-600 text-brand-600 bg-brand-50/50"
                     : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                 }`}
                 aria-current={active ? "page" : undefined}

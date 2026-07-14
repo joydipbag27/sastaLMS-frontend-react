@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useEnrollments } from "../../features/learning/hooks/useEnrollments";
 import { useAuth } from "../../features/auth/hooks/useAuth";
@@ -36,9 +36,11 @@ const SummaryCard = ({ label, value, icon: Icon, iconColor }) => (
 
 const MyLearning = () => {
   const { profile } = useAuth();
+  const location = useLocation();
   const isCreator = profile?.role === "CREATOR";
+  const showPayments = isCreator && location.pathname.includes("/payments");
 
-  // Standard student queries (only enabled for students)
+  // Standard student queries (only enabled for students or non-payments view)
   const { data: enrollments, isLoading: enrollLoading, error: enrollError } = useEnrollments();
 
   // Creator payment queries (only enabled for creators)
@@ -81,7 +83,7 @@ const MyLearning = () => {
   };
 
   // 1. RENDER CREATOR PAYMENT FLOW
-  if (isCreator) {
+  if (showPayments) {
     const formatCurrency = (val) => {
       const amount = val || 0;
       return new Intl.NumberFormat("en-IN", {
@@ -110,7 +112,7 @@ const MyLearning = () => {
               label="Total Revenue"
               value={formatCurrency(paySummary?.totalRevenue)}
               icon={TrendingUp}
-              iconColor="bg-brand-50 text-brand-200"
+              iconColor="bg-brand-50 text-brand-600"
             />
             <SummaryCard
               label="Monthly Revenue"
@@ -122,7 +124,7 @@ const MyLearning = () => {
               label="Successful Purchases"
               value={paySummary?.totalSuccessfulPayments ?? 0}
               icon={ShieldCheck}
-              iconColor="bg-brand-50 text-brand-200"
+              iconColor="bg-brand-50 text-brand-600"
             />
             <SummaryCard
               label="Purchase Attempts"
@@ -181,7 +183,7 @@ const MyLearning = () => {
                         <button
                           onClick={() => handleDownloadInvoice(p._id)}
                           disabled={downloadingId === p._id}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-50 hover:bg-brand-100 text-brand-200 text-[10px] font-bold transition-all border border-brand-100 shadow-sm cursor-pointer disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-50 hover:bg-brand-100 text-brand-600 text-[10px] font-bold transition-all border border-brand-100 shadow-sm cursor-pointer disabled:opacity-50"
                         >
                           {downloadingId === p._id ? (
                             <Loader2 size={11} className="animate-spin" />
@@ -271,15 +273,15 @@ const MyLearning = () => {
                     className="w-full h-44 object-cover border-b border-slate-100 bg-slate-50"
                   />
                 ) : (
-                  <div className="w-full h-44 bg-gradient-to-br from-brand-50 to-sky-50 flex flex-col items-center justify-center text-brand-200 border-b border-slate-100 gap-1.5">
+                  <div className="w-full h-44 bg-gradient-to-br from-brand-50 to-sky-50 flex flex-col items-center justify-center text-brand-600 border-b border-slate-100 gap-1.5">
                     <GraduationCap size={36} className="stroke-[1.5]" />
                     <span className="text-[10px] font-bold tracking-wider font-outfit uppercase">SastaLMS Class</span>
                   </div>
                 )}
                 <div className="p-4 space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${
-                      isCompleted ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-brand-50 text-brand-200 border-brand-100"
+                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${
+                      isCompleted ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-brand-50 text-brand-600 border-brand-100"
                     }`}>
                       {enr.status}
                     </span>

@@ -48,14 +48,14 @@ const App = () => {
             className="text-3xl font-black text-[#111111] tracking-tight flex items-center"
           >
             Sasta
-            <motion.span 
-              animate={{ 
+            <motion.span
+              animate={{
                 scale: [1, 1.04, 1]
               }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 1.5, 
-                ease: "easeInOut" 
+              transition={{
+                repeat: Infinity,
+                duration: 1.5,
+                ease: "easeInOut"
               }}
               className="bg-[#FFE700] text-[#111111] px-2 py-0.5 rounded-lg ml-1 shadow-sm font-black border border-[#E6CF00]/30"
             >
@@ -84,7 +84,7 @@ const App = () => {
           </div>
 
           {/* Loading Text */}
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: [0.4, 1, 0.4] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -161,6 +161,7 @@ const App = () => {
                   <Route path="courses/:courseId" element={<NavigateToCourse />} />
                   <Route path="users" element={<AdminUsersPage />} />
                   <Route path="settings" element={<SettingsTab profile={currentProfile} onLogoutSuccess={handleLogout} />} />
+                  <Route path="payments" element={<MyLearning />} />
                   <Route path="*" element={<Navigate to="/creator/users" replace />} />
                 </Routes>
               </AdminLayout>

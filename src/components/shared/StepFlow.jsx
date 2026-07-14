@@ -24,7 +24,7 @@ const StepFlow = ({ currentStep, steps = ["Send OTP", "Verify OTP", "Complete Ac
               </div>
               <span
                 className={`text-xs font-semibold ${
-                  isActive ? "text-brand-200 font-bold" : isCompleted ? "text-slate-600" : "text-slate-400"
+                  isActive ? "text-brand-600 font-bold" : isCompleted ? "text-slate-600" : "text-slate-400"
                 }`}
               >
                 {step}

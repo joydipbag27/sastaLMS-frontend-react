@@ -216,10 +216,10 @@ const AdminUsersPage = () => {
       {/* Metrics Section */}
       {summary ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-          <MetricCard label="Total Users" value={summary.totalUsers ?? 0} icon={Users} iconColor="bg-brand-50 text-brand-200" />
+          <MetricCard label="Total Users" value={summary.totalUsers ?? 0} icon={Users} iconColor="bg-brand-50 text-brand-600" />
           <MetricCard label="Enrolled Users" value={summary.enrolledUsers ?? 0} icon={UserCheck} iconColor="bg-emerald-50 text-emerald-600" />
-          <MetricCard label="Enrollments" value={summary.totalEnrollments ?? 0} icon={BookOpen} iconColor="bg-brand-50 text-brand-200" />
-          <MetricCard label="Total Courses" value={summary.totalCourses ?? 0} icon={FileText} iconColor="bg-brand-50 text-brand-200" />
+          <MetricCard label="Enrollments" value={summary.totalEnrollments ?? 0} icon={BookOpen} iconColor="bg-brand-50 text-brand-600" />
+          <MetricCard label="Total Courses" value={summary.totalCourses ?? 0} icon={FileText} iconColor="bg-brand-50 text-brand-600" />
           <MetricCard label="Published" value={summary.publishedCourses ?? 0} icon={Eye} iconColor="bg-emerald-50 text-emerald-600" />
           <MetricCard label="Draft" value={summary.draftCourses ?? 0} icon={FileEdit} iconColor="bg-amber-50 text-amber-600" />
           <MetricCard label="Blocked" value={summary.blockedUsers ?? 0} icon={Ban} iconColor="bg-rose-50 text-rose-600" />
@@ -257,7 +257,7 @@ const AdminUsersPage = () => {
               >
                 {/* User Details */}
                 <div className="col-span-4 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-brand-50 border-brand-100 text-brand-200 flex items-center justify-center font-bold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-brand-50 border-brand-100 text-brand-600 flex items-center justify-center font-bold text-sm shrink-0">
                     {user.username?.charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0">
@@ -300,7 +300,7 @@ const AdminUsersPage = () => {
                   <div className="relative group">
                     <button
                       onClick={() => setLogoutModalUser(user)}
-                      className="p-2 rounded-xl text-slate-450 hover:text-brand-200 hover:bg-brand-50 hover:border-brand-100 transition-all border border-transparent shadow-sm bg-slate-50/50 cursor-pointer"
+                      className="p-2 rounded-xl text-slate-450 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-100 transition-all border border-transparent shadow-sm bg-slate-50/50 cursor-pointer"
                       aria-label="Force Logout"
                     >
                       <LogOut size={13} />
@@ -330,7 +330,7 @@ const AdminUsersPage = () => {
                   <div className="relative group">
                     <button
                       onClick={() => setPromoteModalUser(user)}
-                      className="p-2 rounded-xl text-slate-450 hover:text-brand-200 hover:bg-brand-50 hover:border-brand-100 transition-all border border-transparent shadow-sm bg-slate-50/50 cursor-pointer"
+                      className="p-2 rounded-xl text-slate-450 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-100 transition-all border border-transparent shadow-sm bg-slate-50/50 cursor-pointer"
                       aria-label="Promote to Creator"
                     >
                       <ShieldCheck size={13} />

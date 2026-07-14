@@ -678,7 +678,7 @@ const CreatorDashboard = ({ currentProfile }) => {
                         )}
                       </div>
 
-                      <h4 className="text-sm font-bold text-slate-800 tracking-tight leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-brand-200 transition-colors" title={crs.title}>
+                      <h4 className="text-sm font-bold text-slate-800 tracking-tight leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-brand-600 transition-colors" title={crs.title}>
                         {crs.title}
                       </h4>
 

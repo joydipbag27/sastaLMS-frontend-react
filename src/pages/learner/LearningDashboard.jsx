@@ -101,7 +101,7 @@ const SidebarSectionItem = ({
         className="w-full flex items-center justify-between p-4 bg-white hover:bg-slate-50 transition-all duration-150 text-left group"
       >
         <div className="min-w-0 flex-1">
-          <h4 className="font-bold text-slate-800 text-sm leading-snug font-outfit group-hover:text-brand-200 transition-colors">
+          <h4 className="font-bold text-slate-800 text-sm leading-snug font-outfit group-hover:text-brand-600 transition-colors">
             {sect.title}
           </h4>
           <span className="text-[11px] text-slate-500 font-medium font-sans mt-0.5 block">
@@ -137,14 +137,14 @@ const SidebarSectionItem = ({
                   onClick={() => onSelectLesson(les._id)}
                   className={`flex items-center justify-between px-5 py-3 cursor-pointer transition-all duration-150 border-l-4 ${
                     isSelected
-                      ? "bg-brand-50/70 border-brand-200"
+                      ? "bg-brand-50/70 border-brand-600"
                       : "hover:bg-slate-50 border-transparent"
                   }`}
                 >
                   <div className="flex gap-3 flex-1 min-w-0 pr-2">
                     <div className="min-w-0">
                       <p className={`text-xs font-semibold leading-tight ${
-                        isSelected ? "text-brand-200" : "text-slate-700"
+                        isSelected ? "text-brand-600" : "text-slate-700"
                       }`}>
                         <span className="text-slate-400 font-mono mr-1.5">{displayOrder}</span>
                         {les.title}
@@ -598,7 +598,7 @@ const LearningDashboard = () => {
             </span>
           </div>
 
-          <div className="w-8 h-8 rounded-full bg-brand-50 border-brand-100 flex items-center justify-center font-bold text-xs text-brand-200">
+          <div className="w-8 h-8 rounded-full bg-brand-50 border-brand-100 flex items-center justify-center font-bold text-xs text-brand-600">
             {profile?.username?.charAt(0).toUpperCase()}
           </div>
         </div>
@@ -615,7 +615,7 @@ const LearningDashboard = () => {
               {lessonLoading || videoUrlLoading || playbackStatus === "loading" || progressLoading ? (
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-10 h-10 border-[3px] border-brand-200 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-[10px] uppercase font-bold tracking-widest font-mono text-brand-200">Loading Media...</span>
+                  <span className="text-[10px] uppercase font-bold tracking-widest font-mono text-brand-600">Loading Media...</span>
                 </div>
               ) : activeLesson ? (
                 playbackStatus === "ready" && videoUrl ? (
@@ -685,7 +685,7 @@ const LearningDashboard = () => {
                 )
               ) : (
                 <div className="flex flex-col items-center justify-center text-slate-400 p-6 text-center max-w-sm gap-3">
-                  <div className="w-14 h-14 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-brand-200">
+                  <div className="w-14 h-14 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-brand-600">
                     <Compass size={24} />
                   </div>
                   <h3 className="text-slate-300 font-bold text-sm font-outfit uppercase tracking-wider">Ready to Learn?</h3>
@@ -724,7 +724,7 @@ const LearningDashboard = () => {
                     onClick={() => setActiveTab(key)}
                     className={`relative pb-3 text-sm font-bold font-outfit tracking-wide transition-colors cursor-pointer ${
                       activeTab === key
-                        ? "text-brand-200 border-b-2 border-brand-200"
+                        ? "text-brand-600 border-b-2 border-brand-600"
                         : "text-slate-500 hover:text-slate-800"
                     }`}
                   >
@@ -781,7 +781,7 @@ const LearningDashboard = () => {
                         <div key={item.id} className="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
                           <div className="flex justify-between items-center mb-1.5">
                             <div className="flex items-center gap-2">
-                              <div className="w-5 h-5 rounded-full bg-brand-50 border-brand-100 flex items-center justify-center text-[9px] font-bold text-brand-200">
+                              <div className="w-5 h-5 rounded-full bg-brand-50 border-brand-100 flex items-center justify-center text-[9px] font-bold text-brand-600">
                                 {item.user.charAt(0).toUpperCase()}
                               </div>
                               <span className="font-bold text-slate-800 text-xs font-outfit">{item.user}</span>

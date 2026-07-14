@@ -31,7 +31,7 @@ const LandingNavbar = () => {
   return (
     <header className="sticky top-0 w-full bg-[#F6F4EB]/90 backdrop-blur-md border-b border-slate-200/50 z-40 select-none">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        
+
         {/* Left: Branding */}
         <div className="flex items-center gap-2">
           <Link
@@ -116,14 +116,13 @@ const LandingNavbar = () => {
                 onClick={() => setPanelOpen(!panelOpen)}
                 aria-expanded={panelOpen}
                 aria-haspopup="dialog"
-                className="flex items-center gap-2.5 p-1 rounded-full hover:bg-slate-100/80 transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[#FFE700]"
+                className="flex items-center gap-2.5 p-1 rounded-full hover:bg-slate-100/80 transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-slate-200"
               >
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs border ${
-                    isCreator
+                  className={`w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs border ${isCreator
                       ? "bg-amber-50 border-amber-200 text-amber-700"
                       : "bg-[#FFE700]/20 border-[#FFE700]/30 text-slate-800"
-                  }`}
+                    }`}
                 >
                   {profile.username?.charAt(0).toUpperCase()}
                 </div>
@@ -226,7 +225,7 @@ const LandingNavbar = () => {
           </div>
         </div>
       )}
-      
+
       {/* Hidden container to mount profile panel dropdown on mobile properly */}
       {profile && (
         <ProfilePanel

@@ -23,26 +23,29 @@ const AppNavbar = () => {
 
   const navLinks = isCreator
     ? [
-        { name: "Explore Catalog", path: "/courses", icon: LayoutDashboard },
-        { name: "Payments", path: "/my-learning", icon: CreditCard },
-        { name: "Users & Stats", path: "/creator/users", icon: Users },
-        { name: "Course Manager", path: "/creator/courses", icon: BookOpen },
-      ]
+      { name: "Explore Catalog", path: "/courses", icon: LayoutDashboard },
+      { name: "Payments", path: "/creator/payments", icon: CreditCard },
+      { name: "Users & Stats", path: "/creator/users", icon: Users },
+      { name: "Course Manager", path: "/creator/courses", icon: BookOpen },
+    ]
     : isStudent
       ? [
-          { name: "Explore Catalog", path: "/courses", icon: Search },
-          { name: "My Learning", path: "/my-learning", icon: BookOpen },
-        ]
+        { name: "Explore Catalog", path: "/courses", icon: Search },
+        { name: "My Learning", path: "/my-learning", icon: BookOpen },
+      ]
       : [{ name: "Explore Catalog", path: "/courses", icon: Search }];
 
   const isActive = (path) => {
     if (path === "/courses") return location.pathname.startsWith("/courses");
     if (path === "/my-learning")
       return location.pathname.startsWith("/my-learning");
+    if (path === "/creator/payments")
+      return location.pathname.startsWith("/creator/payments");
     return (
       location.pathname === path ||
       (path !== "/courses" &&
         path !== "/my-learning" &&
+        path !== "/creator/payments" &&
         location.pathname.startsWith(path + "/"))
     );
   };
@@ -52,9 +55,9 @@ const AppNavbar = () => {
       <div className="flex items-center gap-6">
         <Link
           to="/courses"
-          className="text-xl font-black text-brand-200 tracking-tight flex items-center gap-2"
+          className="text-2xl font-black text-[#111111] tracking-tight font-outfit flex items-center"
         >
-          SastaLMS
+          sasta<span className="bg-[#FFE700] text-[#111111] px-1.5 py-0.5 rounded-lg ml-1 shadow-sm font-black">LMS</span>
         </Link>
         {isCreator && (
           <span className="bg-amber-50 text-amber-600 border border-amber-100 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-outfit hidden sm:inline">
@@ -62,12 +65,12 @@ const AppNavbar = () => {
           </span>
         )}
         {isStudent && (
-          <span className="bg-brand-50 text-brand-200 border border-brand-100 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-outfit hidden sm:inline">
+          <span className="bg-brand-50 text-brand-600 border border-brand-100 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-outfit hidden sm:inline">
             STUDENT
           </span>
         )}
         {!profile && (
-          <span className="bg-brand-50 text-brand-200 border border-brand-100 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider hidden sm:inline">
+          <span className="bg-brand-50 text-brand-600 border border-brand-100 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider hidden sm:inline">
             Course Catalog
           </span>
         )}
@@ -86,11 +89,10 @@ const AppNavbar = () => {
                 key={link.name}
                 to={link.path}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-150 font-semibold text-xs ${
-                  active
-                    ? "bg-brand-200 text-[#111111] shadow-sm"
-                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-                }`}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-150 font-semibold text-xs ${active
+                  ? "bg-brand-200 text-[#111111] shadow-sm"
+                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                  }`}
               >
                 <Icon
                   size={14}
@@ -110,7 +112,7 @@ const AppNavbar = () => {
             onClick={() => setPanelOpen(!panelOpen)}
             aria-expanded={panelOpen}
             aria-haspopup="dialog"
-            className="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all duration-150 select-none outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+            className="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all duration-150 select-none outline-none focus-visible:ring-2 focus-visible:ring-slate-200"
           >
             <div className="text-right hidden sm:block">
               <div className="text-xs font-bold text-slate-700 leading-tight">
@@ -121,11 +123,10 @@ const AppNavbar = () => {
               </div>
             </div>
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                  isCreator
-                    ? "bg-amber-50 border border-amber-100 text-amber-600"
-                    : "bg-brand-50 border border-brand-100 text-brand-200"
-              }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${isCreator
+                ? "bg-amber-50 border border-amber-100 text-amber-600"
+                : "bg-brand-50 border border-brand-100 text-brand-200"
+                }`}
             >
               {profile.username?.charAt(0).toUpperCase()}
             </div>
