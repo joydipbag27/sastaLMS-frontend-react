@@ -9,6 +9,7 @@ SastaLMS is a production-ready, open-source Learning Management System (LMS) des
 ---
 
 ## Table of Contents
+- [Visuals & Screenshots](#visuals--screenshots)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -30,6 +31,38 @@ SastaLMS is a production-ready, open-source Learning Management System (LMS) des
 - [Deployment Notes](#deployment-notes)
 - [Related Repository](#related-repository-backend)
 - [License](#license)
+
+---
+
+## Visuals & Screenshots
+
+<details>
+<summary>📸 Click to expand the SastaLMS Screenshot Gallery</summary>
+
+### Public & Student Views
+| Landing Hero | Course Explorer |
+| :---: | :---: |
+| ![Landing Hero](public/sastalms-visuals/landing-hero.png) | ![Course Explorer](public/sastalms-visuals/courses-page.png) |
+
+| Course Details | Video Player Classroom |
+| :---: | :---: |
+| ![Course Details](public/sastalms-visuals/course-detail.png) | ![Video Player](public/sastalms-visuals/video-player.png) |
+
+### Creator & Admin Views
+| Course Management | User & Role Management |
+| :---: | :---: |
+| ![Course Management](public/sastalms-visuals/course-management.png) | ![User Management](public/sastalms-visuals/user-management.png) |
+
+| Payments Tracker | Profile Settings |
+| :---: | :---: |
+| ![Payments Tracker](public/sastalms-visuals/track-payments.png) | ![Profile Settings](public/sastalms-visuals/basic-profile-settings.png) |
+
+### Technical Documentation
+| Specs Page |
+| :---: |
+| ![Documentation Page](public/sastalms-visuals/documentation-page.png) |
+
+</details>
 
 ---
 
