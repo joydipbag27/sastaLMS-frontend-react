@@ -91,12 +91,27 @@ export const VideoPlayer = ({
 
       plyrInstance.on("ended", () => onEnded?.(plyrInstance.duration));
 
+      const setInitialPosition = () => {
+        if (initialTime > 0 && !initialTimeSetRef.current) {
+          if (video && video.readyState >= 1) {
+            plyrInstance.currentTime = initialTime;
+            initialTimeSetRef.current = true;
+            console.log(`[VideoPlayer] setInitialPosition: Seeked to initialTime ${initialTime}`);
+          }
+        }
+      };
+
       plyrInstance.on("ready", () => {
         setIsReady(true);
-        if (initialTime > 0 && !initialTimeSetRef.current) {
-          plyrInstance.currentTime = initialTime;
-          initialTimeSetRef.current = true;
-        }
+        setInitialPosition();
+      });
+
+      plyrInstance.on("canplay", () => {
+        setInitialPosition();
+      });
+
+      plyrInstance.on("loadedmetadata", () => {
+        setInitialPosition();
       });
     };
 
@@ -156,6 +171,17 @@ export const VideoPlayer = ({
       }
     };
   }, [src, poster, autoplay, controls]);
+
+  useEffect(() => {
+    if (initialTime > 0 && !initialTimeSetRef.current && plyrRef.current && videoRef.current) {
+      const videoEl = videoRef.current;
+      if (videoEl.readyState >= 1) {
+        plyrRef.current.currentTime = initialTime;
+        initialTimeSetRef.current = true;
+        console.log(`[VideoPlayer] useEffect: Seeked to initialTime ${initialTime}`);
+      }
+    }
+  }, [initialTime, isReady]);
 
   return (
     <div className={`absolute inset-0 w-full h-full rounded-2xl overflow-hidden shadow-lg border border-slate-100 bg-black plyr-theme-custom transition-opacity duration-300 ${isReady ? "opacity-100" : "opacity-0"}`}>
