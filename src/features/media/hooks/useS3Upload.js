@@ -16,7 +16,30 @@ export const useS3Upload = () => {
   const uploadFile = useCallback(async (file, getUploadUrlFn, confirmUploadFn) => {
     if (!file) return null;
 
-    const mimeType = file.type || "application/octet-stream";
+    let mimeType = file.type || "";
+    const extension = file.name.split(".").pop().toLowerCase();
+
+    // Map extensions to exact mime types accepted by the backend validator schemas
+    if (extension === "mkv") {
+      mimeType = "video/x-matroska";
+    } else if (extension === "mov") {
+      mimeType = "video/quicktime";
+    } else if (extension === "mp4") {
+      mimeType = "video/mp4";
+    } else if (extension === "webm") {
+      mimeType = "video/webm";
+    } else if (["jpg", "jpeg"].includes(extension)) {
+      mimeType = "image/jpeg";
+    } else if (extension === "png") {
+      mimeType = "image/png";
+    } else if (extension === "webp") {
+      mimeType = "image/webp";
+    }
+
+    if (!mimeType) {
+      mimeType = "application/octet-stream";
+    }
+
     setIsUploading(true);
     setUploadPercent(0);
 

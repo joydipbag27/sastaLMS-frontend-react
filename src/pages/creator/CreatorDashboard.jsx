@@ -198,7 +198,7 @@ const CreatorDashboard = ({ currentProfile }) => {
     const body = {
       title: courseTitle,
       description: courseDesc,
-      price: coursePrice,
+      price: coursePrice === "" ? 0 : coursePrice,
       displayName: courseDisplayName,
       level: courseLevel,
     };
@@ -219,6 +219,8 @@ const CreatorDashboard = ({ currentProfile }) => {
       } else {
         const newCourseRes = await createCourse(body);
         courseId = newCourseRes.course._id;
+        setEditingCourseId(courseId);
+        setOriginalStatus(newCourseRes.course.status || "Draft");
 
         if (courseStatus === "Published") {
           try {
@@ -231,7 +233,7 @@ const CreatorDashboard = ({ currentProfile }) => {
       }
 
       if (pendingThumbnailFile) {
-        await uploadThumbnail(
+        const thumbRes = await uploadThumbnail(
           pendingThumbnailFile,
           async (mimeType) => {
             const presignRes = await makeRequest(`/course/${courseId}/thumbnail/upload-url`, {
@@ -250,10 +252,14 @@ const CreatorDashboard = ({ currentProfile }) => {
             return confirmRes.data;
           }
         );
+        setPendingThumbnailFile(null);
+        if (thumbRes && thumbRes.course) {
+          setCourseThumbnail(thumbRes.course.thumbnailUrl || thumbRes.course.thumbnail || "");
+        }
       }
 
       if (pendingTrailerFile) {
-        await uploadTrailer(
+        const trailerRes = await uploadTrailer(
           pendingTrailerFile,
           async (mimeType) => {
             const presignRes = await makeRequest(`/course/${courseId}/trailer/upload-url`, {
@@ -272,6 +278,10 @@ const CreatorDashboard = ({ currentProfile }) => {
             return confirmRes.data;
           }
         );
+        setPendingTrailerFile(null);
+        if (trailerRes && trailerRes.course) {
+          setCourseTrailer(trailerRes.course.trailerUrl || trailerRes.course.trailer || "");
+        }
       }
 
       queryClient.invalidateQueries({ queryKey: ["courses"] });
@@ -283,6 +293,80 @@ const CreatorDashboard = ({ currentProfile }) => {
       resetForm();
     } catch (err) {
       showToast(err.message || "Failed to submit course", "error");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleSingleThumbnailUpload = async () => {
+    if (!pendingThumbnailFile || !editingCourseId) return;
+    setFormLoading(true);
+    try {
+      const thumbRes = await uploadThumbnail(
+        pendingThumbnailFile,
+        async (mimeType) => {
+          const presignRes = await makeRequest(`/course/${editingCourseId}/thumbnail/upload-url`, {
+            method: "POST",
+            body: { mimeType },
+          });
+          if (!presignRes.success) throw new Error(presignRes.data?.error || "Failed to generate thumbnail upload URL");
+          return presignRes.data;
+        },
+        async ({ mediaId }) => {
+          const confirmRes = await makeRequest(`/course/${editingCourseId}/thumbnail/confirm`, {
+            method: "POST",
+            body: { mediaId },
+          });
+          if (!confirmRes.success) throw new Error(confirmRes.data?.error || "Failed to confirm thumbnail upload");
+          return confirmRes.data;
+        }
+      );
+      setPendingThumbnailFile(null);
+      if (thumbRes && thumbRes.course) {
+        setCourseThumbnail(thumbRes.course.thumbnailUrl || thumbRes.course.thumbnail || "");
+      }
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course", editingCourseId] });
+      showToast("Thumbnail uploaded successfully!");
+    } catch (err) {
+      showToast(err.message || "Failed to upload thumbnail", "error");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleSingleTrailerUpload = async () => {
+    if (!pendingTrailerFile || !editingCourseId) return;
+    setFormLoading(true);
+    try {
+      const trailerRes = await uploadTrailer(
+        pendingTrailerFile,
+        async (mimeType) => {
+          const presignRes = await makeRequest(`/course/${editingCourseId}/trailer/upload-url`, {
+            method: "POST",
+            body: { mimeType },
+          });
+          if (!presignRes.success) throw new Error(presignRes.data?.error || "Failed to generate trailer upload URL");
+          return presignRes.data;
+        },
+        async ({ mediaId }) => {
+          const confirmRes = await makeRequest(`/course/${editingCourseId}/trailer/confirm`, {
+            method: "POST",
+            body: { mediaId },
+          });
+          if (!confirmRes.success) throw new Error(confirmRes.data?.error || "Failed to confirm trailer upload");
+          return confirmRes.data;
+        }
+      );
+      setPendingTrailerFile(null);
+      if (trailerRes && trailerRes.course) {
+        setCourseTrailer(trailerRes.course.trailerUrl || trailerRes.course.trailer || "");
+      }
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course", editingCourseId] });
+      showToast("Trailer uploaded successfully!");
+    } catch (err) {
+      showToast(err.message || "Failed to upload trailer", "error");
     } finally {
       setFormLoading(false);
     }
@@ -435,10 +519,19 @@ const CreatorDashboard = ({ currentProfile }) => {
               <Input
                 label="Price (₹ INR)"
                 id="course-price"
-                type="number"
+                type="text"
                 required
+                placeholder="e.g. 500"
                 value={coursePrice}
-                onChange={(e) => setCoursePrice(parseFloat(e.target.value) || 0)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const cleanedVal = val.replace(/\D/g, "");
+                  if (cleanedVal === "") {
+                    setCoursePrice("");
+                  } else {
+                    setCoursePrice(parseInt(cleanedVal, 10));
+                  }
+                }}
               />
 
               <div className="flex flex-col gap-1.5">
@@ -489,13 +582,24 @@ const CreatorDashboard = ({ currentProfile }) => {
                       <p className="text-[10px] text-slate-500 mb-1.5 truncate">
                         {pendingThumbnailFile ? pendingThumbnailFile.name : "Current thumbnail"}
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => pendingThumbnailFile ? setPendingThumbnailFile(null) : handleDeleteThumbnail()}
-                        className="text-[10px] font-bold text-rose-500 hover:text-rose-600 transition-colors"
-                      >
-                        Remove
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => pendingThumbnailFile ? setPendingThumbnailFile(null) : handleDeleteThumbnail()}
+                          className="text-[10px] font-bold text-rose-500 hover:text-rose-600 transition-colors cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                        {pendingThumbnailFile && editingCourseId && !isThumbnailUploading && (
+                          <button
+                            type="button"
+                            onClick={handleSingleThumbnailUpload}
+                            className="text-[10px] font-bold text-[#998A00] hover:text-[#7d7100] transition-colors cursor-pointer"
+                          >
+                            Upload Now
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -553,13 +657,24 @@ const CreatorDashboard = ({ currentProfile }) => {
                       <p className="text-[10px] text-slate-500 mb-1.5 truncate">
                         {pendingTrailerFile ? pendingTrailerFile.name : "Current trailer"}
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => pendingTrailerFile ? setPendingTrailerFile(null) : handleDeleteTrailer()}
-                        className="text-[10px] font-bold text-rose-500 hover:text-rose-600 transition-colors"
-                      >
-                        Remove
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => pendingTrailerFile ? setPendingTrailerFile(null) : handleDeleteTrailer()}
+                          className="text-[10px] font-bold text-rose-500 hover:text-rose-600 transition-colors cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                        {pendingTrailerFile && editingCourseId && !isTrailerUploading && (
+                          <button
+                            type="button"
+                            onClick={handleSingleTrailerUpload}
+                            className="text-[10px] font-bold text-[#998A00] hover:text-[#7d7100] transition-colors cursor-pointer"
+                          >
+                            Upload Now
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ) : (
