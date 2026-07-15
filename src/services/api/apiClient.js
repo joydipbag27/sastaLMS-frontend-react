@@ -1,4 +1,4 @@
-// Custom API client for veoLMS Backend testing
+// Custom API client for SastaLMS Backend testing
 
 let apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 let logCallback = null;

@@ -76,7 +76,7 @@ const DeploymentSection = () => {
             {/* CTAs (Desktop / Tablet Only) */}
             <div className="hidden md:flex flex-wrap items-center gap-4 pt-2">
               <motion.a
-                href="https://github.com/joydipbag27/veoLMS-frontend-react"
+                href="https://github.com/joydipbag27/sastaLMS-frontend-react"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ y: -2, scale: 1.02 }}
@@ -208,7 +208,7 @@ const DeploymentSection = () => {
         {/* Mobile Only: CTAs (placed at the bottom after actions) */}
         <div className="flex md:hidden flex-col gap-3 pt-10 relative z-10 w-full">
           <motion.a
-            href="https://github.com/joydipbag27/veoLMS-frontend-react"
+            href="https://github.com/joydipbag27/sastaLMS-frontend-react"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ y: -2, scale: 1.02 }}

@@ -85,7 +85,7 @@ const DocsPage = () => {
           </div>
           <div className="flex flex-wrap gap-2">
             <a
-              href="https://github.com/joydipbag27/veoLMS-frontend-react"
+              href="https://github.com/joydipbag27/sastaLMS-frontend-react"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white border border-slate-200 text-[#111111] text-xs font-bold font-outfit px-3 py-2 rounded-lg shadow-sm hover:bg-slate-50 flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -434,7 +434,7 @@ const DocsPage = () => {
                     </ul>
                   </div>
                   <a
-                    href="https://github.com/joydipbag27/veoLMS-frontend-react"
+                    href="https://github.com/joydipbag27/sastaLMS-frontend-react"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-4 bg-slate-900 border border-slate-800 text-white text-[11px] font-bold py-2 rounded-lg hover:bg-slate-800 text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
