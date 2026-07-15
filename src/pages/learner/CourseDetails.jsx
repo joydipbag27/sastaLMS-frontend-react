@@ -5,6 +5,7 @@ import { useCurriculum, useLessons } from "../../features/courses/hooks/useCurri
 import { useMedia } from "../../features/media/hooks/useMedia";
 import FileUpload from "../../features/media/components/FileUpload";
 import ManualIngestionWizard from "../../features/media/components/ManualIngestionWizard";
+import Toast from "../../components/shared/Toast";
 import { makeRequest } from "../../services/api/apiClient";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
@@ -302,6 +303,10 @@ const SectionItem = ({
   const [lessonOrder, setLessonOrder] = useState(1);
   const [lessonFormLoading, setLessonFormLoading] = useState(false);
 
+  // Toast state
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => setToast({ message, type });
+
   const handleLessonSubmit = async (e) => {
     e.preventDefault();
     setLessonFormLoading(true);
@@ -316,14 +321,14 @@ const SectionItem = ({
     try {
       if (editingLessonId) {
         await updateLesson({ lessonId: editingLessonId, body });
-        alert("Lesson updated!");
+        showToast("Lesson updated!");
       } else {
         await createLesson(body);
-        alert("Lesson created!");
+        showToast("Lesson created!");
       }
       resetLessonForm();
     } catch (err) {
-      alert(err.message || "Lesson operation failed");
+      showToast(err.message || "Lesson operation failed", "error");
     } finally {
       setLessonFormLoading(false);
     }
@@ -349,9 +354,9 @@ const SectionItem = ({
     if (!confirm("Are you sure you want to delete this lesson?")) return;
     try {
       await deleteLesson(lessonId);
-      alert("Lesson deleted!");
+      showToast("Lesson deleted!");
     } catch (err) {
-      alert(err.message || "Failed to delete lesson");
+      showToast(err.message || "Failed to delete lesson", "error");
     }
   };
 
@@ -508,7 +513,7 @@ const SectionItem = ({
                           onUploadSuccess={() => {
                             refetchLessons();
                             setUploadingLessonId(null);
-                            alert("Video uploaded and attached successfully!");
+                            showToast("Video uploaded and attached successfully!");
                           }}
                         />
                       ) : (
@@ -600,6 +605,7 @@ const SectionItem = ({
           )}
         </div>
       )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };
@@ -645,6 +651,10 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
   const [sectionOrder, setSectionOrder] = useState(1);
   const [sectionFormLoading, setSectionFormLoading] = useState(false);
 
+  // Toast state
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => setToast({ message, type });
+
   const handleEnroll = async () => {
     if (enrollLoading) return;
     if (!currentProfile) {
@@ -658,9 +668,9 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
 
     try {
       await enroll();
-      alert("Enrolled successfully!");
+      showToast("Enrolled successfully!");
     } catch (err) {
-      alert(err.message || "Enrollment failed");
+      showToast(err.message || "Enrollment failed", "error");
     }
   };
 
@@ -676,14 +686,14 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
     try {
       if (editingSectionId) {
         await updateSection({ sectionId: editingSectionId, body });
-        alert("Section updated!");
+        showToast("Section updated!");
       } else {
         await createSection(body);
-        alert("Section created!");
+        showToast("Section created!");
       }
       resetSectionForm();
     } catch (err) {
-      alert(err.message || "Section operation failed");
+      showToast(err.message || "Section operation failed", "error");
     } finally {
       setSectionFormLoading(false);
     }
@@ -693,9 +703,9 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
     if (!confirm("Are you sure? Deleting a section cascades to delete all lessons inside it.")) return;
     try {
       await deleteSection(sectionId);
-      alert("Section deleted!");
+      showToast("Section deleted!");
     } catch (err) {
-      alert(err.message || "Failed to delete section");
+      showToast(err.message || "Failed to delete section", "error");
     }
   };
 
@@ -969,6 +979,7 @@ const CourseDetails = ({ course: initialCourse, currentProfile, onBack }) => {
         </div>
 
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };

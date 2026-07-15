@@ -3,6 +3,7 @@ import { makeRequest } from "../../services/api/apiClient";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
+import Toast from "../../components/shared/Toast";
 
 const RbacTab = ({ currentProfile }) => {
   const [usersList, setUsersList] = useState([]);
@@ -14,6 +15,8 @@ const RbacTab = ({ currentProfile }) => {
   const [sessionCheckResult, setSessionCheckResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState(null);
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => setToast({ message, type });
 
   const handleListUsers = async (cursorVal = null) => {
     setLoading(true);
@@ -32,7 +35,7 @@ const RbacTab = ({ currentProfile }) => {
       setUsersCursor(res.data.nextCursor);
       setUsersHasMore(res.data.hasMore);
     } else {
-      alert(res.data?.error || "Failed to fetch users. Requires CREATOR or ADMIN privilege.");
+      showToast(res.data?.error || "Failed to fetch users. Requires CREATOR or ADMIN privilege.", "error");
     }
   };
 
@@ -44,7 +47,7 @@ const RbacTab = ({ currentProfile }) => {
     if (res.success) {
       setSessionCheckResult({ userId, ...res.data });
     } else {
-      alert(res.data?.error || "Failed to check session");
+      showToast(res.data?.error || "Failed to check session", "error");
     }
   };
 
@@ -57,12 +60,12 @@ const RbacTab = ({ currentProfile }) => {
     });
     setActionLoadingId(null);
     if (res.success) {
-      alert(`Sessions terminated for user ${userId}`);
+      showToast(`Sessions terminated for user ${userId}`);
       if (sessionCheckResult && sessionCheckResult.userId === userId) {
         checkUserSession(userId);
       }
     } else {
-      alert(res.data?.error || "Failed to logout user");
+      showToast(res.data?.error || "Failed to logout user", "error");
     }
   };
 
@@ -75,12 +78,12 @@ const RbacTab = ({ currentProfile }) => {
     });
     setActionLoadingId(null);
     if (res.success) {
-      alert(`User ${userId} deleted successfully`);
+      showToast(`User ${userId} deleted successfully`);
       setUsersList((prev) => prev.filter((u) => u._id !== userId));
       if (rbacSelectedUser?._id === userId) setRbacSelectedUser(null);
       if (sessionCheckResult && sessionCheckResult.userId === userId) setSessionCheckResult(null);
     } else {
-      alert(res.data?.error || "Failed to delete user");
+      showToast(res.data?.error || "Failed to delete user", "error");
     }
   };
 
@@ -92,7 +95,7 @@ const RbacTab = ({ currentProfile }) => {
     });
     setActionLoadingId(null);
     if (res.success) {
-      alert(res.data.message || `User status changed`);
+      showToast(res.data.message || `User status changed`);
       setUsersList((prev) =>
         prev.map((u) => {
           if (u._id === userId) {
@@ -105,7 +108,7 @@ const RbacTab = ({ currentProfile }) => {
         setRbacSelectedUser((prev) => ({ ...prev, isBlocked: !prev.isBlocked }));
       }
     } else {
-      alert(res.data?.error || "Failed to toggle block status");
+      showToast(res.data?.error || "Failed to toggle block status", "error");
     }
   };
 
@@ -119,7 +122,7 @@ const RbacTab = ({ currentProfile }) => {
     });
     setActionLoadingId(null);
     if (res.success) {
-      alert(`Role updated to ${rbacChangeRoleTo} for user ${rbacSelectedUser.username}`);
+      showToast(`Role updated to ${rbacChangeRoleTo} for user ${rbacSelectedUser.username}`);
       setUsersList((prev) =>
         prev.map((u) => {
           if (u._id === rbacSelectedUser._id) {
@@ -130,7 +133,7 @@ const RbacTab = ({ currentProfile }) => {
       );
       setRbacSelectedUser((prev) => ({ ...prev, role: rbacChangeRoleTo }));
     } else {
-      alert(res.data?.error || "Failed to update role");
+      showToast(res.data?.error || "Failed to update role", "error");
     }
   };
 
@@ -338,6 +341,7 @@ const RbacTab = ({ currentProfile }) => {
           </form>
         </Card>
       )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };

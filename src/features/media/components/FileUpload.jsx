@@ -1,12 +1,16 @@
 import React, { useState, useRef, useCallback } from "react";
 import { Upload, FileUp, X, CheckCircle, AlertCircle } from "lucide-react";
 import { useS3Upload } from "../hooks/useS3Upload";
+import Toast from "../../../components/shared/Toast";
 
 const FileUpload = ({ onUploadSuccess, useMediaHook, accept = "video/*" }) => {
   const { getUploadUrl, confirmUpload } = useMediaHook;
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => setToast({ message, type });
 
   const {
     isUploading,
@@ -20,7 +24,7 @@ const FileUpload = ({ onUploadSuccess, useMediaHook, accept = "video/*" }) => {
   const handleFileSelect = useCallback((file) => {
     if (file) {
       if (accept && accept.startsWith("video/") && !file.type.startsWith("video/")) {
-        alert("Only video files are allowed.");
+        showToast("Only video files are allowed.", "error");
         return;
       }
       setSelectedFile(file);
@@ -207,6 +211,7 @@ const FileUpload = ({ onUploadSuccess, useMediaHook, accept = "video/*" }) => {
           </div>
         )}
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };

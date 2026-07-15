@@ -3,6 +3,7 @@ import {
   Download, Trash2, Eye, EyeOff, Copy, CheckCheck,
   Image, Film, Music, FileText, Archive, File, Grid, List, RefreshCw,
 } from "lucide-react";
+import Toast from "../../../components/shared/Toast";
 
 const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
   const { getDownloadUrl, deleteMedia, isDeleting, retryTransfer, isRetrying } = useMediaHook;
@@ -13,6 +14,8 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
   const [copiedId, setCopiedId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [retryingId, setRetryingId] = useState(null);
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => setToast({ message, type });
 
   const formatBytes = (bytes) => {
     if (!bytes) return "0 B";
@@ -50,7 +53,7 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
       link.click();
       document.body.removeChild(link);
     } catch (err) {
-      alert(err.message || "Failed to download");
+      showToast(err.message || "Failed to download", "error");
     } finally {
       setLoadingId(null);
     }
@@ -68,7 +71,7 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
       setPreviewId(media._id);
       setPreviewUrl(url);
     } catch (err) {
-      alert(err.message || "Failed to load preview");
+      showToast(err.message || "Failed to load preview", "error");
     } finally {
       setLoadingId(null);
     }
@@ -85,7 +88,7 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
         setPreviewUrl("");
       }
     } catch (err) {
-      alert(err.message || "Failed to delete");
+      showToast(err.message || "Failed to delete", "error");
     } finally {
       setDeletingId(null);
     }
@@ -95,9 +98,9 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
     setRetryingId(media._id);
     try {
       const result = await retryTransfer(media._id);
-      alert(result?.message || "Retry complete!");
+      showToast(result?.message || "Retry complete!");
     } catch (err) {
-      alert(err.message || "Retry failed");
+      showToast(err.message || "Retry failed", "error");
     } finally {
       setRetryingId(null);
     }
@@ -413,6 +416,7 @@ const FileLibrary = ({ mediaFiles, onDelete, useMediaHook }) => {
           </table>
         </div>
       )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };

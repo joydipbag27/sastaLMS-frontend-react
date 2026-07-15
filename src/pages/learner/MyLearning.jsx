@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import LoadingScreen from "../../components/shared/LoadingScreen";
+import Toast from "../../components/shared/Toast";
 
 // Metric card sub-component
 const SummaryCard = ({ label, value, icon: Icon, iconColor }) => (
@@ -41,6 +42,10 @@ const MyLearning = () => {
   const location = useLocation();
   const isCreator = profile?.role === "CREATOR";
   const showPayments = isCreator && location.pathname.includes("/payments");
+
+  // Toast state
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => setToast({ message, type });
 
   // Standard student queries (only enabled for students or non-payments view)
   const { data: enrollments, isLoading: enrollLoading, error: enrollError } = useEnrollments();
@@ -75,10 +80,10 @@ const MyLearning = () => {
       if (res.success && res.data?.invoiceUrl) {
         window.open(res.data.invoiceUrl, "_blank");
       } else {
-        alert(res.data?.error || "Invoice url is not generated yet for this payment.");
+        showToast(res.data?.error || "Invoice url is not generated yet for this payment.", "error");
       }
     } catch (err) {
-      alert(err.message || "Failed to retrieve invoice.");
+      showToast(err.message || "Failed to retrieve invoice.", "error");
     } finally {
       setDownloadingId(null);
     }
@@ -202,6 +207,7 @@ const MyLearning = () => {
             </div>
           )}
         </div>
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       </div>
     );
   }
@@ -329,6 +335,7 @@ const MyLearning = () => {
           );
         })}
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };

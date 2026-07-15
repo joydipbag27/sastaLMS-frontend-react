@@ -5,6 +5,7 @@ import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 import StepFlow from "../../../components/shared/StepFlow";
 import { ShieldCheck, KeyRound, Lock } from "lucide-react";
+import Toast from "../../../components/shared/Toast";
 
 const ChangePassword = ({ email, onSuccess }) => {
   const [step, setStep] = useState(1);
@@ -14,6 +15,8 @@ const ChangePassword = ({ email, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => setToast({ message, type });
 
   const handleSendOtp = async () => {
     setError("");
@@ -61,8 +64,10 @@ const ChangePassword = ({ email, onSuccess }) => {
     });
     setLoading(false);
     if (res.success) {
-      alert("Password changed successfully! You have been logged out.");
-      onSuccess();
+      showToast("Password changed successfully! Logging you out...");
+      setTimeout(() => {
+        onSuccess();
+      }, 2500);
     } else {
       setError(res.data?.error || "Failed to change password");
     }
@@ -179,6 +184,7 @@ const ChangePassword = ({ email, onSuccess }) => {
           </form>
         )}
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </Card>
   );
 };
