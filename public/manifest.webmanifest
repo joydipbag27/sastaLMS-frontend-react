@@ -1,0 +1,27 @@
+{
+  "name": "SastaLMS Professional Learning Studio",
+  "short_name": "SastaLMS",
+  "description": "An open-source, affordable Learning Management System for creators to build, manage, and sell online courses.",
+  "dir": "auto",
+  "lang": "en-US",
+  "display": "standalone",
+  "orientation": "any",
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#F6F4EB",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "/favicons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
